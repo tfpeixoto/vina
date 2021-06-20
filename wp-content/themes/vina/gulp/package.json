@@ -1,0 +1,44 @@
+{
+  "name": "vina",
+  "version": "1.0.0",
+  "description": "Site VinaEC",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "npm prune"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Thiago Peixoto",
+  "license": "ISC",
+  "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.11.2",
+    "animate-sass": "^0.8.2",
+    "bootstrap": "^4.5.0",
+    "bootstrap-select": "^1.13.12",
+    "browser-sync": "^2.26.7",
+    "critical": "^1.3.9",
+    "gulp-concat": "^2.6.1",
+    "gulp-imagemin": "^6.1.1",
+    "gulp-purgecss": "^2.3.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-uglify-es": "^1.0.4",
+    "jquery": "^3.4.1",
+    "jquery-mask-plugin": "^1.14.16",
+    "jquery-nice-select": "^1.1.0",
+    "jquery-validation": "^1.19.1",
+    "malihu-custom-scrollbar-plugin": "^3.1.5",
+    "owl.carousel": "^2.3.4",
+    "popper.js": "^1.15.0",
+    "purgecss": "^2.3.0",
+    "purgecss-with-wordpress": "^2.3.0",
+    "vanilla-lazyload": "^13.0.1",
+    "wow.js": "^1.2.2"
+  },
+  "dependencies": {
+    "gulp": "^3.9.1"
+  }
+}
