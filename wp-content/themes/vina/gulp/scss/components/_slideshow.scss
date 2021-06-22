@@ -1,0 +1,20 @@
+.slideshow{
+  background: $primary;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+
+  .carousel{
+
+    .carousel-item{
+      max-height: 100vh;
+      max-width: 100vw;
+    }
+    .carousel-indicators li{
+      border-radius: 100%;
+      height: 10px;
+      transition: all ease-in-out .25s;
+      width: 10px;
+    }
+  }
+}

@@ -1,0 +1,22 @@
+$primary: #d07329;
+$secondary: #22090e;
+
+$theme-colors: (
+  "primary": $primary,
+  "secondary": $secondary,
+);
+
+// geral
+$link-color: $primary;
+
+// fontes
+$font-family-base: "Barlow", sans-serif;
+$headings-font-family: "Barlow", sans-serif;
+$headings-line-height: 1.2;
+$headings-font-weight: 700;
+$h2-font-size: 3rem;
+$lead-font-size: 1.5rem;
+
+// navabar
+$navbar-light-color: $primary;
+$navbar-nav-link-padding-x: 1rem;

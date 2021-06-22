@@ -1,7 +1,7 @@
 {
   "name": "vina",
   "version": "1.0.0",
-  "description": "Site VinaEC",
+  "description": "Site Vina Gestão de Resíduos Sólidos",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -39,6 +39,7 @@
     "wow.js": "^1.2.2"
   },
   "dependencies": {
-    "gulp": "^3.9.1"
+    "gulp": "^3.9.1",
+    "slick-carousel": "^1.8.1"
   }
 }

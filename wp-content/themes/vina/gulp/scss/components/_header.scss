@@ -1,0 +1,21 @@
+.header{
+  background: none;
+  position: fixed;
+  top: 0;
+  z-index: 10;
+  width: 100%;
+
+  .navbar-nav{
+    margin-left: auto;
+
+    .nav-link{
+      color: $white;
+      transition: all ease-in-out .25s;
+
+      &:hover{
+        color: $secondary;
+        font-weight: 700;
+      }
+    }
+  }
+}

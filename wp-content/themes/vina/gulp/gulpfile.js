@@ -7,7 +7,6 @@ concat = require('gulp-concat');
 rename = require('gulp-rename');
 uglify = require('gulp-uglify-es').default;
 purgecss = require('gulp-purgecss');
-purgecssWordpress = require('purgecss-with-wordpress');
 
 // BROWSER SYNC
 gulp.task('browser-sync', function () {
@@ -61,10 +60,10 @@ gulp.task('imagemin', function () {
 // CONCAT, MINIFY E GERACAO DE JS
 gulp.task('js', function () {
   return gulp.src([
-    'js/components/jquery-3.5.1.min.js',
-    'js/components/popper-1.16.1.min.js',
-    'js/components/bootstrap-4.5.0.min.js',
-    'js/components/owl.carousel.min.js',
+    // 'js/components/jquery-3.5.1.min.js',
+    // 'js/components/popper-1.16.1.min.js',
+    // 'js/components/bootstrap-4.5.0.min.js',
+    // 'js/components/owl.carousel.min.js',
     'js/acoes.js',
   ])
     .pipe(concat('scripts.js'))
@@ -81,4 +80,4 @@ gulp.task('watch', function () {
   gulp.watch('images/**/*', ['imagemin']);
 });
 
-gulp.task('default', ['sass', 'js', 'watch', 'browser-sync'])
+gulp.task('default', ['sass', 'js', 'imagemin', 'watch', 'browser-sync'])
