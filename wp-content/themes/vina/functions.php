@@ -95,3 +95,35 @@ function vina_paginacao()
     // 'end_size' => 1,
   ));
 }
+
+// POST TYPE SERVICOS
+function vina_post_type_servicos()
+{
+  $nomeSingular = 'Serviço';
+  $nomePlural = 'Serviços';
+  $description = $nomeSingular . ' da Vina';
+
+  $labels = array(
+    'name' => $nomePlural,
+    'singular_name' => $nomeSingular,
+    'add_new_item' => "Adicionar novo " . $nomeSingular,
+    'edit_item' => 'Editar ' . $nomeSingular,
+  );
+
+  $supports = array(
+    'title',
+    'editor',
+    'thumbnail'
+  );
+
+  $args = array(
+    'labels' => $labels,
+    'public' => true,
+    'description' => $description,
+    'menu_icon' => 'dashicons-palmtree',
+    'supports' => $supports,
+  );
+
+  register_post_type('servicos', $args);
+}
+add_action('init', 'vina_post_type_servicos');

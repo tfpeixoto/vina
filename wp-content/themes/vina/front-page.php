@@ -1,8 +1,8 @@
 <?php
-/* Theme template: Página Inicial */
+/* Template name: Página Inicial */
 
 $estiloPagina = 'home.css';
-require_once('header.php');
+require_once('header-home.php');
 ?>
 
 <section class="slideshow">
@@ -15,21 +15,21 @@ require_once('header.php');
 
     <div class="carousel-inner">
       <div class="carousel-item active">
-        <img class="d-block w-100" src="<?php bloginfo('template_url'); ?>/assets/images/banner.png" alt="Primeiro Slide">
+        <img class="d-block w-100" src="<?php bloginfo('template_url'); ?>/assets/images/banner.jpg" alt="Primeiro Slide">
         <div class="carousel-caption d-none d-md-block">
           <h5>Filosofia moderna e consciente</h5>
         </div>
       </div>
       <div class="carousel-item">
-        <img class="d-block w-100" src="<?php bloginfo('template_url'); ?>/assets/images/banner.png" alt="Segundo Slide">
+        <img class="d-block w-100" src="<?php bloginfo('template_url'); ?>/assets/images/banner.jpg" alt="Segundo Slide">
         <div class="carousel-caption d-none d-md-block">
-          <h5>2</h5>
+          <h5>Estrutura e capacitação técnica</h5>
         </div>
       </div>
       <div class="carousel-item">
-        <img class="d-block w-100" src="<?php bloginfo('template_url'); ?>/assets/images/banner.png" alt="Terceiro Slide">
+        <img class="d-block w-100" src="<?php bloginfo('template_url'); ?>/assets/images/banner.jpg" alt="Terceiro Slide">
         <div class="carousel-caption d-none d-md-block">
-          <h5>3</h5>
+          <h5>Conceito de empresa-parque</h5>
         </div>
       </div>
     </div>
@@ -46,5 +46,5 @@ require_once('header.php');
 </section>
 
 <?php
-require_once('footer.php');
+require_once('footer-home.php');
 ?>

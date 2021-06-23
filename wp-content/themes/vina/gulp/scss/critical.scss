@@ -4,6 +4,10 @@
 @import "../node_modules/bootstrap/scss/mixins";
 @import "../node_modules/bootstrap/scss/reboot";
 
+
+@import '../node_modules/@fortawesome/fontawesome-free/scss/fontawesome';
+@import "../node_modules/@fortawesome/fontawesome-free/scss/brands";
+@import "../node_modules/@fortawesome/fontawesome-free/scss/solid";
 @import "components/variaveis";
 
 @import "../node_modules/bootstrap/scss/grid";
