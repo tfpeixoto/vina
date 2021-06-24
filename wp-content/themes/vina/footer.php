@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row d-flex justify-content-between">
       <div class="col-12 col-md-8 footer-geral__endereco">
-        <p>Telefone: (31) 3479 – 8181<br />
+        <p>Telefone: <a href="tel:+553134798181">(31) 3479–8181</a><br />
           Endereço: Av. Perimetral, 2521<br />
           Distrito Industrial do Jatobá<br />
           Cep: 30.670 – 845<br />
@@ -26,8 +26,8 @@
         ?>
 
         <ul class="redes-sociais">
-          <li><a href="#"><i class="fab fa-instagram"></i></a></li>
-          <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+          <li><a href="https://www.facebook.com/vinasocial/" target="_blank"><i class="fab fa-instagram"></i></a></li>
+          <li><a href="https://www.instagram.com/vinasocial/" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
         </ul>
       </div>
     </div>

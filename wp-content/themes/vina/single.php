@@ -7,17 +7,8 @@ require_once('header.php');
   <div class="container">
     <div class="row d-flex justify-content-start">
       <div class="col-8">
-      <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-
         <h1><?php the_title(); ?></h1>
         <?php the_content(); ?>
-
-        <?php endwhile;
-        else : ?>
-
-          <p>Não há posts publicados</p>
-
-        <?php endif; ?>
       </div>
     </div>
   </div>

@@ -127,3 +127,36 @@ function vina_post_type_servicos()
   register_post_type('servicos', $args);
 }
 add_action('init', 'vina_post_type_servicos');
+
+
+// POST TYPE SLIDESHOW
+function vina_post_type_slideshow()
+{
+  $nomeSingular = 'Slide';
+  $nomePlural = 'Slides';
+  $description = $nomeSingular . ' da Vina';
+
+  $labels = array(
+    'name' => $nomePlural,
+    'singular_name' => $nomeSingular,
+    'add_new_item' => "Adicionar novo " . $nomeSingular,
+    'edit_item' => 'Editar ' . $nomeSingular,
+  );
+
+  $supports = array(
+    'title',
+    'editor',
+    'thumbnail'
+  );
+
+  $args = array(
+    'labels' => $labels,
+    'public' => true,
+    'description' => $description,
+    'menu_icon' => 'dashicons-format-gallery',
+    'supports' => $supports,
+  );
+
+  register_post_type('slideshow', $args);
+}
+add_action('init', 'vina_post_type_slideshow');

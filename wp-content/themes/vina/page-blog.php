@@ -11,9 +11,15 @@ require_once('header.php');
       <div class="col-8">
         <h1>VinaVina</h1>
 
-        <?php if(have_posts()) : while (have_posts()) : the_post(); ?>
+        <?php
+        $args = array(
+          'post_type' => 'post',
+          'posts_per_page' => -1
+        );
+        $posts = new WP_Query($args);
+        if ($posts->have_posts()) : while ($posts->have_posts()) : $posts->the_post(); ?>
 
-            <article class="servicos">
+            <article class="posts">
               <a href="<?php the_permalink(); ?>" alt="<?php the_title(); ?>">
                 <?php the_title('<h3>', '</h3>');  ?>
               </a>

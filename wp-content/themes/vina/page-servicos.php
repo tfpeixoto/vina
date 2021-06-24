@@ -21,11 +21,13 @@ require_once('header.php');
         if ($servicos->have_posts()) : while ($servicos->have_posts()) : $servicos->the_post(); ?>
 
             <article class="servicos">
-              <a href="<?php the_permalink(); ?>" alt="<?php the_title(); ?>">
-                <?php the_title('<h3>', '</h3>');  ?>
-              </a>
+              <h3>
+                <a href="<?php the_permalink(); ?>" alt="<?php the_title(); ?>">
+                  <?php the_title();  ?>
+                </a>
+              </h3>
 
-              <?php the_excerpt(); ?>
+              <p><?php the_excerpt(); ?></p>
             </article>
 
           <?php endwhile;
