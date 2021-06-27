@@ -1,3 +1,20 @@
+header {
+  .navbar-toggler {
+    border: 2px solid $white;
+    width: 50px;
+
+    .navbar-toggler-trace {
+      background: $white;
+      border-radius: 50px;
+      content: " ";
+      display: block;
+      height: 3px;
+      margin: 5px 0;
+      width: 100%;
+    }
+  }
+}
+
 //header home
 .header-home {
   background: none;
@@ -7,8 +24,12 @@
   width: 100%;
 
   .navbar-nav {
+    margin-top: 2rem;
     margin-left: auto;
 
+    @include media-breakpoint-up(md) {
+      margin-top: 0;
+    }
     .nav-link {
       color: $white;
       font-size: 1rem;
@@ -34,8 +55,12 @@
   width: 100%;
 
   .navbar-nav {
+    margin-top: 2rem;
     margin-left: auto;
 
+    @include media-breakpoint-up(md) {
+      margin-top: 0;
+    }
     .nav-link {
       color: $white;
       font-size: 1rem;

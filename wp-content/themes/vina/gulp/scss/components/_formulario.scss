@@ -1,0 +1,19 @@
+.formulario {
+  input,
+  select,
+  textarea {
+    background: #e5e5e5;
+  }
+  input[type="submit"]{
+    background: #707070;
+    border: 0;
+    border-radius: 10px;
+    color: $white;
+    padding: .25rem 1rem;
+  }
+  #curriculo,
+  #deficiencia {
+    background: none;
+    border: none;
+  }
+}

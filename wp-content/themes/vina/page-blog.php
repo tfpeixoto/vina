@@ -8,7 +8,7 @@ require_once('header.php');
 <section class="conteudo">
   <div class="container">
     <div class="row d-flex justify-content-start">
-      <div class="col-8">
+      <div class="col-12 col-md-8">
         <h1>VinaVina</h1>
 
         <?php
@@ -20,9 +20,15 @@ require_once('header.php');
         if ($posts->have_posts()) : while ($posts->have_posts()) : $posts->the_post(); ?>
 
             <article class="posts">
-              <a href="<?php the_permalink(); ?>" alt="<?php the_title(); ?>">
-                <?php the_title('<h3>', '</h3>');  ?>
-              </a>
+              <?php if (has_post_thumbnail()) {
+                the_post_thumbnail();
+              } ?>
+
+              <h3>
+                <a href="<?php the_permalink(); ?>" alt="<?php the_title(); ?>">
+                  <?php the_title();  ?>
+                </a>
+              </h3>
 
               <?php the_excerpt(); ?>
             </article>

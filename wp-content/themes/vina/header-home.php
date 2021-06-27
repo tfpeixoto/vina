@@ -20,7 +20,9 @@
         <?php the_custom_logo(); ?>
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navheader" aria-controls="navheader" aria-expanded="false" aria-label="Alterna navegação">
-          <span class="navbar-toggler-icon"></span>
+          <span class="navbar-toggler-trace"></span>
+          <span class="navbar-toggler-trace"></span>
+          <span class="navbar-toggler-trace"></span>
         </button>
 
         <?php
