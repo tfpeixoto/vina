@@ -3,4 +3,5 @@ wp-content/themes/twentytwentyone
 wp-content/uploads
 dumps
 
+wp-config-web.php
 wp-config.php
