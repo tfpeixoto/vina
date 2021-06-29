@@ -1,16 +1,24 @@
 .slideshow {
-  background: $primary;
+  background: $white;
   display: flex;
   justify-content: center;
-  height: 100vh;
-
+  height: 100%;
+  width: 100%;
+  
+  @include media-breakpoint-up(sm) {
+    height: 100vh;
+    overflow: hidden;
+  }
   .carousel {
     .carousel-item {
-      object-fit: 100%;
       object-position: center;
       max-height: 100vh;
       width: 100vw;
 
+      img{
+        height: auto;
+        min-width: 100%;
+      }
       .carousel-caption {
         bottom: 45%;
         text-transform: uppercase;

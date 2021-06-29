@@ -101,5 +101,57 @@
   // blog
   .posts{
     margin-bottom: 2rem;
+
+    &__box{
+      margin-bottom: 2rem;
+      
+      img{
+        margin-bottom: 1rem;
+      }
+    }
+  }
+
+  .paginacao {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3rem;
+
+    ul {
+      display: flex;
+      list-style: none;
+
+      li {
+        color: $secondary;
+        display: block;
+        font-size: 1.5rem;
+        font-weight: bold;
+        min-height: 2.5rem;
+        min-width: 2.5rem;
+        padding-inline-start: 0;
+        text-align: center;
+
+        .current {
+          color: $secondary;
+        }
+        a {
+          color: $secondary;
+          padding: 0.5rem 1rem;
+
+          &.prev {
+            background: $secondary;
+            color: $white;
+          }
+          &.next {
+            background: $secondary;
+            color: $white;
+          }
+          &:hover {
+            background: $primary;
+            color: $white;
+            text-decoration: none;
+          }
+        }
+      }
+    }
   }
 }

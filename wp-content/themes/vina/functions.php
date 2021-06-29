@@ -121,6 +121,7 @@ function vina_post_type_servicos()
     'public' => true,
     'description' => $description,
     'menu_icon' => 'dashicons-palmtree',
+    'show_in_rest' => true,
     'supports' => $supports,
   );
 
@@ -160,3 +161,35 @@ function vina_post_type_slideshow()
   register_post_type('slideshow', $args);
 }
 add_action('init', 'vina_post_type_slideshow');
+
+// Configs do Gutemberg
+function vina_config()
+{
+  // 1. Responsividade nas mídias incorporadas, como o bloco do YouTube, por exemplo.
+  add_theme_support('responsive-embeds');
+
+  // 2. Estilo padrão de cada bloco.
+  add_theme_support('wp-block-styles');
+
+  // 3. Alinhamentos de blocos: largura completa (Full) e largura ampla (Wide)
+  add_theme_support('align-wide');
+
+  add_theme_support('editor-color-palette', array(
+    array(
+      'name' => __('Laranja', 'vina'),
+      'slug' => 'laranja',
+      'color' => '#d07329',
+    ),
+    array(
+      'name' => __('Marrom', 'vina'),
+      'slug' => 'marrom',
+      'color' => '#22090e',
+    ),
+    array(
+      'name' => __('Branco', 'vina'),
+      'slug' => 'branco',
+      'color' => '#ffffff',
+    ),
+  ));
+}
+add_action('after_setup_theme', 'vina_config', 0);

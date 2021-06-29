@@ -1,0 +1,68 @@
+// // Estilos de alinhamento do Gutemberg
+// .conteudo *:not(.alignwide):not(.alignfull) {
+//   max-width: 1200px;
+//   margin-left: auto;
+//   margin-right: auto;
+// }
+// .wp-block-image.alignfull {
+//   display: block;
+//   text-align: center;
+// }
+// .wp-block-image.alignwide {
+//   max-width: 75%;
+//   margin-left: auto;
+//   margin-right: auto;
+// }
+
+// // Estilos de blocos
+// .wp-block-columns {
+//   display: flex;
+// }
+// .wp-block-column {
+//   flex: 1;
+//   margin: 0 20px;
+// }
+
+// @media screen and (max-width: 764px) {
+//   .wp-block-columns.has-3-columns {
+//     flex-flow: row wrap;
+//   }
+
+//   .has-3-columns .wp-block-column:first-child {
+//     flex-basis: 100%;
+//   }
+// }
+
+// @media (max-width: 478px) {
+//   .wp-block-columns.has-3-columns {
+//     display: block;
+//   }
+
+//   .wp-block-column {
+//     margin: 20px 0;
+//   }
+// }
+
+// cor group
+.has-laranja-background-color {
+	background-color: #d07329;
+}
+.has-laranja-color {
+	color: #d07329;
+}
+
+// cor group negativa
+.has-marrom-background-color {
+	background-color: #22090e;
+}
+.has-marrom-color {
+	color: #22090e;
+}
+
+// cor branco
+.has-branco-background-color {
+	background-color: #ffffff;
+}
+.has-branco-color {
+	color: #ffffff;
+}
