@@ -19,7 +19,7 @@ require_once('header-home.php');
       if ($slides->have_posts()) : while ($slides->have_posts()) : $slides->the_post(); ?>
 
           <div class="carousel-item">
-            <img class="d-block" src="<?php the_post_thumbnail(); ?>" alt="<?php the_title(); ?>">
+            <img class="d-block" src="<?php the_post_thumbnail_url(); ?>" alt="<?php the_title(); ?>">
             <div class="carousel-caption d-none d-md-block">
               <h5><?php the_title(); ?></h5>
             </div>
