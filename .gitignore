@@ -1,4 +1,4 @@
 wp-content/themes/vina/gulp/node_modules
 wp-content/themes/twentytwentyone
-wp-content/uploads
+# wp-content/uploads
 wp-config.php
