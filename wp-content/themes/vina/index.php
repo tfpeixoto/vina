@@ -1,6 +1,4 @@
 <?php
-/* Theme template: Página Inicial */
-
 $estiloPagina = 'home.css';
 require_once('header.php');
 ?>
