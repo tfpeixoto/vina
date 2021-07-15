@@ -2,10 +2,12 @@
 $images = get_field('galeria');
 $size = 'full';
 $contadorSlides = 0;
+$ancora = $args['id'];
+
 if ($images) : ?>
 
   <section class="slideshow">
-    <div id="slideGaleria" class="carousel slide" data-ride="carousel">
+    <div id="<?= $ancora ? "slide-${ancora}" : "slideGaleria" ?>" class="carousel slide" data-ride="carousel">
       <div class="carousel-inner">
         <?php foreach ($images as $image) : ?>
 
@@ -20,19 +22,19 @@ if ($images) : ?>
       $images = get_field('galeria');
       if ($images) : ?>
 
-        <ol class="carousel-indicators" href="#slideGaleria">
+        <ol class="carousel-indicators" href="#<?= $ancora ? "slide-${ancora}" : "slideGaleria" ?>">
           <?php foreach ($images as $image) : ?>
-            <li data-target="#slideHome" data-slide-to="<?= $contadorSlides++ ?>"></li>
+            <li data-target="#<?= $ancora ? "slide-${ancora}" : "slideGaleria" ?>" data-slide-to="<?= $contadorSlides++ ?>"></li>
           <?php endforeach; ?>
         </ol>
 
       <?php endif; ?>
 
-      <a class="carousel-control-prev" href="#slideGaleria" role="button" data-slide="prev">
+      <a class="carousel-control-prev" href="#<?= $ancora ? "slide-${ancora}" : "slideGaleria" ?>" role="button" data-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="sr-only">Anterior</span>
       </a>
-      <a class="carousel-control-next" href="#slideGaleria" role="button" data-slide="next">
+      <a class="carousel-control-next" href="#<?= $ancora ? "slide-${ancora}" : "slideGaleria" ?>" role="button" data-slide="next">
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="sr-only">Próximo</span>
       </a>

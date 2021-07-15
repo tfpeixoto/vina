@@ -14,6 +14,8 @@ require_once('header.php');
   </div>
 </section>
 
+<?php get_template_part('template_parts/galeria'); ?>
+
 <?php
 require_once('footer.php');
 ?>

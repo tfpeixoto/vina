@@ -24,3 +24,7 @@ $navbar-nav-link-padding-x: .75rem;
 
 // carousel
 $carousel-control-icon-width: 35px;
+
+html{
+  scroll-behavior: smooth;
+}
