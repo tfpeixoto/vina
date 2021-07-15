@@ -12,44 +12,44 @@
     padding-right: 1rem;
     padding-bottom: 1rem;
 
-    @include media-breakpoint-up(md){
+    @include media-breakpoint-up(md) {
       width: fit-content;
       max-width: 60%;
     }
   }
 
-  &.laranja{
+  &.laranja {
     background: url(../images/padrao-laranja.jpg) repeat;
     color: $white;
 
-    h1{
+    h1 {
       color: $secondary;
       border-color: $white;
     }
-    a{
+    a {
       color: $white;
       text-decoration: underline;
     }
   }
 
-  &.marrom{
+  &.marrom {
     background: url(../images/padrao-marrom.jpg) repeat;
     color: $white;
 
-    h1{
+    h1 {
       color: $white;
     }
   }
 
-  &.socioambiental{
+  &.socioambiental {
     background: url(../images/padrao-laranja.jpg) repeat;
     color: $secondary;
 
-    h1{
+    h1 {
       color: $secondary;
       border-color: $white;
     }
-    a{
+    a {
       color: $white;
       text-decoration: underline;
     }
@@ -75,7 +75,7 @@
         opacity: 0;
         padding: 0.6rem 0 3rem 0;
         width: 1rem;
-        transition: all ease-in-out .25s;
+        transition: all ease-in-out 0.25s;
       }
       &:hover {
         &:before {
@@ -93,35 +93,35 @@
         }
       }
     }
-    p{
+    p {
       margin-left: 1rem;
     }
   }
 
-  .back-top{
+  .back-top {
     border: 1px solid $primary;
     border-radius: 100px;
     margin-top: 2rem;
-    padding: .25rem .5rem;
+    padding: 0.25rem 0.5rem;
     position: absolute;
     right: 0;
     text-decoration: none;
-    transition: all ease-in-out .25s;
-    
-    &:hover{
+    transition: all ease-in-out 0.25s;
+
+    &:hover {
       background: $primary;
       color: $white;
     }
   }
 
   // blog
-  .posts{
+  .posts {
     margin-bottom: 2rem;
 
-    &__box{
+    &__box {
       margin-bottom: 2rem;
-      
-      img{
+
+      img {
         margin-bottom: 1rem;
       }
     }
@@ -135,19 +135,22 @@
     ul {
       display: flex;
       list-style: none;
+      padding-inline-start: 0;
 
       li {
         color: $secondary;
         display: block;
-        font-size: 1.5rem;
+        font-size: 1rem;
         font-weight: bold;
-        min-height: 2.5rem;
-        min-width: 2.5rem;
+        min-height: 2rem;
+        min-width: 2rem;
         padding-inline-start: 0;
         text-align: center;
 
         .current {
-          color: $secondary;
+          background: $primary;
+          color: $white;
+          padding: .5rem 1rem;
         }
         a {
           color: $secondary;
