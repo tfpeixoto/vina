@@ -53,6 +53,26 @@
       color: $white;
       text-decoration: underline;
     }
+    ul{
+      padding-inline-start: 0;
+
+      li{
+        display: inline-block;
+        list-style: none;
+        padding: 0 1rem;
+
+        &:first-child{
+          padding-left: 0;
+        }
+      }
+    }
+    a{
+      transition: all ease-in-out .25s;
+
+      &:hover{
+        text-decoration: none;
+      }
+    }
   }
 
   // servicos
@@ -95,6 +115,23 @@
     }
     p {
       margin-left: 1rem;
+    }
+  }
+
+  .lateral-servicos{
+    background: rgba($primary, .2);
+    border-radius: 20px;
+    line-height: 1.2;
+    padding: 2rem;
+    transition: all ease-in-out .25s;
+
+    li{
+      list-style: none;
+      margin-bottom: 1rem;
+
+      &:last-child{
+        margin-bottom: 0;
+      }
     }
   }
 
