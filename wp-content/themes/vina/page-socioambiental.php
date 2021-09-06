@@ -4,7 +4,9 @@ $estiloPagina = 'page.css';
 require_once('header.php');
 ?>
 
-<section class="banner-interno" style="background: url(<?php the_post_thumbnail_url(); ?>); background-size: cover; background-position: top center; background-repeat: no-repeat;">
+<section class="banner-interno socioambiental">
+  <?php the_post_thumbnail(); ?>
+
   <div class="container">
     <div class="row">
       <div class="col-12">
@@ -15,6 +17,10 @@ require_once('header.php');
 </section>
 
 <section class="conteudo socioambiental">
+  <div class="selo">
+    <img src="<?php bloginfo('template_url'); ?>/assets/images/selo-socioambiental.png" alt="Selo Socioambiental" />
+  </div>
+
   <div class="container">
     <div class="row d-flex justify-content-center">
       <div class="col-12">

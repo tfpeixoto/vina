@@ -5,7 +5,7 @@ $estiloPagina = 'page.css';
 require_once('header.php');
 ?>
 
-<section class="conteudo socioambiental">
+<section class="conteudo laranja">
   <div class="container">
     <div class="row d-flex justify-content-start">
       <div class="col-12 col-md-8">
