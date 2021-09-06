@@ -15,14 +15,18 @@
       max-height: 100vh;
       width: 100vw;
 
-      img{
+      & > img{
         height: auto;
         min-width: 100%;
       }
       .carousel-caption {
-        bottom: 45%;
+        bottom: 35%;
         text-transform: uppercase;
 
+        .marca-slide{
+          margin-bottom: 2rem;
+          width: 250px !important;
+        }
         h5 {
           font-size: 1.5rem;
           font-weight: 400;
