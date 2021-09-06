@@ -10,7 +10,9 @@
       </div>
 
       <div class="col-12 col-md-4 footer-geral__nav">
-        <a href="#"><img src="http://localhost/vina/wp-content/uploads/2021/06/marca-vinaec.png" alt="#" /></a>
+        <a href="<?php $home = site_url(); echo $home; ?>">
+        <img src="<?php bloginfo('template_url'); ?>/assets/images/marca-vina.png" alt="Vina Gestão de Resíduos Sólidos e Locação de Equipamentos" />
+      </a>
 
         <?php
         wp_nav_menu(array(
@@ -36,5 +38,4 @@
 
 <?php wp_footer(); ?>
 </body>
-
 </html>
