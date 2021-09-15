@@ -21,15 +21,11 @@ require_once('header.php');
           $servicos = new WP_Query($args);
           if ($servicos->have_posts()) : while ($servicos->have_posts()) : $servicos->the_post(); ?>
 
-
               <li>
                 <a href="<?php the_permalink(); ?>" alt="<?php the_title(); ?>">
                   <?php the_title();  ?>
                 </a>
               </li>
-
-              <?php /*<p><?php the_excerpt(); ?></p>*/ ?>
-
 
             <?php endwhile;
           else : ?>

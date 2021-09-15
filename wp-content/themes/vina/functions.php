@@ -46,7 +46,8 @@ function vina_scripts()
   wp_enqueue_script('bootstrap', 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js', array('jquery', 'popper'), '4.5.0', true);
   wp_enqueue_script('validate', 'https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js', array('jquery'), '1.19.2', true);
   wp_enqueue_script('mask', 'https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js', array('jquery'), '1.14.16', true);
-  wp_enqueue_script('acoes', get_template_directory_uri() . '/assets/js/scripts.min.js', array('jquery'), '1.0', true);
+  wp_enqueue_script('lightbox', 'https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js', array('jquery', 'bootstrap'), '5.3.0', true);
+  wp_enqueue_script('acoes', get_template_directory_uri() . '/assets/js/scripts.min.js', array('jquery', 'lightbox'), '1.0', true);
 }
 add_action('wp_enqueue_scripts', 'vina_scripts');
 
@@ -161,6 +162,39 @@ function vina_post_type_slideshow()
   register_post_type('slideshow', $args);
 }
 add_action('init', 'vina_post_type_slideshow');
+
+// POST TYPE GALERIAS
+function vina_post_type_galerias()
+{
+  $nomeSingular = 'Galeria';
+  $nomePlural = 'Galerias';
+  $description = $nomeSingular . ' da Vina';
+
+  $labels = array(
+    'name' => $nomePlural,
+    'singular_name' => $nomeSingular,
+    'add_new_item' => "Adicionar novo " . $nomeSingular,
+    'edit_item' => 'Editar ' . $nomeSingular,
+  );
+
+  $supports = array(
+    'title',
+    'editor',
+    'thumbnail'
+  );
+
+  $args = array(
+    'labels' => $labels,
+    'public' => true,
+    'description' => $description,
+    'menu_icon' => 'dashicons-format-gallery',
+    'show_in_rest' => true,
+    'supports' => $supports,
+  );
+
+  register_post_type('galerias', $args);
+}
+add_action('init', 'vina_post_type_galerias');
 
 // Configs do Gutemberg
 function vina_config()
