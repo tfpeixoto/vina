@@ -24,7 +24,7 @@ require_once('header.php');
       $galerias = new WP_Query($args);
       if ($galerias->have_posts()) : while ($galerias->have_posts()) : $galerias->the_post(); ?>
 
-          <li class="col-12 col-md-3 galeria__item">
+          <li class="col-12 col-md-4 galeria__item">
             <a class="galeria__link" href="<?php the_permalink(); ?>" title="<?php the_title(); ?>">
               <div class="galeria__boximage">
                 <img class="img-fluid galeria__imagem" src="<?php the_post_thumbnail_url(); ?>" />
