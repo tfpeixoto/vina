@@ -18,8 +18,8 @@
 
       <div class="col-12 col-md-2 footer-home__social">
         <ul>
-          <li><a href="#"><i class="fab fa-instagram"></i></a></li>
-          <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+          <li><a href="https://www.facebook.com/vinasocial/" target="_blank"><img src="<?php bloginfo('template_url'); ?>/assets/images/icone-facebook.png" alt="Facebook Vina" /></a></li>
+          <li><a href="https://www.instagram.com/vinasocial/" target="_blank"><img src="<?php bloginfo('template_url'); ?>/assets/images/icone-instagram.png" alt="Instagram Vina" /></a></li>
         </ul>
       </div>
     </div>

@@ -28,8 +28,8 @@
         ?>
 
         <ul class="redes-sociais">
-          <li><a href="https://www.facebook.com/vinasocial/" target="_blank"><i class="fab fa-instagram"></i></a></li>
-          <li><a href="https://www.instagram.com/vinasocial/" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+          <li><a href="https://www.facebook.com/vinasocial/" target="_blank"><img src="<?php bloginfo('template_url'); ?>/assets/images/icone-facebook.png" alt="Facebook Vina" /></a></li>
+          <li><a href="https://www.instagram.com/vinasocial/" target="_blank"><img src="<?php bloginfo('template_url'); ?>/assets/images/icone-instagram.png" alt="Instagram Vina" /></a></li>
         </ul>
       </div>
     </div>

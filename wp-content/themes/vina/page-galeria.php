@@ -26,7 +26,9 @@ require_once('header.php');
 
           <li class="col-12 col-md-3 galeria__item">
             <a class="galeria__link" href="<?php the_permalink(); ?>" title="<?php the_title(); ?>">
-              <img class="img-fluid galeria__imagem" src="<?php the_post_thumbnail_url(); ?>" />
+              <div class="galeria__boximage">
+                <img class="img-fluid galeria__imagem" src="<?php the_post_thumbnail_url(); ?>" />
+              </div>
               <p class="galeria__nome"><?php the_title(); ?></p>
             </a>
           </li>

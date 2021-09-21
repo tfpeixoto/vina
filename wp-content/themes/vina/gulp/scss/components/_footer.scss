@@ -52,6 +52,14 @@
           color: $white;
           font-size: 1.25rem;
           padding: 1.25rem 0.5rem;
+          transition: all ease-in-out 0.25s;
+          &:hover {
+            opacity: .5;
+          }
+        }
+        img {
+          height: 2rem;
+          width: 2rem;
         }
       }
     }
@@ -62,7 +70,7 @@
 .footer-geral {
   background: $secondary;
   color: $white;
-  padding: 4rem 0;
+  padding: 3rem 0;
 
   a {
     color: $white;
@@ -109,6 +117,17 @@
         display: inline;
         list-style: none;
         padding: 1rem 0.5rem;
+
+        a {
+          transition: all ease-in-out 0.25s;
+          &:hover {
+            opacity: 0.75;
+          }
+        }
+        img {
+          height: 2rem;
+          width: 2rem;
+        }
       }
     }
   }
