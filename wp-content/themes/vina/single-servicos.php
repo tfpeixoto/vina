@@ -18,6 +18,7 @@ require_once('header.php');
             'post_type' => 'servicos',
             'posts_per_page' => -1
           );
+
           $servicos = new WP_Query($args);
           if ($servicos->have_posts()) : while ($servicos->have_posts()) : $servicos->the_post(); ?>
 
@@ -32,14 +33,19 @@ require_once('header.php');
 
             <p>Não há posts publicados</p>
 
-          <?php endif; ?>
+          <?php endif; wp_reset_query(); ?>
         </ul>
       </div>
     </div>
   </div>
 </section>
 
-<?php get_template_part('template_parts/galeria'); ?>
+<?php 
+$args = array(
+  'id' => $id
+);
+
+get_template_part('template_parts/galeria', 'galeria', $args); ?>
 
 <?php
 require_once('footer.php');
