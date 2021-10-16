@@ -10,10 +10,6 @@
       </div>
 
       <div class="col-12 col-md-4 footer-geral__nav">
-        <a href="<?php $home = site_url(); echo $home; ?>">
-        <img src="<?php bloginfo('template_url'); ?>/assets/images/marca-vina.png" alt="Vina Gestão de Resíduos Sólidos e Locação de Equipamentos" />
-      </a>
-
         <?php
         wp_nav_menu(array(
           'theme_location'  => 'menu-rodape',
@@ -28,6 +24,10 @@
         ?>
 
         <ul class="redes-sociais">
+          <li class="marca"><a href="<?php $home = site_url();
+                        echo $home; ?>">
+              <img src="<?php bloginfo('template_url'); ?>/assets/images/marca-vina.png" alt="Vina Gestão de Resíduos Sólidos e Locação de Equipamentos" />
+            </a></li>
           <li><a href="https://www.facebook.com/vinasocial/" target="_blank"><img src="<?php bloginfo('template_url'); ?>/assets/images/icone-facebook.png" alt="Facebook Vina" /></a></li>
           <li><a href="https://www.instagram.com/vinasocial/" target="_blank"><img src="<?php bloginfo('template_url'); ?>/assets/images/icone-instagram.png" alt="Instagram Vina" /></a></li>
         </ul>
@@ -38,4 +38,5 @@
 
 <?php wp_footer(); ?>
 </body>
+
 </html>

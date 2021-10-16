@@ -70,7 +70,7 @@
 .footer-geral {
   background: $secondary;
   color: $white;
-  padding: 3rem 0;
+  padding: 2rem 0;
 
   a {
     color: $white;
@@ -85,7 +85,6 @@
   }
 
   &__nav {
-    margin-top: 2rem;
     text-align: center;
     text-transform: uppercase;
 
@@ -118,14 +117,22 @@
         list-style: none;
         padding: 1rem 0.5rem;
 
+        &.marca{
+          img{
+            height: auto;
+            width: 125px;
+          }
+        }
         a {
           transition: all ease-in-out 0.25s;
           &:hover {
+            text-decoration: none;
             opacity: 0.75;
           }
         }
         img {
           height: 2rem;
+          margin-bottom: 0;
           width: 2rem;
         }
       }
