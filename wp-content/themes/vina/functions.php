@@ -31,6 +31,8 @@ function vina_registra_menu()
   register_nav_menus(array(
     'menu-principal' => __('Menu Principal', 'vina'),
     'menu-rodape' => __('Menu Rodapé', 'vina'),
+    'menu-servicos' => __('Menu Serviços', 'vina'),
+    'menu-galeria' => __('Menu Galerias', 'vina')
   ));
 }
 add_action('after_setup_theme', 'vina_registra_menu');

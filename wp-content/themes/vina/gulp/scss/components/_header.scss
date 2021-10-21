@@ -30,16 +30,24 @@ header {
     @include media-breakpoint-up(md) {
       margin-top: 0;
     }
-    .nav-link {
-      color: $white;
-      font-size: 1rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      transition: all ease-in-out 0.25s;
-
-      &:hover {
-        color: $secondary;
+    /* purgecss ignore */
+    .nav-item {
+      &.active {
+        .nav-link {
+          color: $secondary;
+        }
+      }
+      .nav-link {
+        color: $white;
+        font-size: 1rem;
         font-weight: 700;
+        text-transform: uppercase;
+        transition: all ease-in-out 0.25s;
+
+        &:hover {
+          color: $secondary;
+          font-weight: 700;
+        }
       }
     }
   }
@@ -61,16 +69,23 @@ header {
     @include media-breakpoint-up(md) {
       margin-top: 0;
     }
-    .nav-link {
-      color: $white;
-      font-size: 1rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      transition: all ease-in-out 0.25s;
-
-      &:hover {
-        color: $primary;
+    .nav-item {
+      &.active {
+        .nav-link {
+          color: $primary;
+        }
+      }
+      .nav-link {
+        color: $white;
+        font-size: 1rem;
         font-weight: 700;
+        text-transform: uppercase;
+        transition: all ease-in-out 0.25s;
+
+        &:hover {
+          color: $primary;
+          font-weight: 700;
+        }
       }
     }
   }

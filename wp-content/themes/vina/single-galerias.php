@@ -17,22 +17,40 @@ if (have_posts()) : while (have_posts()) : the_post();
           </div>
         </div>
 
-        <ul class="row galeria__lista">
+        <div class="row">
+          <div class="col-12 col-md-8">
+            <ul class="row galeria__lista">
 
-          <?php foreach ($images as $image) : ?>
+              <?php foreach ($images as $image) : ?>
 
-            <li class="col-12 col-md-3 galeria__item">
-              <a href="<?php echo esc_url($image['url']); ?>" data-toggle="lightbox" data-gallery="example-gallery" data-type="image" data-max-width="700">
-                <div class="galeria__boximage">
-                  <img src="<?php echo esc_url($image['url']); ?>" class="img-fluid galeria__imagem" alt="<?php echo esc_attr($image['alt']); ?>">
-                </div>
-              </a>
-            </li>
+                <li class="col-12 col-md-4 galeria__item">
+                  <a href="<?php echo esc_url($image['url']); ?>" data-toggle="lightbox" data-gallery="example-gallery" data-type="image" data-max-width="700">
+                    <div class="galeria__boximage">
+                      <img src="<?php echo esc_url($image['url']); ?>" class="img-fluid galeria__imagem" alt="<?php echo esc_attr($image['alt']); ?>">
+                    </div>
+                  </a>
+                </li>
 
-          <?php endforeach; ?>
+              <?php endforeach; ?>
 
-        </ul>
-      </div>
+            </ul>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <?php
+            wp_nav_menu(array(
+              'theme_location'  => 'menu-galeria',
+              'depth'           => 2,
+              'container'       => 'div',
+              'container_class' => 'lateral-servicos',
+              'container_id'    => 'nav-servicos',
+              'menu_class'      => 'navbar-nav',
+              'fallback_cb'     => 'WP_Bootstrap_Navwalker::fallback',
+              'walker'          => new WP_Bootstrap_Navwalker(),
+            ));
+            ?>
+          </div>
+        </div>
     </section>
 
   <?php endwhile;

@@ -6,7 +6,7 @@
     border-bottom: 1px solid $primary;
     border-right: 1px solid $primary;
     border-bottom-right-radius: 10px;
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 400;
     margin-bottom: 3rem;
     padding-right: 1rem;
@@ -14,7 +14,7 @@
 
     @include media-breakpoint-up(md) {
       width: fit-content;
-      max-width: 60%;
+      max-width: 75%;
     }
   }
 
@@ -145,8 +145,14 @@
 
     li{
       list-style: none;
-      margin-bottom: 1rem;
+      margin-bottom: .25rem;
 
+      &.active{
+        .nav-link{
+          color: $secondary;
+          text-decoration: underline;
+        }
+      }
       &:last-child{
         margin-bottom: 0;
       }

@@ -12,41 +12,27 @@ require_once('header.php');
       </div>
 
       <div class="col-12 col-md-5">
-        <ul class="lateral-servicos">
-          <?php
-          $args = array(
-            'post_type' => 'servicos',
-            'posts_per_page' => -1
-          );
-
-          $servicos = new WP_Query($args);
-          if ($servicos->have_posts()) : while ($servicos->have_posts()) : $servicos->the_post(); ?>
-
-              <li>
-                <a href="<?php the_permalink(); ?>" alt="<?php the_title(); ?>">
-                  <?php the_title();  ?>
-                </a>
-              </li>
-
-            <?php endwhile;
-          else : ?>
-
-            <p>Não há posts publicados</p>
-
-          <?php endif; wp_reset_query(); ?>
-        </ul>
+        <?php
+        wp_nav_menu(array(
+          'theme_location'  => 'menu-servicos',
+          'depth'           => 2,
+          'container'       => 'div',
+          'container_class' => 'lateral-servicos',
+          'container_id'    => 'nav-servicos',
+          'menu_class'      => 'navbar-nav',
+          'fallback_cb'     => 'WP_Bootstrap_Navwalker::fallback',
+          'walker'          => new WP_Bootstrap_Navwalker(),
+        ));
+        ?>
       </div>
     </div>
   </div>
 </section>
 
-<?php 
-$args = array(
-  'id' => $id
-);
-
-get_template_part('template_parts/galeria', 'galeria', $args); ?>
-
 <?php
+// $args = array(
+//   'id' => $id
+// );
+get_template_part('template_parts/galeria', 'galeria');
 require_once('footer.php');
 ?>
