@@ -1,7 +1,5 @@
-wp-content/themes/vina/gulp/node_modules
+node_modules
 wp-content/uploads
-dumps
 
-wp-config-web.php
 wp-config.php
 .htaccess
