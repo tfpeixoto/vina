@@ -43,10 +43,10 @@ gulp.task('purgecss', ['sass'], function () {
   return gulp.src(`${dir.src}/css/*.css`)
     .pipe(purgecss({
       content: [`${dir.build}/**/*.php`],
-      whitelist: ['far', 'fa', 'fas', 'fab', 'fa-clock', 'current-menu-item'],
+      whitelist: ['far', 'fa', 'fas', 'fab', 'fa-clock', 'current-menu-item', 'grecaptcha-badge'],
       whitelistPatterns: [/fa/]
     }))
-    .pipe(gulp.dest(`${dir.src}/assets/css`))
+    .pipe(gulp.dest(`${dir.build}/assets/css`))
 });
 
 // IMAGEMIN

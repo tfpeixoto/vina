@@ -18,6 +18,7 @@
     }
   }
 
+  // fundo laranja
   &.laranja {
     background: url(../images/padrao-laranja.jpg) repeat;
     color: $white;
@@ -32,6 +33,7 @@
     }
   }
 
+  // fundo marrom
   &.marrom {
     background: url(../images/padrao-marrom.jpg) repeat;
     color: $white;
@@ -41,27 +43,11 @@
     }
   }
 
+  // socioambiental
   &.socioambiental {
     background: url(../images/padrao-laranja.jpg) repeat;
     color: $secondary;
-    margin-top: 400px;
     position: relative;
-
-    .selo{
-      display: flex;
-      justify-content: center;
-      height: 200px;
-      position: absolute;
-      z-index: 0;
-      top: -100px;
-      width: 100%;
-
-      img{
-        margin: 0 auto;
-        max-height: 200px;
-        max-width: 200px;
-      }
-    }
 
     h1 {
       color: $secondary;
@@ -71,24 +57,105 @@
       color: $white;
       text-decoration: underline;
     }
-    ul{
+    ul {
       padding-inline-start: 0;
 
-      li{
+      li {
         display: inline-block;
         list-style: none;
         padding: 0 1rem;
 
-        &:first-child{
+        &:first-child {
           padding-left: 0;
         }
       }
     }
-    a{
-      transition: all ease-in-out .25s;
+    a {
+      transition: all ease-in-out 0.25s;
 
-      &:hover{
+      &:hover {
         text-decoration: none;
+      }
+    }
+  }
+
+  // pagina socioambiental e galeria
+  .socioambiental {
+    display: block;
+    position: relative;
+
+    &__galeria {
+      padding: 0 0 100px 0;
+      margin-top: -300px;
+
+      .carousel-inner {
+        border: 10px solid $white;
+
+        img {
+          height: auto;
+          width: 100%;
+        }
+        .carousel-caption {
+          background: #c77c06;
+          bottom: 0;
+          color: $black;
+          padding: 1rem;
+
+          @include media-breakpoint-up(md) {
+            bottom: 20px;
+            left: 25%;
+            right: 0;
+            text-align: left;
+          }
+          h5 {
+            display: none;
+
+            @include media-breakpoint-up(md) {
+              display: block;
+              font-size: 1.25rem;
+              font-weight: 500;
+            }
+          }
+          p {
+            display: none;
+
+            @include media-breakpoint-up(md) {
+              display: block;
+              font-size: 1rem;
+              line-height: 1.2;
+            }
+          }
+          a {
+            justify-content: center;
+
+            @include media-breakpoint-up(md) {
+              display: flex;
+              justify-content: right;
+              text-transform: uppercase;
+            }
+          }
+        }
+      }
+      .carousel-indicators {
+        bottom: -60px;
+        margin: 15px;
+
+        @include media-breakpoint-up(md) {
+          justify-content: flex-start;
+        }
+
+        li {
+          @include media-breakpoint-up(md) {
+            background: none;
+            color: $white;
+            font-size: 0.8rem;
+            height: auto;
+            margin: 0 0.75rem;
+            text-indent: initial;
+            text-transform: uppercase;
+            width: auto;
+          }
+        }
       }
     }
   }
@@ -136,29 +203,31 @@
     }
   }
 
-  .lateral-servicos{
-    background: rgba($primary, .2);
+  // lista de links laterais
+  .lateral-servicos {
+    background: rgba($primary, 0.2);
     border-radius: 20px;
     line-height: 1.2;
     padding: 2rem;
-    transition: all ease-in-out .25s;
+    transition: all ease-in-out 0.25s;
 
-    li{
+    li {
       list-style: none;
-      margin-bottom: .25rem;
+      margin-bottom: 0.25rem;
 
-      &.active{
-        .nav-link{
+      &.active {
+        .nav-link {
           color: $secondary;
           text-decoration: underline;
         }
       }
-      &:last-child{
+      &:last-child {
         margin-bottom: 0;
       }
     }
   }
 
+  // botao voltar para o topo
   .back-top {
     border: 1px solid $primary;
     border-radius: 100px;
@@ -211,7 +280,7 @@
         .current {
           background: $primary;
           color: $white;
-          padding: .5rem 1rem;
+          padding: 0.5rem 1rem;
         }
         a {
           color: $secondary;

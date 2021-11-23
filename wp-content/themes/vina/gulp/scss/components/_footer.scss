@@ -54,7 +54,7 @@
           padding: 1.25rem 0.5rem;
           transition: all ease-in-out 0.25s;
           &:hover {
-            opacity: .5;
+            opacity: 0.5;
           }
         }
         img {
@@ -117,8 +117,8 @@
         list-style: none;
         padding: 1rem 0.5rem;
 
-        &.marca{
-          img{
+        &.marca {
+          img {
             height: auto;
             width: 125px;
           }
@@ -140,6 +140,8 @@
   }
 }
 
+/* purgecss start ignore */
 .grecaptcha-badge {
   visibility: hidden;
 }
+/* purgecss end ignore */
