@@ -36,6 +36,8 @@ require_once('header.php');
               </a>
             </h3>
 
+            <p><strong><?php the_date(); ?></strong></p>
+
             <?php the_excerpt(); ?>
           </article>
 

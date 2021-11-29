@@ -17,6 +17,25 @@ require_once('header.php');
 </section>
 
 <section class="conteudo socioambiental">
+  <div class="selo">
+    <img src="<?php bloginfo('template_url'); ?>/assets/images/selo-socioambiental.png" alt="Selo Socioambiental" />
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8">
+      <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
+
+          <?php the_content(); ?>
+
+        <?php endwhile;
+      else : ?>
+
+        <p>Não há posts publicados</p>
+
+      <?php endif; ?>
+    </div>
+  </div>
+
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-12 col-md-10 socioambiental__galeria">
@@ -84,21 +103,6 @@ require_once('header.php');
             <span class="sr-only">Próximo</span>
           </a>
         </div>
-      </div>
-    </div>
-
-    <div class="row justify-content-center">
-      <div class="col-12 col-md-10">
-        <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-
-            <?php the_content(); ?>
-
-          <?php endwhile;
-        else : ?>
-
-          <p>Não há posts publicados</p>
-
-        <?php endif; ?>
       </div>
     </div>
   </div>

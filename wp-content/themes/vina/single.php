@@ -5,9 +5,10 @@ require_once('header.php');
 
 <section class="conteudo">
   <div class="container">
-    <div class="row d-flex justify-content-start">
+    <div class="row justify-content-start">
       <div class="col-8">
         <h1><?php the_title(); ?></h1>
+        <p><strong><?php $data = get_the_date(); echo $data ?></strong></p>
         <?php the_content(); ?>
       </div>
     </div>

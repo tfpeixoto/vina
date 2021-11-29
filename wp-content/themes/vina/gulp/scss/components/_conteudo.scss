@@ -49,6 +49,21 @@
     color: $secondary;
     position: relative;
 
+    .selo {
+      display: flex;
+      justify-content: center;
+      height: 200px;
+      position: absolute;
+      z-index: 0;
+      top: -100px;
+      width: 100%;
+
+      img {
+        margin: 0 auto;
+        max-height: 200px;
+        max-width: 200px;
+      }
+    }
     h1 {
       color: $secondary;
       border-color: $white;
@@ -85,8 +100,7 @@
     position: relative;
 
     &__galeria {
-      padding: 0 0 100px 0;
-      margin-top: -300px;
+      padding: 3rem 0 0 0;
 
       .carousel-inner {
         border: 10px solid $white;
@@ -184,17 +198,19 @@
       }
       &:hover {
         &:before {
-          color: $secondary;
+          color: $white;
+          display: block;
+          margin-top: -3px;
           opacity: 1;
         }
       }
       a {
         color: $secondary;
-        text-decoration: underline;
+        text-decoration: none;
         transition: all ease-in-out 0.25s;
 
         &:hover {
-          color: $secondary;
+          color: $white;
         }
       }
     }
