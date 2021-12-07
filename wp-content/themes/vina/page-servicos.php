@@ -26,8 +26,6 @@ require_once('header.php');
                   <?php the_title();  ?>
                 </a>
               </h3>
-
-              <?php /*<p><?php the_excerpt(); ?></p>*/ ?>
             </article>
 
           <?php endwhile;

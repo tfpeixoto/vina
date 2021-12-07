@@ -43,8 +43,8 @@ gulp.task('purgecss', ['sass'], function () {
   return gulp.src(`${dir.src}/css/*.css`)
     .pipe(purgecss({
       content: [`${dir.build}/**/*.php`],
-      whitelist: ['far', 'fa', 'fas', 'fab', 'fa-clock', 'current-menu-item', 'grecaptcha-badge'],
-      whitelistPatterns: [/fa/]
+      whitelist: ['far', 'fa', 'fas', 'fab', 'fa-clock', 'current-menu-item', 'grecaptcha-badge', 'modal', 'ekko-lightbox', 'modal-dialog', 'modal-backdrop'],
+      whitelistPatterns: [/fa/, /^ekko/, /^modal/]
     }))
     .pipe(gulp.dest(`${dir.build}/assets/css`))
 });

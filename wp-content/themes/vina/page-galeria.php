@@ -3,7 +3,7 @@
 /**
  * Template name: Galeria
  */
-$estiloPagina = 'page.css';
+$estiloPagina = 'page.css?v=1';
 require_once('header.php');
 ?>
 

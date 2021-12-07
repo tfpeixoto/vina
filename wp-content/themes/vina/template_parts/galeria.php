@@ -2,6 +2,7 @@
 $images = get_field('galeria');
 $size = 'full';
 $contadorSlides = 0;
+$ancora = 0;
 
 if ($images) : ?>
 
