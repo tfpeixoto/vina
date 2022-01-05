@@ -1,5 +1,7 @@
+assinatura
 node_modules
 wp-content/uploads
+wp-content/updraft
 
 wp-config.php
 .htaccess

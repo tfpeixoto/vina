@@ -44,7 +44,12 @@ gulp.task('purgecss', ['sass'], function () {
     .pipe(purgecss({
       content: [`${dir.build}/**/*.php`],
       whitelist: ['far', 'fa', 'fas', 'fab', 'fa-clock', 'current-menu-item', 'grecaptcha-badge', 'modal', 'ekko-lightbox', 'modal-dialog', 'modal-backdrop'],
-      whitelistPatterns: [/fa/, /^ekko/, /^modal/]
+      whitelistPatterns: [/fa/, /^ekko/, /^modal/],
+      safelist: {
+        standard: [],
+        deep: [],
+        greedy: [/formulario/]
+      }
     }))
     .pipe(gulp.dest(`${dir.build}/assets/css`))
 });
