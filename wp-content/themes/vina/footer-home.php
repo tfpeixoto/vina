@@ -20,7 +20,9 @@
         <ul>
           <li><a href="https://www.facebook.com/vinasocial/" target="_blank" rel="noopener noreferrer"><img src="<?php bloginfo('template_url'); ?>/assets/images/icone-facebook.png" alt="Facebook Vina" /></a></li>
           <li><a href="https://www.instagram.com/vinasocial/" target="_blank" rel="noopener noreferrer"><img src="<?php bloginfo('template_url'); ?>/assets/images/icone-instagram.png" alt="Instagram Vina" /></a></li>
+          <?php /*
           <li><a href="https://wa.me/553196337645" target="_blank" rel="noopener noreferrer"><img src="<?php bloginfo('template_url'); ?>/assets/images/icone-whatsapp.png" class="icone-whatsapp" alt="Whatsapp Vina" /></a></li>
+          */ ?>
         </ul>
       </div>
     </div>
