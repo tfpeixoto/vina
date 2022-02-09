@@ -1,6 +1,8 @@
 <?php
-/* Template name: Blog */
 
+/**
+ * Template name: Busca
+ */
 $estiloPagina = 'page.css';
 require_once('header.php');
 ?>
@@ -8,7 +10,7 @@ require_once('header.php');
 <section class="conteudo">
   <div class="container">
     <div class="row justify-content-between">
-      <div class="col-8">
+      <div class="col-12 col-md-8">
         <h1>VinaVina</h1>
       </div>
 
@@ -29,7 +31,8 @@ require_once('header.php');
         'posts_per_page' => 9
       );
       $posts = query_posts($args);
-      if (have_posts()) : while (have_posts()) : the_post(); ?>
+      if (have_posts()) : while (have_posts()) : the_post();
+      ?>
 
           <article class="col-12 col-md-4 posts__box">
             <?php if (has_post_thumbnail()) {

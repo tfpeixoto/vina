@@ -18,6 +18,41 @@
     }
   }
 
+  &__busca {
+    background: $white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+
+    @include media-breakpoint-down(sm) {
+      margin-bottom: 3rem;
+    }
+
+    form {
+      position: relative;
+
+      input {
+        background: transparent;
+        border: none;
+        padding: 2px 5px;
+        width: 100%;
+      }
+
+      button {
+        background: transparent;
+        border: none;
+        position: absolute;
+        right: 0;
+        top: 0;
+
+        svg {
+          fill: $primary;
+          height: auto;
+          width: 16px;
+        }
+      }
+    }
+  }
+
   // fundo laranja
   &.laranja {
     background: url(../images/padrao-laranja.jpg) repeat;
