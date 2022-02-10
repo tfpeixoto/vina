@@ -47,7 +47,7 @@ gulp.task('purgecss', ['sass'], function () {
       whitelistPatterns: [/fa/, /^ekko/, /^modal/],
       safelist: {
         standard: [],
-        deep: [],
+        deep: [/input/],
         greedy: [/formulario/]
       }
     }))

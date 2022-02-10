@@ -7,9 +7,15 @@ require_once('header.php');
 
 <section class="conteudo">
   <div class="container">
-    <div class="row">
-      <div class="col-12">
+    <div class="row justify-content-between">
+      <div class="col-8">
         <h1>VinaVina</h1>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <div class="conteudo__busca">
+          <?php get_search_form(); ?>
+        </div>
       </div>
     </div>
 

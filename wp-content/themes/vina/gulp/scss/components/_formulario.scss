@@ -9,27 +9,40 @@
       background: #e5e5e5;
       border: none;
       border-radius: 5px;
+      max-width: 100%;
     }
     input[type="text"],
     input[type="email"],
     select,
-    textarea{
+    textarea {
       box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.4);
       min-height: 40px;
       min-width: 100px;
-      padding: .5rem 1rem;
-    }
-    input[type="submit"] {
-      background: #707070;
-      border: 0;
-      border-radius: 10px;
-      color: $white;
-      padding: 0.25rem 1rem;
+      padding: 0.5rem 1rem;
+      width: 400px;
     }
     #curriculo,
     #deficiencia {
       background: none;
       border: none;
+    }
+  }
+  input[type="submit"] {
+    background: #707070;
+    border: 0;
+    border-radius: 10px;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.4);
+    color: $white;
+    padding: 0.25rem 1rem;
+    transition: all ease-in-out 0.25s;
+
+    &:hover {
+      background: $secondary;
+    }
+
+    &:active {
+      background: $primary;
+      box-shadow: none;
     }
   }
 }
