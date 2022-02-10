@@ -24,7 +24,7 @@
     border-radius: 5px;
 
     @include media-breakpoint-down(sm) {
-      margin-bottom: 3rem;
+      margin-bottom: 2rem;
     }
 
     form {
@@ -50,6 +50,14 @@
           width: 16px;
         }
       }
+    }
+  }
+
+  &__retorno {
+    margin-bottom: 2rem;
+
+    strong{
+      color: $primary;
     }
   }
 

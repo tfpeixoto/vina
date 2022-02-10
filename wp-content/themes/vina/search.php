@@ -21,18 +21,25 @@ require_once('header.php');
       </div>
     </div>
 
-    <div class="row d-flex justify-content-start posts">
-      <?php
-      $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+    <div class="row">
+      <div class="col-12 conteudo__retorno">
+        <?php
+        global $wp_query;
+        $total_resultados = $wp_query->found_posts;
+        $termo_buscado = get_search_query();
 
-      $args = array(
-        'post_type' => 'post',
-        'paged' => $paged,
-        'posts_per_page' => 9
-      );
-      $posts = query_posts($args);
-      if (have_posts()) : while (have_posts()) : the_post();
-      ?>
+        $frase_retorno = ($total_resultados > 1) ?
+          "Encontramos <strong> ${total_resultados} </strong> resultados com o termo <strong> ${termo_buscado} </strong>" :
+          "Encontramos <strong> ${total_resultados} </strong> resultado com o termo <strong> ${termo_buscado} </strong>";
+
+        if ($total_resultados != 0) echo $frase_retorno;
+        ?>
+      </div>
+    </div>
+
+    <div class="row d-flex justify-content-start posts">
+      <?php 
+      if (have_posts()) : while (have_posts()) : the_post(); ?>
 
           <article class="col-12 col-md-4 posts__box">
             <?php if (has_post_thumbnail()) {
@@ -53,7 +60,9 @@ require_once('header.php');
         <?php endwhile;
       else : ?>
 
-        <p>Não há posts publicados</p>
+        <div class="col-12 posts__retorno">
+          <p>Desculpe, não há resultados com o termo <strong><?= $termo_buscado; ?></strong>.</p>
+        </div>
 
       <?php endif; ?>
     </div>
