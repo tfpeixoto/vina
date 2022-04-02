@@ -5,7 +5,7 @@ Tags: seo, sitemap, google search console, schema, redirection, WordPress SEO
 Tested up to: 5.9
 Requires at least: 5.6
 Requires PHP: 7.2
-Stable tag: 1.0.82
+Stable tag: 1.0.85.1
 License: GPL-2.0+
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -580,26 +580,23 @@ Please drop us an email at support@rankmath.com and we would be more than happy 
 
 == Changelog ==
 
-= 1.0.82 [Feb 09, 2022] =
-* Added: [New options](https://i.rankmath.com/LoMD3n) to debug the IndexNow API related issues
-* Added: Support for Cyrillic characters in the Content Analysis, now languages like Russian are supported
-* Added: Support for ImageMagick extension
-* Added: [New filter](https://rankmath.com/kb/filters-hooks-api-developer/#change-sitemap-caching-mode) to change the Sitemap caching method
-* Improved: Made several significant code improvements in the Analytics Module that have made the plugin even FASTER and lighter
-* Improved: Made several improvements in [Content AI](https://rankmath.com/content-ai/) to make it easy to understand
-* Improved: Plugin performance by removing duplicate queries
-* Improved: Don't submit `noindex` posts to the [IndexNow API](https://rankmath.com/kb/how-to-use-indexnow/) after updating the post
-* Improved: Warning shown below the Thumbnail Overlay field
-* Fixed: JS errors in Gutenberg editor after disabling the PRO version
-* Fixed: Content analysis was not analyzing the main post content on the pages that were using Divi's dynamic Header & Footer templates
-* Fixed: PHP warning on Divi's frontend editor when WP File Manager plugin was active
-* Fixed: Searching for encoded [404 URLs](https://rankmath.com/kb/advanced-404-monitor/) was not working
-* Fixed: Too many redirections error on some setups when [Remove Product Base](https://rankmath.com/kb/general-settings/#remove-base) option was enabled
-* Fixed: Editing a Focus Keyword was not working
-* Fixed: Content AI's [Recommended keywords](https://rankmath.com/kb/how-to-use-content-ai/#keywords) were not detecting accented characters in the Content area
-* Fixed: SEO panel was getting closed after removing the Focus keyword in the Divi Page Builder
-* Fixed: [Slack sharing](https://rankmath.com/kb/slack-enhanced-sharing/) was showing the wrong product price for the Product variant
-* Fixed: PHP errors on some sites
-* Removed: [Alexa Verification field](https://rankmath.com/kb/verify-your-site-with-alexa/#how-to-set-up-your-site-on-alexa) from the General Settings as it is no longer used
+= 1.0.85.1 [Mar 24, 2022] =
+* Fixed: Trailing slashes were automatically added to [Source URL](https://rankmath.com/kb/setting-up-redirections/#source-urls) when creating a **new** Redirection rule
+
+= 1.0.85 [Mar 23, 2022] =
+* Added: Search field for in the property selection dropdown present in the [Analytics Module settings](https://rankmath.com/kb/general-settings/#search-console-settings)
+* Improved: Increased the width of [tables present on the Analytics Pages](https://rankmath.com/kb/analytics/)
+* Improved: Added condition to validate the date before adding it to `article:published_time` & `article:modified_time` tags
+* Updated: [CTR](https://rankmath.com/kb/analytics/#seo-performance) calculation formula to show more accurate values in the Analytics Module
+* Fixed: [SEO Analysis](https://rankmath.com/kb/seo-analysis/) was not working on some setups
+* Fixed: [SEO score](https://rankmath.com/kb/score-100-in-tests/) was crossing 100 value on some setups
+* Fixed: Trailing slash was getting stripped from the [Source URL](https://rankmath.com/kb/setting-up-redirections/#source-urls) when setting a Redirection
+* Fixed: [SERP preview](https://rankmath.com/kb/general-tab/#num-1-4-writing-a-compelling-title-permalink-and-description) in Divi editor was not showing the parent page in the permalink
+* Fixed: [Auto Post Redirection](https://rankmath.com/kb/general-settings/#auto-post-redirect) was not working on Product Category pages when the WPML plugin is active
+* Fixed: [Rest of the Keywords](https://rankmath.com/kb/analytics/#num-4-2-rest-of-the-keywords) was not showing any data when keywords had Multibyte characters
+* Fixed: Links inserted from [Link Suggestion](https://rankmath.com/kb/pillar-content-internal-linking/#pillar-content) were getting inserted to the wrong location in the Block editor
+* Fixed: [Index Status](https://rankmath.com/kb/url-inspection-api-integration/) was showing wrong pagination count when entries were not present in the `rank_math_analytics_objects` table
+* Fixed: Non-existent [sitemap](https://rankmath.com/kb/configure-sitemaps/) pages were showing a blank sitemap instead of a 404 error, props to [@Roger_Montti](https://www.linkedin.com/in/martinibuster/)
+* Fixed: Incompatibility with the Blocksy theme
 
 Full changelog can be found here - **[Rank Math SEO changelog](https://rankmath.com/changelog/?utm_source=Plugin&utm_medium=Changelog&utm_campaign=WP)**
