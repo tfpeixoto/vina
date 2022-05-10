@@ -19,3 +19,7 @@ jobs:
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_SECRET }}
           server-dir: public/
+          exclude: | 
+            **/wp-content/uploads/**
+            **/wp-content/updraft/**
+            .htaccess
