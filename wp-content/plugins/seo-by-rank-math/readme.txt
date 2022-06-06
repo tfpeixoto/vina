@@ -2,10 +2,10 @@
 Contributors: rankmath
 Plugin link: https://rankmath.com/?utm_source=LP&utm_campaign=WP
 Tags: seo, sitemap, google search console, schema, redirection, WordPress SEO
-Tested up to: 5.9
+Tested up to: 6.0
 Requires at least: 5.6
 Requires PHP: 7.2
-Stable tag: 1.0.88.1
+Stable tag: 1.0.90
 License: GPL-2.0+
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -185,7 +185,7 @@ Even with significantly more features than other plugins, Rank Math SEO loads am
 ### Take a sneak peek into Rank Math SEO’s features ###
 
 #### Detailed Setup Tutorial ####
-[youtube https://www.youtube.com/watch?v=dTvZuMRzW4w]
+[youtube https://www.youtube.com/watch?v=cQLvCBVev3I]
 
 ### List of Best Rank Math SEO Features ###
 
@@ -580,23 +580,27 @@ Please drop us an email at support@rankmath.com and we would be more than happy 
 
 == Changelog ==
 
-= 1.0.88.1 [May 04, 2022] =
-* Fixed: [GA4 Data stream](https://rankmath.com/kb/using-ga4/#datastream-and-country) dropdown was not showing any value even if it was working fine
-
-= 1.0.88 [May 04, 2022] =
-* Added: [HUGE!] Rank Math now supports [Google Analytics 4](https://rankmath.com/kb/using-ga4/)
-* Added: Option to create GA4 property with one click
-* Added: New option in [Database Tools](https://rankmath.com/kb/rank-math-status-and-tools/#fix-analytics-table-collations) to match the collations of all Analytics tables
-* Fixed: [Content AI](https://rankmath.com/kb/how-to-use-content-ai/) was not working on secondary language posts created using the WPML plugin
-* Fixed: [Search form on the Settings page](https://rankmath.com/kb/general-settings/) was showing irrelevant items in the dropdown 
-* Fixed: Both `index` & `noindex` options could be selected in the [Date Archive Robots settings](https://rankmath.com/kb/titles-and-meta/#date-robots-meta)
-* Fixed: Dashboard widget was showing 403 error to the Shop Manager user role
-* Fixed: Dashboard widget was showing an error when the site couldn't load the Blog posts from rankmath.com/blog/
-* Fixed: "Exclude this attachment from the Sitemap" option on the attachment details popup was showing to all the users
-* Fixed: [Content Analysis](https://rankmath.com/blog/divi-seo/) was also analyzing the global Header & Footer content added in the Divi's Theme Builder
-* Fixed: On Divi's frontend editor, the SEO modal was getting closed after clicking on the Schema generator button
-* Fixed: In [Easy Mode](https://rankmath.com/kb/switch-from-easy-to-advanced-mode/), [Instant Indexing](https://rankmath.com/kb/how-to-use-indexnow/#submit-urls-manually) settings were linked to the wrong page
-* Fixed: [Update data manually](https://rankmath.com/kb/general-settings/#analytics-database) option was not working well on some setups in the Analytics Module
-* Fixed: Invalid `%searchphrase%` variable was used as a default value on the Search page
+= 1.0.90 [Jun 01, 2022] =
+* Added: New [filter to modify](https://rankmath.com/kb/filters-hooks-api-developer/#change-time-to-read-text) the text of [Time to Read](https://rankmath.com/kb/slack-enhanced-sharing/#enhanced-sharing) label
+* Added: New filter to modify [Words Per Minute](https://rankmath.com/kb/filters-hooks-api-developer/#change-words-per-minute) in the Slack enhanced sharing
+* Added: New function in Paper class to reset the main post instance. You can now use `\RankMath\Paper\Paper::reset();` code to reset the current Paper instance
+* Improved: Made several significant code improvements that make the plugin even FASTER and lighter
+* Improved: Optimized the query that [imports data from other plugins](https://rankmath.com/kb/import-export-settings/#plugin-importers-section)
+* Improved: Log details of the error when [collation fixer function](https://rankmath.com/kb/rank-math-status-and-tools/#fix-analytics-table-collations) is executed
+* Improved: Description for [Noindex Paginated Pages](https://rankmath.com/kb/titles-and-meta/#noindex-paginated-pages) & [Noindex Archive Subpages](https://rankmath.com/kb/titles-and-meta/#noindex-archive-subpages) to make it easy to understand
+* Improved: Confirm dialog messages when [importing](https://rankmath.com/kb/import-export-settings/) or [cleaning the plugin data](https://rankmath.com/kb/remove-yoast/) to make it easy to understand
+* Removed: Code that [ping sitemaps](https://rankmath.com/kb/configure-sitemaps/#ping-search-engines) to Bing as it no longer supports it. You can read more about it here: https://www.seroundtable.com/bings-anonymous-sitemap-submissions-deprecated-33414.html
+* Fixed: jQuery Migrate warnings on some setups
+* Fixed: [Link Counter](https://rankmath.com/kb/link-counter/) was not working correctly on some setups
+* Fixed: Twitter overlay image option was not working when the [Use Data from Facebook tab](https://rankmath.com/kb/meta-box-social-tab/#use-data-from-facebook-tab) option was enabled
+* Fixed: [Auto Post Redirect](https://rankmath.com/kb/general-settings/#auto-post-redirect) was not working on a subdomain installation
+* Fixed: PHP error on some setups when [HowTo block](https://rankmath.com/kb/howto-schema/#num-1-2-add-the-howto-block-to-the-post) was used in the post
+* Fixed: JS console warnings when using the [HowTo](https://rankmath.com/blog/howto-schema/) block
+* Fixed: JS console warnings on[Analytics pages](https://rankmath.com/kb/analytics/)
+* Fixed: Posts list column & [Post Analytics](https://rankmath.com/kb/analytics/#post-analytics) was not showing the FAQ & HowTo schema when those were added using the blocks
+* Fixed: Duplicated rows were stored in the redirections_cache table on some setups
+* Fixed: Duplicate code that used to ping sitemaps to Google twice on some setups
+* Fixed: Missing Rank Math icon in Block editor when Display Button Label option was enabled in the Preferences settings
+* Fixed: Permalink in Classic Editor was not updating after publishing the post on some setups
 
 Full changelog can be found here - **[Rank Math SEO changelog](https://rankmath.com/changelog/?utm_source=Plugin&utm_medium=Changelog&utm_campaign=WP)**
