@@ -5,7 +5,7 @@ Tags: seo, sitemap, google search console, schema, redirection, WordPress SEO
 Tested up to: 6.0
 Requires at least: 5.6
 Requires PHP: 7.2
-Stable tag: 1.0.90
+Stable tag: 1.0.92.1
 License: GPL-2.0+
 License URI: https://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -580,27 +580,25 @@ Please drop us an email at support@rankmath.com and we would be more than happy 
 
 == Changelog ==
 
-= 1.0.90 [Jun 01, 2022] =
-* Added: New [filter to modify](https://rankmath.com/kb/filters-hooks-api-developer/#change-time-to-read-text) the text of [Time to Read](https://rankmath.com/kb/slack-enhanced-sharing/#enhanced-sharing) label
-* Added: New filter to modify [Words Per Minute](https://rankmath.com/kb/filters-hooks-api-developer/#change-words-per-minute) in the Slack enhanced sharing
-* Added: New function in Paper class to reset the main post instance. You can now use `\RankMath\Paper\Paper::reset();` code to reset the current Paper instance
-* Improved: Made several significant code improvements that make the plugin even FASTER and lighter
-* Improved: Optimized the query that [imports data from other plugins](https://rankmath.com/kb/import-export-settings/#plugin-importers-section)
-* Improved: Log details of the error when [collation fixer function](https://rankmath.com/kb/rank-math-status-and-tools/#fix-analytics-table-collations) is executed
-* Improved: Description for [Noindex Paginated Pages](https://rankmath.com/kb/titles-and-meta/#noindex-paginated-pages) & [Noindex Archive Subpages](https://rankmath.com/kb/titles-and-meta/#noindex-archive-subpages) to make it easy to understand
-* Improved: Confirm dialog messages when [importing](https://rankmath.com/kb/import-export-settings/) or [cleaning the plugin data](https://rankmath.com/kb/remove-yoast/) to make it easy to understand
-* Removed: Code that [ping sitemaps](https://rankmath.com/kb/configure-sitemaps/#ping-search-engines) to Bing as it no longer supports it. You can read more about it here: https://www.seroundtable.com/bings-anonymous-sitemap-submissions-deprecated-33414.html
-* Fixed: jQuery Migrate warnings on some setups
-* Fixed: [Link Counter](https://rankmath.com/kb/link-counter/) was not working correctly on some setups
-* Fixed: Twitter overlay image option was not working when the [Use Data from Facebook tab](https://rankmath.com/kb/meta-box-social-tab/#use-data-from-facebook-tab) option was enabled
-* Fixed: [Auto Post Redirect](https://rankmath.com/kb/general-settings/#auto-post-redirect) was not working on a subdomain installation
-* Fixed: PHP error on some setups when [HowTo block](https://rankmath.com/kb/howto-schema/#num-1-2-add-the-howto-block-to-the-post) was used in the post
-* Fixed: JS console warnings when using the [HowTo](https://rankmath.com/blog/howto-schema/) block
-* Fixed: JS console warnings on[Analytics pages](https://rankmath.com/kb/analytics/)
-* Fixed: Posts list column & [Post Analytics](https://rankmath.com/kb/analytics/#post-analytics) was not showing the FAQ & HowTo schema when those were added using the blocks
-* Fixed: Duplicated rows were stored in the redirections_cache table on some setups
-* Fixed: Duplicate code that used to ping sitemaps to Google twice on some setups
-* Fixed: Missing Rank Math icon in Block editor when Display Button Label option was enabled in the Preferences settings
-* Fixed: Permalink in Classic Editor was not updating after publishing the post on some setups
+= 1.0.92 [Jun 29, 2022] =
+* Added: New filter to [disable the domain checking functionality](https://rankmath.com/kb/filters-hooks-api-developer/#disable-domain-checking)
+* Improved: Made several significant code improvements in the [Analytics module](https://rankmath.com/kb/analytics) to make the plugin even FASTER and LIGHTER
+* Improved: Made changes in the Person entity of Schema to include it only on the pages where it is needed
+* Improved: Dark mode styling of the [Schema Generator](https://rankmath.com/kb/rich-snippets/#add-schema-posts-pages) in the Elementor editor
+* Removed: Old update routine files as most of those contained the deprecated code
+* Fixed: Heading tags used for representational purposes were getting counted in the [Content AI Heading count test](https://rankmath.com/kb/how-to-use-content-ai/#heading-count)
+* Fixed: [Focus keyword in the content test](https://rankmath.com/kb/score-100-in-tests/#focus-keyword-in-the-content-runs-of-all-focus-keywords) was not working well in the Elementor editor when the dash was used in the Focus keyword
+* Fixed: Autogeneration of permalink was not working well when German umlauts were used in the [SERP URL field](https://rankmath.com/kb/general-tab/#num-1-1-seo-title-permalink-and-description)
+* Fixed: RSS feed settings were not imported from the Yoast plugin
+* Fixed: Unable to search the pages in the [About & Contact page](https://rankmath.com/kb/local-seo/#about-page) dropdown due to the `minimumInputLength`
+* Fixed: Settings search bar was not working on the first-page load after updating the plugin
+* Fixed: Missing SEO tags on the frontend when Elementor Maintenance mode was partially configured
+* Fixed: [Redirection debugger](https://rankmath.com/kb/general-settings/#debug-redirections) was sending a 404 error code in the header
+* Fixed: PHP notices and warnings in the Redirection debugger on some setups
+* Fixed: [Nofollow Domains](https://rankmath.com/kb/general-settings/#nofollow-domains) &[ Nofollow Exclude Domains](https://rankmath.com/kb/general-settings/#no-follow-exclude-domains) options not working reliably
+* Fixed: Encoded characters were shown in the Rich Results section of the [Index Status](https://rankmath.com/kb/url-inspection-api-integration/#rich-result-types)
+
+= 1.0.92.1 [Jun 29, 2022] =
+* Fixed: PHP Fatal error on some installations where Elementor page builder and PHP v7.2 was used
 
 Full changelog can be found here - **[Rank Math SEO changelog](https://rankmath.com/changelog/?utm_source=Plugin&utm_medium=Changelog&utm_campaign=WP)**
