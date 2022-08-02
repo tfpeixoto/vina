@@ -5,9 +5,9 @@ Tags: seo, sitemap, google search console, schema, redirection, WordPress SEO
 Tested up to: 6.0
 Requires at least: 5.6
 Requires PHP: 7.2
-Stable tag: 1.0.92.1
-License: GPL-2.0+
-License URI: https://www.gnu.org/licenses/gpl-2.0.txt
+Stable tag: 1.0.94
+License: GPLv3 or later
+License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
 Rank Math SEO is the Best WordPress SEO plugin combines the features of many SEO tools in a single package & helps you multiply your SEO traffic.
 
@@ -580,25 +580,17 @@ Please drop us an email at support@rankmath.com and we would be more than happy 
 
 == Changelog ==
 
-= 1.0.92 [Jun 29, 2022] =
-* Added: New filter to [disable the domain checking functionality](https://rankmath.com/kb/filters-hooks-api-developer/#disable-domain-checking)
-* Improved: Made several significant code improvements in the [Analytics module](https://rankmath.com/kb/analytics) to make the plugin even FASTER and LIGHTER
-* Improved: Made changes in the Person entity of Schema to include it only on the pages where it is needed
-* Improved: Dark mode styling of the [Schema Generator](https://rankmath.com/kb/rich-snippets/#add-schema-posts-pages) in the Elementor editor
-* Removed: Old update routine files as most of those contained the deprecated code
-* Fixed: Heading tags used for representational purposes were getting counted in the [Content AI Heading count test](https://rankmath.com/kb/how-to-use-content-ai/#heading-count)
-* Fixed: [Focus keyword in the content test](https://rankmath.com/kb/score-100-in-tests/#focus-keyword-in-the-content-runs-of-all-focus-keywords) was not working well in the Elementor editor when the dash was used in the Focus keyword
-* Fixed: Autogeneration of permalink was not working well when German umlauts were used in the [SERP URL field](https://rankmath.com/kb/general-tab/#num-1-1-seo-title-permalink-and-description)
-* Fixed: RSS feed settings were not imported from the Yoast plugin
-* Fixed: Unable to search the pages in the [About & Contact page](https://rankmath.com/kb/local-seo/#about-page) dropdown due to the `minimumInputLength`
-* Fixed: Settings search bar was not working on the first-page load after updating the plugin
-* Fixed: Missing SEO tags on the frontend when Elementor Maintenance mode was partially configured
-* Fixed: [Redirection debugger](https://rankmath.com/kb/general-settings/#debug-redirections) was sending a 404 error code in the header
-* Fixed: PHP notices and warnings in the Redirection debugger on some setups
-* Fixed: [Nofollow Domains](https://rankmath.com/kb/general-settings/#nofollow-domains) &[ Nofollow Exclude Domains](https://rankmath.com/kb/general-settings/#no-follow-exclude-domains) options not working reliably
-* Fixed: Encoded characters were shown in the Rich Results section of the [Index Status](https://rankmath.com/kb/url-inspection-api-integration/#rich-result-types)
-
-= 1.0.92.1 [Jun 29, 2022] =
-* Fixed: PHP Fatal error on some installations where Elementor page builder and PHP v7.2 was used
+= 1.0.94 [July 28, 2022] =
+* Improved: [NEW!] Major improvement in the plugin's UI
+* Added: Hover effect on inactive radio button type fields like [Redirection Type](https://rankmath.com/kb/general-settings/#redirection-type) & [Breadcrumbs](https://rankmath.com/kb/general-settings/#breadcrumbs)
+* Improved: Show two Schema types in one row in the [Schema Generator](https://rankmath.com/kb/schema-generator/) popup for a better user experience
+* Improved: Disconnect account button styling
+* Improved: Variable dropdown description color for better readability
+* Improved: Width issue of [GSC and GA fields](https://rankmath.com/kb/general-settings/#search-console-settings) if there are no properties in it
+* Improved: Replaced Rank Math's SVG icon in the header of Settings page with the font icon
+* Updated: [Google preview](https://rankmath.com/kb/general-tab/#the-preview-section) as per the current Google design
+* Updated: Font icons in the plugin for better UX
+* Fixed: Adding incorrect [Source URL in Redirection](https://rankmath.com/kb/setting-up-redirections/#source-urls) was leading to a white screen of death
+* Fixed: Pillar icon was incorrectly showing in the [Post list](https://rankmath.com/kb/titles-and-meta/#bulk-editing)
 
 Full changelog can be found here - **[Rank Math SEO changelog](https://rankmath.com/changelog/?utm_source=Plugin&utm_medium=Changelog&utm_campaign=WP)**
