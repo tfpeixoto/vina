@@ -28,7 +28,7 @@
 </head>
 
 <body <?php body_class(); ?>>
-  <header class="header-home">
+  <header class="header header__home">
     <div class="container">
       <nav class="navbar navbar-expand-lg">
         <?php the_custom_logo(); ?>

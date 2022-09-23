@@ -37,7 +37,7 @@
 </head>
 
 <body <?php body_class(); ?>>
-  <header class="header-geral">
+  <header class="header header__geral">
     <div class="container">
       <nav class="navbar navbar-expand-lg">
         <?php the_custom_logo(); ?>
