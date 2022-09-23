@@ -2,6 +2,7 @@
 <html lang="pt-br">
 
 <head>
+  <link rel="preconnect" href="https://www.google-analytics.com/">
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-102072980-1"></script>
   <script>

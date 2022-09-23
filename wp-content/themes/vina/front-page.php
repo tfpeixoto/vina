@@ -36,7 +36,7 @@ require_once('header-home.php');
           <div class="carousel-item">
             <img class="d-block" src="<?php the_post_thumbnail_url(); ?>" alt="<?php the_title(); ?>">
             <div class="carousel-caption d-none d-md-block">
-              <img src="<?php bloginfo('template_url'); ?>/assets/images/marca-vina.png" class="marca-slide" alt="Vina" />
+              <img src="<?php bloginfo('template_url'); ?>/assets/images/marca-vina.png" width="1920" height="1080" class="marca-slide" alt="Vina" />
               <h5><?php the_title(); ?></h5>
             </div>
           </div>
