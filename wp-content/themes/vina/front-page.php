@@ -7,6 +7,22 @@ require_once('header-home.php');
 
 <section class="slideshow">
   <div id="slideHome" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators" href="#slideHome">
+      <?php
+      $contadorSlides = 0;
+      $args = array(
+        'post_type' => 'slideshow',
+        'posts_per_page' => -1
+      );
+      $slides = new WP_Query($args);
+      if ($slides->have_posts()) : while ($slides->have_posts()) : $slides->the_post(); ?>
+
+          <li data-target="#slideHome" data-slide-to="<?= $contadorSlides++ ?>"></li>
+
+      <?php endwhile;
+      endif; ?>
+    </ol>
+
     <div class="carousel-inner">
 
       <?php
@@ -14,7 +30,6 @@ require_once('header-home.php');
         'post_type' => 'slideshow',
         'posts_per_page' => -1
       );
-      $contadorSlides = 0;
       $slides = new WP_Query($args);
       if ($slides->have_posts()) : while ($slides->have_posts()) : $slides->the_post(); ?>
 
@@ -33,21 +48,6 @@ require_once('header-home.php');
 
       <?php endif; ?>
     </div>
-
-    <ol class="carousel-indicators" href="#slideHome">
-      <?php
-      $args = array(
-        'post_type' => 'slideshow',
-        'posts_per_page' => -1
-      );
-      $slides = new WP_Query($args);
-      if ($slides->have_posts()) : while ($slides->have_posts()) : $slides->the_post(); ?>
-
-          <li data-target="#slideHome" data-slide-to="<?= $contadorSlides++ ?>"></li>
-
-      <?php endwhile;
-      endif; ?>
-    </ol>
 
     <a class="carousel-control-prev" href="#slideHome" role="button" data-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
