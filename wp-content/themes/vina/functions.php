@@ -235,7 +235,7 @@ add_action('after_setup_theme', 'vina_config', 0);
 // add_filter('video_embed_html', 'video_embed_responsivo');
 
 
-Remover o block-library/style.css
+// Remover o block-library/style.css
 function wpassist_remove_block_library_css()
 {
   wp_dequeue_style('wp-block-library');
