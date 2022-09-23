@@ -278,3 +278,8 @@ function hot_set_headers_seo()
   // header('Content-Security-Policy': 'default-src self');
 }
 add_action('send_headers', 'hot_set_headers_seo');
+
+
+// desative css and js for Recaptcha
+add_filter( 'wpcf7_load_js', '__return_false' );
+add_filter( 'wpcf7_load_css', '__return_false' );
