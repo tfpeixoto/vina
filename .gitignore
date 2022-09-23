@@ -3,6 +3,7 @@ node_modules
 tmpnodejsnpm-cache
 wp-content/uploads
 wp-content/updraft
+wp-content/webp-express/webp-images
 
 wp-config.php
 .htaccess
