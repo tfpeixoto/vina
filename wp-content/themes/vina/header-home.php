@@ -31,7 +31,7 @@
   <header class="header header__home">
     <div class="container">
       <nav class="navbar navbar-expand-lg">
-        <a href="<?php ?>" class="custom-logo-link" title="<?php bloginfo('title'); ?>">
+        <a href="<?php $url = home_url(); echo $url; ?>" class="custom-logo-link" title="<?php bloginfo('title'); ?>">
           <img src="<?= get_template_directory_uri(); ?>/assets/images/marca-vina.svg" width="150" height="46" class="custom-logo" alt="<?php bloginfo('title'); ?>" />
         </a>
 
