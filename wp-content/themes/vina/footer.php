@@ -26,7 +26,7 @@
         <ul class="redes-sociais">
           <li class="marca"><a href="<?php $home = site_url();
                         echo $home; ?>">
-              <img src="<?php bloginfo('template_url'); ?>/assets/images/marca-vina.png" alt="Vina Gestão de Resíduos Sólidos e Locação de Equipamentos" />
+              <img src="<?php bloginfo('template_url'); ?>/assets/images/marca-vina.svg" alt="Vina Gestão de Resíduos Sólidos e Locação de Equipamentos" />
             </a></li>
           <li>
             <a href="https://www.facebook.com/vinasocial/" target="_blank" rel="noopener noreferrer">

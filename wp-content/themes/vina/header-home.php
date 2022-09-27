@@ -28,10 +28,12 @@
 </head>
 
 <body <?php body_class(); ?>>
-  <header class="header-home">
+  <header class="header header__home">
     <div class="container">
       <nav class="navbar navbar-expand-lg">
-        <?php the_custom_logo(); ?>
+        <a href="<?php ?>" class="custom-logo-link" title="<?php bloginfo('title'); ?>">
+          <img src="<?= get_template_directory_uri(); ?>/assets/images/marca-vina.svg" width="150" height="46" class="custom-logo" alt="<?php bloginfo('title'); ?>" />
+        </a>
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navheader" aria-controls="navheader" aria-expanded="false" aria-label="Alterna navegação">
           <span class="navbar-toggler-trace"></span>

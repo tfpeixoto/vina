@@ -1,4 +1,9 @@
 header {
+  position: fixed;
+  top: 0;
+  z-index: 10;
+  width: 100vw;
+
   .navbar-toggler {
     border: 2px solid $white;
     width: 50px;
@@ -13,78 +18,70 @@ header {
       width: 100%;
     }
   }
-}
 
-//header home
-.header-home {
-  background: none;
-  position: fixed;
-  top: 0;
-  z-index: 10;
-  width: 100%;
+  //header home
+  &.header__home {
+    background: none;
 
-  .navbar-nav {
-    margin-top: 2rem;
-    margin-left: auto;
+    .navbar-nav {
+      margin-top: 2rem;
+      margin-left: auto;
 
-    @include media-breakpoint-up(md) {
-      margin-top: 0;
-    }
-    /* purgecss ignore */
-    .nav-item {
-      &.active {
-        .nav-link {
-          color: $secondary;
-        }
+      @include media-breakpoint-up(md) {
+        margin-top: 0;
       }
-      .nav-link {
-        color: $white;
-        font-size: 1rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        transition: all ease-in-out 0.25s;
-
-        &:hover {
-          color: $secondary;
+      /* purgecss ignore */
+      .nav-item {
+        &.active {
+          .nav-link {
+            color: $secondary;
+          }
+        }
+        .nav-link {
+          color: $white;
+          font-size: 1rem;
           font-weight: 700;
+          text-transform: uppercase;
+          transition: all ease-in-out 0.25s;
+
+          &:hover {
+            color: $secondary;
+            font-weight: 700;
+          }
         }
       }
     }
   }
-}
 
-// header-geral
-.header-geral {
-  background: $secondary;
-  color: $white;
-  position: fixed;
-  top: 0;
-  z-index: 10;
-  width: 100%;
+  // header-geral
+  &.header__geral {
+    background: $secondary;
+    color: $white;
 
-  .navbar-nav {
-    margin-top: 2rem;
-    margin-left: auto;
+    .navbar-nav {
+      margin-top: 2rem;
+      margin-left: auto;
 
-    @include media-breakpoint-up(md) {
-      margin-top: 0;
-    }
-    .nav-item {
-      &.active {
-        .nav-link {
-          color: $primary;
-        }
+      @include media-breakpoint-up(md) {
+        margin-top: 0;
       }
-      .nav-link {
-        color: $white;
-        font-size: 1rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        transition: all ease-in-out 0.25s;
-
-        &:hover {
-          color: $primary;
+      .nav-item {
+        &.active {
+          .nav-link {
+            color: $primary;
+          }
+        }
+        .nav-link {
+          color: $white;
+          font-size: 1rem;
           font-weight: 700;
+          text-transform: uppercase;
+          transition: all ease-in-out 0.25s;
+
+          &:hover {
+            color: $primary;
+            font-weight: 700;
+          }
         }
       }
     }

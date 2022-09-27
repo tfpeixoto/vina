@@ -24,7 +24,6 @@ require_once('header-home.php');
     </ol>
 
     <div class="carousel-inner">
-
       <?php
       $args = array(
         'post_type' => 'slideshow',
@@ -34,9 +33,23 @@ require_once('header-home.php');
       if ($slides->have_posts()) : while ($slides->have_posts()) : $slides->the_post(); ?>
 
           <div class="carousel-item">
-            <img class="d-block" src="<?php the_post_thumbnail_url(); ?>" width="1920" height="1080" alt="<?php the_title(); ?>">
+            <?php
+            $image_mobile = get_field('imagem_mobile');
+            if ($image_mobile) :
+            ?>
+
+              <img class="d-block d-md-none img-mobile" src="<?= $image_mobile['url'] ?>" alt="<?= $image_mobile['alt'] ?>">
+
+            <?php else : ?>
+
+              <img class="d-block d-md-none img-mobile" src="<?php the_post_thumbnail_url(); ?>" alt="<?php the_title(); ?>">
+
+            <?php endif; ?>
+
+            <img class="d-none d-md-block img-desktop" src="<?php the_post_thumbnail_url(); ?>" width="1920" height="1080" alt="<?php the_title(); ?>">
+
             <div class="carousel-caption d-none d-md-block">
-              <img src="<?php bloginfo('template_url'); ?>/assets/images/marca-vina.png" class="marca-slide" alt="Vina" />
+              <img src="<?= get_template_directory_uri(); ?>/assets/images/marca-vina.svg" class="marca-slide" width="250" height="76" alt="<?php bloginfo('title'); ?>" />
               <h5><?php the_title(); ?></h5>
             </div>
           </div>

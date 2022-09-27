@@ -2,7 +2,10 @@
 @import "./node_modules/bootstrap/scss/bootstrap";
 @import "components/wordpress";
 
+@import "components/geral";
+/*! purgecss start ignore */
 @import "components/conteudo";
+/*! purgecss end ignore */
 @import "components/galeria";
 @import "components/formulario";
 @import "components/footer";

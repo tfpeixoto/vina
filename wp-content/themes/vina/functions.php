@@ -227,6 +227,14 @@ function vina_config()
 }
 add_action('after_setup_theme', 'vina_config', 0);
 
+// function video_embed_responsivo($html)
+// {
+//   return '<div class="video-container">' . $html . '</div>';
+// }
+// add_filter('embed_oembed_html', 'video_embed_responsivo', 10, 3);
+// add_filter('video_embed_html', 'video_embed_responsivo');
+
+
 // Remover o block-library/style.css
 function wpassist_remove_block_library_css()
 {
@@ -281,5 +289,5 @@ add_action('send_headers', 'hot_set_headers_seo');
 
 
 // desative css and js for Recaptcha
-add_filter( 'wpcf7_load_js', '__return_false' );
-add_filter( 'wpcf7_load_css', '__return_false' );
+add_filter('wpcf7_load_js', '__return_false');
+add_filter('wpcf7_load_css', '__return_false');
