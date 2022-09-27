@@ -12,7 +12,7 @@ if ($images) : ?>
         <?php foreach ($images as $image) : ?>
 
           <div class="carousel-item <?php $contadorSlides == 0 ? 'active' : ''; ?>">
-            <img class="d-block" src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">
+            <img class="d-block img-desktop" src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">
           </div>
 
         <?php endforeach; ?>
