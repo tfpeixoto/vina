@@ -26,7 +26,7 @@ class CombineCss
 	 */
 	public static function doCombine($htmlSource)
 	{
-		if (! (function_exists('libxml_use_internal_errors') && function_exists('libxml_clear_errors') && class_exists('\DOMDocument')) && class_exists('\DOMXpath')) {
+		if ( ! Misc::isDOMDocumentOn() ) {
 			return $htmlSource;
 		}
 
@@ -215,7 +215,7 @@ class CombineCss
 			OptimizeCommon::setAssetCachedData(
 				self::$jsonStorageFile,
 				OptimizeCss::getRelPathCssCacheDir(),
-				json_encode($storageJsonContentsToSave)
+				wp_json_encode($storageJsonContentsToSave)
 			);
 		}
 
@@ -446,7 +446,10 @@ HTML;
 						$cssContent = OptimizeCommon::stripSourceMap($cssContent, 'css');
 					}
 
-					$finalCombinedCssContent .= '/*!'.str_replace(Misc::getWpRootDirPath(), '/', $localAssetsPath)."*/\n";
+					if (apply_filters('wpacu_print_info_comments_in_cached_assets', true)) {
+						$finalCombinedCssContent .= '/*!' . str_replace( Misc::getWpRootDirPath(), '/', $localAssetsPath ) . "*/\n";
+					}
+
 					$finalCombinedCssContent .= OptimizeCss::maybeFixCssContent($cssContent, $pathToAssetDir . '/') . "\n";
 
 					$finalCombinedCssContent = self::appendToCombineCss($localAssetsExtra, $assetHref, $pathToAssetDir, $finalCombinedCssContent);
@@ -507,7 +510,10 @@ HTML;
 
 				$afterCssContent = OptimizeCss::maybeFixCssContent( $afterCssContent, $pathToAssetDir . '/' );
 
-				$finalAssetsContents .= '/* [inline: after] */'.$afterCssContent.'/* [/inline: after] */'."\n";
+				$finalAssetsContents .= apply_filters('wpacu_print_info_comments_in_cached_assets', true) ? '/* [inline: after] */' : '';
+				$finalAssetsContents .= $afterCssContent;
+				$finalAssetsContents .= apply_filters('wpacu_print_info_comments_in_cached_assets', true) ? '/* [/inline: after] */' : '';
+				$finalAssetsContents .= "\n";
 			}
 		}
 

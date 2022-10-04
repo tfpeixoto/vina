@@ -5,9 +5,9 @@ if (! isset($data)) {
 }
 ?>
 <script type="text/javascript" data-wpacu-own-inline-script="true">
-    var wpacuContentLinks           = document.getElementsByClassName('wpacu-assets-collapsible'),
+    var wpacuContentLinks = document.getElementsByClassName('wpacu-assets-collapsible'),
         wpacuInlineCodeContentLinks = document.getElementsByClassName('wpacu-assets-inline-code-collapsible'),
-        wpacuPluginToggleWrapLinks  = document.getElementsByClassName('wpacu-plugin-contracted-wrap-link'),
+        wpacuPluginToggleWrapLinks = document.getElementsByClassName('wpacu-plugin-contracted-wrap-link'),
         wpacuI, wpacuITwo, wpacuIThree;
 
     // "Styles" & "Scripts" main areas
@@ -41,6 +41,32 @@ if (! isset($data)) {
                 assetInlineCodeContent.style.maxHeight = null;
             } else {
                 assetInlineCodeContent.style.maxHeight = assetInlineCodeContent.scrollHeight + 'px';
+            }
+        });
+    }
+
+    for (wpacuIThree = 0; wpacuIThree < wpacuPluginToggleWrapLinks.length; wpacuIThree++) {
+        wpacuPluginToggleWrapLinks[wpacuIThree].addEventListener('click', function (e) {
+            e.preventDefault();
+
+            var wpacuNext = this.nextElementSibling;
+
+            if (this.classList.contains('wpacu-link-closed')) {
+                // Change Link Class
+                this.classList.remove('wpacu-link-closed');
+                this.classList.add('wpacu-link-open');
+
+                // Change Target Content  Class
+                wpacuNext.classList.remove('wpacu-area-closed');
+                wpacuNext.classList.add('wpacu-area-open');
+            } else {
+                // Change Link Class
+                this.classList.remove('wpacu-link-open');
+                this.classList.add('wpacu-link-closed');
+
+                // Change Target Content Class
+                wpacuNext.classList.remove('wpacu-area-open');
+                wpacuNext.classList.add('wpacu-area-closed');
             }
         });
     }
@@ -120,32 +146,6 @@ if (! isset($data)) {
     }
     ?>
 
-    for (wpacuIThree = 0; wpacuIThree < wpacuPluginToggleWrapLinks.length; wpacuIThree++) {
-        wpacuPluginToggleWrapLinks[wpacuIThree].addEventListener('click', function (e) {
-            e.preventDefault();
-
-            var wpacuNext = this.nextElementSibling;
-
-            if (this.classList.contains('wpacu-link-closed')) {
-                // Change Link Class
-                this.classList.remove('wpacu-link-closed');
-                this.classList.add('wpacu-link-open');
-
-                // Change Target Content  Class
-                wpacuNext.classList.remove('wpacu-area-closed');
-                wpacuNext.classList.add('wpacu-area-open');
-            } else {
-                // Change Link Class
-                this.classList.remove('wpacu-link-open');
-                this.classList.add('wpacu-link-closed');
-
-                // Change Target Content  Class
-                wpacuNext.classList.remove('wpacu-area-open');
-                wpacuNext.classList.add('wpacu-area-closed');
-            }
-        });
-    }
-
     /* Source: http://bdadam.com/blog/automatically-adapting-the-height-textarea.html */
     (function() {
         function wpacuAdjustTextareaHeight(el, minHeight) {
@@ -201,7 +201,7 @@ if (! isset($data)) {
             wpacuTotalHeight = 0;
 
             $wpacuEl = $(this);
-            $wpacuP = $wpacuEl.parent();
+            $wpacuP  = $wpacuEl.parent();
             $wpacuUp = $wpacuP.parent();
             $wpacuPs = $wpacuUp.find('div');
 
@@ -239,7 +239,7 @@ if (! isset($data)) {
         for (var wpacuII = 0; wpacuII < wpacuElGoPro.length; wpacuII++) {
             // Here we have the same onclick
             wpacuElGoPro.item(wpacuII).onclick = function() {
-                window.location.replace('<?php echo $upgradeToProLink; ?>');
+                window.location.replace('<?php echo esc_js($upgradeToProLink); ?>');
             };
         }
     <?php

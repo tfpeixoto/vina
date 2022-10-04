@@ -153,60 +153,7 @@ class MinifyJs
 		// Do not perform another \DOMDocument call if it was done already somewhere else (e.g. CombineJs)
 		$fetchType = 'regex'; // 'regex' or 'dom'
 
-		if ( $fetchType === 'dom' ) {
-			// DOMDocument extension has to be enabled, otherwise return the HTML source as was (no changes)
-			if ( ! ( function_exists( 'libxml_use_internal_errors' ) && function_exists( 'libxml_clear_errors' ) && class_exists( '\DOMDocument' ) ) ) {
-				return $htmlSource;
-			}
-
-			$domTag = OptimizeCommon::getDomLoadedTag($htmlSource, 'minifyInlineScriptTags');
-
-			$scriptTagsObj = $domTag->getElementsByTagName( 'script' );
-
-			if ( $scriptTagsObj === null ) {
-				return $htmlSource;
-			}
-
-			foreach ( $scriptTagsObj as $scriptTagObj ) {
-				// Does it have the "src" attribute? Skip it as it's not an inline SCRIPT tag
-				if ( isset( $scriptTagObj->attributes ) && $scriptTagObj->attributes !== null ) {
-					foreach ( $scriptTagObj->attributes as $attrObj ) {
-						if ( $attrObj->nodeName === 'src' ) {
-							continue 2;
-						}
-
-						if ( $attrObj->nodeName === 'type' && $attrObj->nodeValue !== 'text/javascript' ) {
-							// If a "type" parameter exists (otherwise it defaults to "text/javascript")
-							// and the value of "type" is not "text/javascript", do not proceed with any optimization (including minification)
-							continue 2;
-						}
-					}
-				}
-
-				$originalTag = CleanUp::getOuterHTML( $scriptTagObj );
-
-				// No need to use extra resources as the tag is already minified
-				if ( preg_match( '/(' . implode( '|', $skipTagsContaining ) . ')/', $originalTag ) ) {
-					continue;
-				}
-
-				$originalTagContents = ( isset( $scriptTagObj->nodeValue ) && trim( $scriptTagObj->nodeValue ) !== '' ) ? $scriptTagObj->nodeValue : false;
-
-				if ( $originalTagContents ) {
-					$newTagContents = OptimizeJs::maybeAlterContentForInlineScriptTag( $originalTagContents, true );
-
-					if ( $newTagContents !== $originalTagContents ) {
-						$htmlSource = str_ireplace(
-							'>' . $originalTagContents . '</script',
-							'>' . $newTagContents . '</script',
-							$htmlSource
-						);
-					}
-
-					libxml_clear_errors();
-				}
-			}
-		} elseif ($fetchType === 'regex') {
+		if ($fetchType === 'regex') {
 			preg_match_all( '@(<script[^>]*?>).*?</script>@si', $htmlSource, $matchesScriptTags, PREG_SET_ORDER );
 
 			if ( $matchesScriptTags === null ) {

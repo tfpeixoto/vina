@@ -8,9 +8,9 @@ namespace WpAssetCleanUp;
 class Menu
 {
 	/**
-	 * @var array
+	 * @var array|string[]
 	 */
-	public $allMenuPages = array();
+	public static $allMenuPages = array();
 
 	/**
 	 * @var string
@@ -27,7 +27,7 @@ class Menu
      */
     public function __construct()
     {
-    	$this->allMenuPages = array(
+    	self::$allMenuPages = array(
 		    WPACU_PLUGIN_ID . '_getting_started',
 		    WPACU_PLUGIN_ID . '_settings',
 		    WPACU_PLUGIN_ID . '_assets_manager',
@@ -148,6 +148,7 @@ class Menu
             array(new Info, 'help')
         );
 
+		// [wpacu_lite]
 	    // Upgrade to "Go Pro" | Redirects to sale page
 	    add_submenu_page(
 		    self::$_slug,
@@ -157,13 +158,14 @@ class Menu
 		    WPACU_PLUGIN_ID . '_go_pro',
 		    function() {}
 	    );
+		// [/wpacu_lite]
 
 	    // Add "Asset CleanUp Pro" Settings Link to the main "Settings" menu within the Dashboard
 	    // For easier navigation
 	    $GLOBALS['submenu']['options-general.php'][] = array(
 		    WPACU_PLUGIN_TITLE,
 		    self::getAccessCapability(),
-		    admin_url( 'admin.php?page=' . WPACU_PLUGIN_ID . '_settings'),
+		    esc_url(admin_url( 'admin.php?page=' . WPACU_PLUGIN_ID . '_settings')),
 		    WPACU_PLUGIN_TITLE,
 	    );
 
@@ -187,6 +189,14 @@ class Menu
 
 		// self::$_capability default value: "administrator"
 		return current_user_can(self::getAccessCapability());
+	}
+
+	/**
+	 * @return bool
+	 */
+	public static function isPluginPage()
+	{
+		return isset($_GET['page']) && in_array($_GET['page'], self::$allMenuPages);
 	}
 
 	/**
@@ -234,7 +244,7 @@ class Menu
 		}
 
 		// Build your links URL.
-		$url = admin_url( 'admin.php?page=wpassetcleanup_assets_manager' );
+		$url = esc_url(admin_url( 'admin.php?page=wpassetcleanup_assets_manager' ));
 
 		// Maybe put in some extra arguments based on the post status.
 		$edit_link = add_query_arg(
@@ -266,9 +276,7 @@ class Menu
 	 */
 	public function pluginPagesAccessDenied()
 	{
-		if ( ! (isset($_GET['page'])
-		        && strpos($_GET['page'], WPACU_PLUGIN_ID . '_') === 0
-		        && in_array($_GET['page'], $this->allMenuPages)) ) {
+		if ( ! self::isPluginPage() ) {
 			// Not an Asset CleanUp page
 			return;
 		}

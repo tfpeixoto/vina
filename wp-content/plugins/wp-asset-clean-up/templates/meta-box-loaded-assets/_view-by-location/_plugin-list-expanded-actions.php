@@ -13,11 +13,11 @@ if (! isset($showUnloadOnThisPageCheckUncheckAll, $showLoadItOnThisPageCheckUnch
                 <li>"Unload on this page"</li>
                 <li>
                     <a class="wpacu-plugin-check-all"
-                       data-wpacu-plugin="<?php echo $locationChild; ?>"
+                       data-wpacu-plugin="<?php echo esc_html($locationChild); ?>"
                        href="#">Check All</a>
                     |
                     <a class="wpacu-plugin-uncheck-all"
-                       data-wpacu-plugin="<?php echo $locationChild; ?>"
+                       data-wpacu-plugin="<?php echo esc_html($locationChild); ?>"
                        href="#">Uncheck All</a>
                 </li>
             </ul>
@@ -33,11 +33,11 @@ if (! isset($showUnloadOnThisPageCheckUncheckAll, $showLoadItOnThisPageCheckUnch
                 <li>Make an exception from bulk unload, "Load it on this page"</li>
                 <li>
                     <a class="wpacu-plugin-check-load-all"
-                       data-wpacu-plugin="<?php echo $locationChild; ?>"
+                       data-wpacu-plugin="<?php echo esc_html($locationChild); ?>"
                        href="#">Check All</a>
                     |
                     <a class="wpacu-plugin-uncheck-load-all"
-                       data-wpacu-plugin="<?php echo $locationChild; ?>"
+                       data-wpacu-plugin="<?php echo esc_html($locationChild); ?>"
                        href="#">Uncheck All</a>
                 </li>
         </div>

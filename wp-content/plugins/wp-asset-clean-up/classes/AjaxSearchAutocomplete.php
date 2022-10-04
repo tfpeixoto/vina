@@ -25,7 +25,7 @@ class AjaxSearchAutocomplete
 			return;
 	    }
 
-	    $wpacuFor = $_REQUEST['wpacu_for'];
+	    $wpacuFor = sanitize_text_field($_REQUEST['wpacu_for']);
 	    $forPostType = '';
 
 	    switch ($wpacuFor) {
@@ -56,16 +56,15 @@ class AjaxSearchAutocomplete
 	    );
 
 	    wp_localize_script('wpacu-autocomplete-search', 'wpacu_autocomplete_search_obj', array(
-		    'ajax_url'       => admin_url('admin-ajax.php'),
+		    'ajax_url'       => esc_url(admin_url('admin-ajax.php')),
 		    'ajax_nonce'     => wp_create_nonce('wpacu_autocomplete_search_nonce'),
 		    'ajax_action'    => WPACU_PLUGIN_ID . '_autocomplete_search',
 		    'post_type'      => $forPostType,
-		    'redirect_to'    => admin_url('admin.php?page=wpassetcleanup_assets_manager&wpacu_for='.$wpacuFor.'&wpacu_post_id=[post_id_here]')
+		    'redirect_to'    => esc_url(admin_url('admin.php?page=wpassetcleanup_assets_manager&wpacu_for='.$wpacuFor.'&wpacu_post_id=post_id_here'))
 	    ));
 
-	    $wp_scripts = wp_scripts();
 	    wp_enqueue_style('wpacu-jquery-ui-css',
-		    '//ajax.googleapis.com/ajax/libs/jqueryui/' . $wp_scripts->registered['jquery-ui-autocomplete']->ver . '/themes/smoothness/jquery-ui.css',
+		    WPACU_PLUGIN_URL . '/assets/auto-complete/smoothness/jquery-ui-custom.css',
 		    false, null, false
 	    );
 
@@ -86,11 +85,11 @@ CSS;
 
 		global $wpdb;
 
-		$search_term = isset($_REQUEST['wpacu_term'])      ? $_REQUEST['wpacu_term']      : '';
-		$post_type   = isset($_REQUEST['wpacu_post_type']) ? $_REQUEST['wpacu_post_type'] : '';
+		$search_term = isset($_REQUEST['wpacu_term'])      ? sanitize_text_field($_REQUEST['wpacu_term']) : '';
+		$post_type   = isset($_REQUEST['wpacu_post_type']) ? sanitize_text_field($_REQUEST['wpacu_post_type']) : '';
 
 		if ( $search_term === '' ) {
-			echo json_encode(array());
+			echo wp_json_encode(array());
 		}
 
 		$results = array();
@@ -105,7 +104,7 @@ CSS;
 		    );
 	    } else {
 	    	// 'attachment'
-		    $search = $wpdb->get_col( $wpdb->prepare( " SELECT DISTINCT ID FROM {$wpdb->posts} WHERE post_title = '%s' ", $search_term ) );
+		    $search = $wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT ID FROM {$wpdb->posts} WHERE post_title = '%s'", $search_term ) );
 		    $queryDataByKeyword = array(
 			    'post_type' => 'attachment',
 			    'post_status' => 'inherit',
@@ -175,7 +174,7 @@ CSS;
 			wp_die();
 		}
 
-		echo json_encode($results);
+		echo wp_json_encode($results);
 		wp_die();
 	}
 }

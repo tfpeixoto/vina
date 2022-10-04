@@ -41,7 +41,7 @@ class OwnAssets
 		    $wpacu_object_data['source_load_error_msg'] = __('The source might not be reachable', 'wp-asset-clean-up');
 		    $wpacu_object_data['plugin_id'] = WPACU_PLUGIN_ID;
 		    $wpacu_object_data['plugin_title'] = WPACU_PLUGIN_TITLE;
-		    $wpacu_object_data['ajax_url']  = admin_url('admin-ajax.php');
+		    $wpacu_object_data['ajax_url']  = esc_url(admin_url('admin-ajax.php'));
 		    $wpacu_object_data['is_frontend_view'] = false;
 
 		    if ( isset($_GET['wpacu_manage_dash']) ) {
@@ -101,10 +101,13 @@ class OwnAssets
                 $unloadAssetsSubmit = (isset($_POST['wpacu_unload_assets_area_loaded']) && $_POST['wpacu_unload_assets_area_loaded']);
 
                 // After updating the CSS/JS manager within the front-end view (when "Manage in the front-end" is enabled)
-                $frontendViewPageAssetsJustUpdated = (! is_admin() && get_transient('wpacu_page_just_updated'));
+                $frontendViewPageAssetsJustUpdated = (! is_admin() && (isset($_GET['wpacu_time']) && $_GET['wpacu_time']) && get_transient('wpacu_page_just_updated'));
 
                 // After updating the "Settings" within the Dashboard
-                $pluginSettingsWithinDashboardJustUpdated = (is_admin() && get_transient('wpacu_settings_updated'));
+                $pluginSettingsWithinDashboardJustUpdated = (is_admin() &&
+                 (Misc::getVar('request', 'page') === WPACU_PLUGIN_ID . '_settings') &&
+                 Misc::getVar('get', 'wpacu_selected_tab_area') &&
+                 get_transient('wpacu_settings_updated'));
 
                 if ($unloadAssetsSubmit || $frontendViewPageAssetsJustUpdated || $pluginSettingsWithinDashboardJustUpdated) {
                     // Instruct the script to trigger clearing the cache via AJAX
@@ -119,7 +122,17 @@ class OwnAssets
 			 */
                 // When click the "Clear CSS/JS Files Cache" link within the Dashboard (e.g. toolbar or quick action areas)
                 // Cache was already cleared; Do not clear it again (save resources); Clear other caches
-                if (get_transient('wpacu_clear_assets_cache_via_link')) {
+                // Make sure the referrer (it needs to have one) is the same URI as the currently loaded one (without any extra parameters)
+		        $wpacuClearOtherCaches = false;
+                $wpacuReferrer         = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+
+                if ($wpacuReferrer) {
+	                list(,$wpacuUriFromReferrer ) = explode('//' . parse_url($wpacuReferrer, PHP_URL_HOST), $wpacuReferrer);
+	                $wpacuRequestUri              = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+	                $wpacuClearOtherCaches        = ($wpacuUriFromReferrer === $wpacuRequestUri);
+                }
+
+                if ($wpacuClearOtherCaches && get_transient('wpacu_clear_assets_cache_via_link')) {
 	                delete_transient('wpacu_clear_assets_cache_via_link');
                     $wpacu_object_data['clear_other_caches'] = true;
                 }
@@ -147,51 +160,53 @@ class OwnAssets
 	 */
 	public function inlineCode()
 	{
-		if (is_admin_bar_showing()) {
-			?>
-            <style <?php echo Misc::getStyleTypeAttribute(); ?> data-wpacu-own-inline-style="true">
-                #wp-admin-bar-assetcleanup-asset-unload-rules-css-default,
-                #wp-admin-bar-assetcleanup-asset-unload-rules-js-default {
-                    overflow-y: auto;
-                    max-height: calc(100vh - 250px);
-                }
+		if ( ! is_admin_bar_showing() ) {
+		    return; // the code below is relevant only if the admin bar is shown
+        }
+        ?>
+        <style <?php echo Misc::getStyleTypeAttribute(); ?> data-wpacu-own-inline-style="true">
+            #wp-admin-bar-assetcleanup-asset-unload-rules-css-default,
+            #wp-admin-bar-assetcleanup-asset-unload-rules-js-default,
+            #wp-admin-bar-assetcleanup-plugin-unload-rules-notice-default {
+                overflow-y: auto;
+                max-height: calc(100vh - 250px);
+            }
 
-                #wp-admin-bar-assetcleanup-parent span.dashicons {
-                    width: 15px;
-                    height: 15px;
-                    font-family: 'Dashicons', Arial, "Times New Roman", "Bitstream Charter", Times, serif !important;
-                }
+            #wp-admin-bar-assetcleanup-parent span.dashicons {
+                width: 15px;
+                height: 15px;
+                font-family: 'Dashicons', Arial, "Times New Roman", "Bitstream Charter", Times, serif !important;
+            }
 
-                #wp-admin-bar-assetcleanup-parent > a:first-child strong {
-                    font-weight: bolder;
-                    color: #76f203;
-                }
+            #wp-admin-bar-assetcleanup-parent > a:first-child strong {
+                font-weight: bolder;
+                color: #76f203;
+            }
 
-                #wp-admin-bar-assetcleanup-parent > a:first-child:hover {
-                    color: #00b9eb;
-                }
+            #wp-admin-bar-assetcleanup-parent > a:first-child:hover {
+                color: #00b9eb;
+            }
 
-                #wp-admin-bar-assetcleanup-parent > a:first-child:hover strong {
-                    color: #00b9eb;
-                }
+            #wp-admin-bar-assetcleanup-parent > a:first-child:hover strong {
+                color: #00b9eb;
+            }
 
-                #wp-admin-bar-assetcleanup-test-mode-info {
-                    margin-top: 5px !important;
-                    margin-bottom: -8px !important;
-                    padding-top: 3px !important;
-                    border-top: 1px solid #ffffff52;
-                }
+            #wp-admin-bar-assetcleanup-test-mode-info {
+                margin-top: 5px !important;
+                margin-bottom: -8px !important;
+                padding-top: 3px !important;
+                border-top: 1px solid #ffffff52;
+            }
 
-                /* Add some spacing below the last text */
-                #wp-admin-bar-assetcleanup-test-mode-info-2 {
-                    padding-bottom: 3px !important;
-                }
-            </style>
-			<?php
-			if (wp_style_is(WPACU_PLUGIN_ID . '-style', 'enqueued')) {
-				echo Misc::preloadAsyncCssFallbackOutput();
-			}
-		}
+            /* Add some spacing below the last text */
+            #wp-admin-bar-assetcleanup-test-mode-info-2 {
+                padding-bottom: 3px !important;
+            }
+        </style>
+        <?php
+        if (wp_style_is(WPACU_PLUGIN_ID . '-style', 'enqueued')) {
+            echo Misc::preloadAsyncCssFallbackOutput();
+        }
 	}
 
 	/**
@@ -225,7 +240,7 @@ class OwnAssets
                 ?>
                 #toplevel_page_wpassetcleanup_getting_started { display: none !important; }
                 <?php
-            } elseif (isset($_GET['page']) && strpos($_GET['page'], WPACU_PLUGIN_ID.'_') === 0) {
+            } elseif (Menu::isPluginPage()) {
                 // The menu is shown: make the sidebar area a bit larger so the whole "Asset CleanUp Pro" menu text is seen properly when viewing its pages
                 ?>
                 #adminmenuback, #adminmenuwrap, #adminmenu, #adminmenu .wp-submenu { width: 172px; }
@@ -472,7 +487,7 @@ HTML;
 
 	    // If the post status is 'private' only direct method can be used to fetch the assets
 	    // as the remote post one will return a 404 error since the page is accessed as a guest visitor
-        $postStatus = $postId > 0 ? get_post_status($postId) : false;
+        $postStatus      = $postId > 0 ? get_post_status($postId) : false;
         $wpacuDomGetType = ($postStatus === 'private') ? 'direct' : Main::$domGetType;
 
 		$wpacuObjectData = array(
@@ -490,7 +505,7 @@ HTML;
             'start_del_h'       => Main::START_DEL_HARDCODED,
             'end_del_h'         => Main::END_DEL_HARDCODED,
 
-			'ajax_url'          => admin_url('admin-ajax.php'),
+			'ajax_url'          => esc_url(admin_url('admin-ajax.php')),
 			'post_id'           => $postId, // if any
 			'page_url'          => $pageUrl // post, page, custom post type, homepage etc.
 		);
@@ -588,35 +603,10 @@ HTML;
 		wp_enqueue_script(WPACU_PLUGIN_ID . '-script');
 
 		if ($page === WPACU_PLUGIN_ID . '_settings') {
-		    // [Start] Chosen Style
-			wp_enqueue_style(
-                WPACU_PLUGIN_ID . '-chosen-style',
-                plugins_url('/assets/chosen/chosen.min.css', WPACU_PLUGIN_FILE),
-                array(),
-				'1.8.7'
-            );
-
-			$chosenStyleInline = <<<CSS
-#wpacu_hide_meta_boxes_for_post_types_chosen { margin-top: 5px; min-width: 320px; }
-CSS;
-			wp_add_inline_style(WPACU_PLUGIN_ID . '-chosen-style', $chosenStyleInline);
-            // [End] Chosen Style
-
-			// [Start] Chosen Script
-			wp_enqueue_script(
-				WPACU_PLUGIN_ID . '-chosen-script',
-				plugins_url('/assets/chosen/chosen.jquery.min.js', WPACU_PLUGIN_FILE),
-				array('jquery'),
-				'1.8.7'
-			);
-
-			$chosenScriptInline = <<<JS
-jQuery(document).ready(function($) { $('.wpacu-chosen-select').chosen(); });
-JS;
-			wp_add_inline_script(WPACU_PLUGIN_ID . '-chosen-script', $chosenScriptInline);
-			// [End] Chosen Script
+			$this->loadjQueryChosen();
         }
 
+		// Standard edit post page
 	    global $pagenow;
 
 		$isEditPostArea = ($pagenow === 'post.php' && Misc::getVar('get', 'post') && Misc::getVar('get', 'action') === 'edit');
@@ -752,6 +742,40 @@ JS;
 			wp_add_inline_script(WPACU_PLUGIN_ID . '-tooltipster-script', $tooltipsterScriptInline);
 			// [End] Tooltipster Script
         }
+    }
+
+
+	/**
+	 *
+	 */
+	public function loadjQueryChosen()
+    {
+        // [Start] Chosen Style
+		wp_register_style(
+			WPACU_PLUGIN_ID . '-chosen-style',
+			plugins_url('/assets/chosen/chosen.min.css', WPACU_PLUGIN_FILE),
+			array(),
+			'1.8.7'
+		);
+
+	    wp_enqueue_style(WPACU_PLUGIN_ID . '-chosen-style');
+
+		$chosenStyleInline = <<<CSS
+#wpacu_hide_meta_boxes_for_post_types_chosen { margin-top: 5px; min-width: 320px; }
+CSS;
+		wp_add_inline_style(WPACU_PLUGIN_ID . '-chosen-style', $chosenStyleInline);
+		// [End] Chosen Style
+
+		// [Start] Chosen Script
+		wp_register_script(
+			WPACU_PLUGIN_ID . '-chosen-script',
+			plugins_url('/assets/chosen/chosen.jquery.min.js', WPACU_PLUGIN_FILE),
+			array('jquery'),
+			'1.8.7'
+		);
+
+		wp_enqueue_script(WPACU_PLUGIN_ID . '-chosen-script');
+		// [End] Chosen Script
 	}
 
     /**
@@ -777,7 +801,7 @@ JS;
 		    WPACU_PLUGIN_ID . '-script',
 		    'wpacu_object',
 		    apply_filters('wpacu_object_data', array(
-                'ajax_url'    => admin_url('admin-ajax.php'),
+                'ajax_url'    => esc_url(admin_url('admin-ajax.php')),
                 'plugin_id'   => WPACU_PLUGIN_ID,
                 'plugin_name' => WPACU_PLUGIN_ID,
                 'start_del_h' => Main::START_DEL_HARDCODED,
@@ -814,7 +838,8 @@ JS;
 			$src = str_replace(
 				array('?ver=',          '&ver='),
 				array('?wpacuversion=', '&wpacuversion='),
-				$src);
+                $src
+            );
 		}
 
 		return $src;

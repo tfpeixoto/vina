@@ -120,8 +120,8 @@ class OptimizeJs
 		$doFileMinify = true;
 
 		$isMinifyJsFilesEnabled = (isset($fileAlreadyChecked['is_minify_js_enabled']) && $fileAlreadyChecked['is_minify_js_enabled'])
-					? $fileAlreadyChecked['is_minify_js_enabled']
-					: MinifyJs::isMinifyJsEnabled() && in_array(Main::instance()->settings['minify_loaded_js_for'], array('src', 'all', ''));
+			? $fileAlreadyChecked['is_minify_js_enabled']
+			: MinifyJs::isMinifyJsEnabled() && in_array(Main::instance()->settings['minify_loaded_js_for'], array('src', 'all', ''));
 
 		if (! $isMinifyJsFilesEnabled) {
 			$doFileMinify = false;
@@ -217,7 +217,7 @@ class OptimizeJs
 		 * [START] JS Content Optimization
 		*/
 		if (Main::instance()->settings['cache_dynamic_loaded_js'] &&
-			((strpos($src, '/?') !== false) || strpos($src, '.php?') !== false || Misc::endsWith($src, '.php')) &&
+		    ((strpos($src, '/?') !== false) || strpos($src, '.php?') !== false || Misc::endsWith($src, '.php')) &&
 		    (strpos($src, site_url()) !== false)
 		) {
 			$pathToAssetDir = '';
@@ -312,7 +312,7 @@ class OptimizeJs
 		$newLocalPath    = WP_CONTENT_DIR . $newFilePathUri; // Ful Local path
 		$newLocalPathUrl = WP_CONTENT_URL . $newFilePathUri; // Full URL path
 
-		if ($jsContent && $jsContent !== '/**/') {
+		if ($jsContent && $jsContent !== '/**/' && apply_filters('wpacu_print_info_comments_in_cached_assets', true)) {
 			$jsContent = '/*!' . $sourceBeforeOptimization . '*/' . "\n" . $jsContent;
 		}
 
@@ -330,7 +330,7 @@ class OptimizeJs
 		);
 
 		// Add / Re-add (with new version) transient
-		OptimizeCommon::setTransient($transientName, json_encode($saveValues));
+		OptimizeCommon::setTransient($transientName, wp_json_encode($saveValues));
 
 		return array(
 			OptimizeCommon::getSourceRelPath($value->src), // Original SRC (Relative path)
@@ -453,7 +453,7 @@ class OptimizeJs
 	/**
 	 * @param $htmlSource
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public static function updateHtmlSourceOriginalToOptimizedJs($htmlSource)
 	{
@@ -591,7 +591,7 @@ class OptimizeJs
 	 * @param $sourceUrl array
 	 * @param $optimizeUrl string
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public static function updateOriginalToOptimizedTag($scriptSourceTag, $sourceUrl, $optimizeUrl)
 	{
@@ -680,13 +680,10 @@ class OptimizeJs
 				$htmlSource = Preloads::appendPreloadsForScriptsToHead($htmlSource);
 			}
 
-			$htmlSource = str_replace(Preloads::DEL_SCRIPTS_PRELOADS, '', $htmlSource);
 			/* [wpacu_timing] */ Misc::scriptExecTimer($wpacuTimingName, 'end'); /* [/wpacu_timing] */
 		}
 
-		/* [wpacu_timing] */ $wpacuTimingName = 'alter_html_source_for_combine_js';
-
-		Misc::scriptExecTimer($wpacuTimingName); /* [/wpacu_timing] */
+		/* [wpacu_timing] */ $wpacuTimingName = 'alter_html_source_for_combine_js'; Misc::scriptExecTimer($wpacuTimingName); /* [/wpacu_timing] */
 		$proceedWithCombineOnThisPage = true;
 
 		$isSingularPage = defined('WPACU_CURRENT_PAGE_ID') && WPACU_CURRENT_PAGE_ID > 0 && is_singular();
@@ -702,7 +699,7 @@ class OptimizeJs
 
 			// 'no_js_optimize' refers to avoid the combination of JS files
 			if ( (isset( $pageOptions['no_js_optimize'] )     && $pageOptions['no_js_optimize'])
-			  || (isset( $pageOptions['no_assets_settings'] ) && $pageOptions['no_assets_settings']) ) {
+			     || (isset( $pageOptions['no_assets_settings'] ) && $pageOptions['no_assets_settings']) ) {
 				$proceedWithCombineOnThisPage = false;
 			}
 		}
@@ -710,6 +707,9 @@ class OptimizeJs
 		if ($proceedWithCombineOnThisPage) {
 			/* [wpacu_timing] */ // Note: Load timing is checked within the method /* [/wpacu_timing] */
 			$htmlSource = CombineJs::doCombine($htmlSource);
+			if (defined('WPACU_REAPPLY_PRELOADING_FOR_COMBINED_JS') && WPACU_REAPPLY_PRELOADING_FOR_COMBINED_JS) {
+				$htmlSource = Preloads::appendPreloadsForScriptsToHead($htmlSource);
+			}
 		}
 		/* [wpacu_timing] */ Misc::scriptExecTimer($wpacuTimingName, 'end'); /* [/wpacu_timing] */
 
@@ -720,6 +720,8 @@ class OptimizeJs
 		}
 
 		// Final cleanups
+		$htmlSource = str_replace(Preloads::DEL_SCRIPTS_PRELOADS, '', $htmlSource);
+
 		$htmlSource = preg_replace('#(\s+|)(data-wpacu-jquery-core-handle=1|data-wpacu-jquery-migrate-handle=1)(\s+|)#Umi', ' ', $htmlSource);
 
 		$htmlSource = preg_replace('#(\s+|)data-wpacu-script-rel-src-before=(["\'])' . '(.*)' . '(\1)(\s+|)#Usmi', ' ', $htmlSource);
@@ -727,7 +729,7 @@ class OptimizeJs
 		$htmlSource = preg_replace('#<script(\s+)src=\'#Umi', '<script src=\'', $htmlSource);
 
 		// Clear possible empty SCRIPT tags (e.g. left from associated 'before' and 'after' tags after their content was stripped)
-		$htmlSource = preg_replace('#<script(\s+| )(type=\'text/javascript\'|)(\s+|)></script>#Umi', '', $htmlSource);
+		$htmlSource = preg_replace('#<script(\s+)(type=\'text/javascript\'|)(\s+|)></script>#Umi', '', $htmlSource);
 
 		/* [wpacu_timing] */ Misc::scriptExecTimer('alter_html_source_for_optimize_js', 'end'); /* [/wpacu_timing] */
 		return $htmlSource;
@@ -791,7 +793,7 @@ class OptimizeJs
 	 * @param $jsContent
 	 * @param $appendBefore
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public static function maybeDoJsFixes($jsContent, $appendBefore)
 	{
@@ -827,12 +829,8 @@ class OptimizeJs
 	 */
 	public static function moveInlinejQueryAfterjQuerySrc($htmlSource)
 	{
-		if (stripos($htmlSource, '<script') === false) {
-			return $htmlSource; // no SCRIPT tags, hmm
-		}
-
-		if (! (function_exists('libxml_use_internal_errors') && function_exists('libxml_clear_errors') && class_exists('\DOMDocument')) && class_exists('\DOMXpath')) {
-			return $htmlSource; // DOMDocument has to be enabled
+		if (stripos($htmlSource, '<script') === false || ! Misc::isDOMDocumentOn()) {
+			return $htmlSource;
 		}
 
 		$domTag = OptimizeCommon::getDomLoadedTag($htmlSource, 'moveInlinejQueryAfterjQuerySrc');
@@ -1167,8 +1165,6 @@ class OptimizeJs
 	{
 		global $wp_scripts;
 
-		$typeAttr = Misc::getScriptTypeAttribute();
-
 		$output = '';
 
 		if ($position === 'translations') {
@@ -1179,7 +1175,7 @@ class OptimizeJs
 			}
 
 			if ( $translations ) {
-				$output = sprintf( "<script%s id='%s-js-translations'>\n%s\n</script>\n", $typeAttr, esc_attr( $handle ), $translations );
+				$output = sprintf( "<script%s id='%s-js-translations'>\n%s\n</script>\n", Misc::getScriptTypeAttribute(), esc_attr( $handle ), $translations );
 			}
 		}
 
@@ -1192,16 +1188,16 @@ class OptimizeJs
 				}
 			}
 
-			$output .= sprintf("<script%s id='%s-js-extra'>\n", $typeAttr, esc_attr($handle));
+			$output .= sprintf("<script%s id='%s-js-extra'>\n", Misc::getScriptTypeAttribute(), esc_attr($handle));
 
 			// CDATA is not needed for HTML 5.
-			if ( $typeAttr ) {
+			if ( Misc::getScriptTypeAttribute() ) {
 				$output .= "/* <![CDATA[ */\n";
 			}
 
 			$output .= $inlineScriptContent."\n";
 
-			if ( $typeAttr ) {
+			if ( Misc::getScriptTypeAttribute() ) {
 				$output .= "/* ]]> */\n";
 			}
 
@@ -1218,7 +1214,7 @@ class OptimizeJs
 			}
 
 			if ( $inlineScriptContent ) {
-				$output = sprintf( "<script%s id='%s-js-%s'>\n%s\n</script>\n", $typeAttr, $handle, $position, $inlineScriptContent );
+				$output = sprintf( "<script%s id='%s-js-%s'>\n%s\n</script>\n", Misc::getScriptTypeAttribute(), $handle, $position, $inlineScriptContent );
 			}
 		}
 

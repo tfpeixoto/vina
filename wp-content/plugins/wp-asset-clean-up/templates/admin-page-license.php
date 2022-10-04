@@ -25,7 +25,7 @@ include_once '_top-area.php';
     <div class="wrap-upgrade-info">
         <p><span class="dashicons dashicons-info"></span> <?php echo sprintf(
                 __('If you already purchased the Pro version and you don\'t know how to activate it, %sfollow the steps from the "Help" section%s.', 'wp-asset-clean-up'),
-                '<a href="'.admin_url('admin.php?page=wpassetcleanup_get_help').'">', '</a>'
+                '<a href="'.esc_url(admin_url('admin.php?page=wpassetcleanup_get_help')).'">', '</a>'
             );
         ?></p>
         <div class="wpacu-clearfix"></div>

@@ -46,9 +46,7 @@ class HardcodedAssets
 
 			$anyHardCodedAssets = HardcodedAssets::getAll($htmlSource); // Fetch all for this type of request
 
-			$htmlSource = str_replace('{wpacu_hardcoded_assets}', $anyHardCodedAssets, $htmlSource);
-
-			echo $htmlSource;
+			echo str_replace('{wpacu_hardcoded_assets}', $anyHardCodedAssets, $htmlSource);
 		}, 0);
 	}
 
@@ -126,13 +124,15 @@ class HardcodedAssets
 					'25bd090513716c34b48b0495c834d2070088ad24'
 				);
 
-				// Sometimes, the hash checking might failed (if there's a small change to the JS content)
+				// Sometimes, the hash checking might fail (if there's a small change to the JS content)
 				// Consider using a fallback verification by checking the actual content
 				$stripsSpecificStylesContaining = array(
-					'<style media="print">#wpadminbar { display:none; }</style>'
+					'<style media="print">#wpadminbar { display:none; }</style>',
+					'id="edd-store-menu-styling"',
+					'#wp-admin-bar-gform-forms'
 				);
 
-				foreach ( $matchesSourcesFromTags as $matchedTagIndex => $matchedTag ) {
+				foreach ( $matchesSourcesFromTags as $matchedTag ) {
 					// LINK "stylesheet" tags (if any)
 					if ( isset( $matchedTag['link_tag'] ) && trim( $matchedTag['link_tag'] ) !== '' && ( trim( strip_tags( $matchedTag['link_tag'] ) ) === '' ) ) {
 						$matchedTagOutput = trim( $matchedTag['link_tag'] );
@@ -158,7 +158,7 @@ class HardcodedAssets
 
 						foreach ( $stripsSpecificStylesContaining as $cssContentTargeted ) {
 							if ( strpos( $matchedTagOutput, $cssContentTargeted ) !== false ) {
-								continue;
+								continue 2; // applies for this "foreach": ($matchesSourcesFromTags as $matchedTag)
 							}
 						}
 
@@ -239,13 +239,14 @@ class HardcodedAssets
 					'1a8f46f9f33e5d95919620df54781acbfa9efff7'
 				);
 
-				// Sometimes, the hash checking might failed (if there's a small change to the JS content)
+				// Sometimes, the hash checking might fail (if there's a small change to the JS content)
 				// Consider using a fallback verification by checking the actual content
 				$stripsSpecificScriptsContaining = array(
 					'// The customizer requires postMessage and CORS (if the site is cross domain)',
 					'b[c] += ( window.postMessage && request ? \' \' : \' no-\' ) + cs;',
 					"(function(){var request,b=document.body,c='className',cs='customize-support',rcs=new RegExp('(^|\\s+)(no-)?'+cs+'(\\s+|$)');request=!0;b[c]=b[c].replace(rcs,' ');b[c]+=(window.postMessage&&request?' ':' no-')+cs}())",
-					'document.body.className = document.body.className.replace( /(^|\s)(no-)?customize-support(?=\s|$)/, \'\' ) + \' no-customize-support\''
+					'document.body.className = document.body.className.replace( /(^|\s)(no-)?customize-support(?=\s|$)/, \'\' ) + \' no-customize-support\'',
+					"c = c.replace(/woocommerce-no-js/, 'woocommerce-js');" // WooCommerce related
 				);
 
 				foreach ( $matchesScriptTags as $matchedTag ) {
@@ -261,7 +262,7 @@ class HardcodedAssets
 
 						foreach ( $stripsSpecificScriptsContaining as $jsContentTargeted ) {
 							if ( strpos( $matchedTagOutput, $jsContentTargeted ) !== false ) {
-								continue;
+								continue 2; // applies for this "foreach": ($matchesScriptTags as $matchedTag)
 							}
 						}
 
@@ -344,106 +345,11 @@ class HardcodedAssets
 		}
 
 		if ($encodeIt) {
-			return base64_encode( json_encode( $hardCodedAssets ) );
+			return base64_encode( wp_json_encode( $hardCodedAssets ) );
 		}
 
 		return $hardCodedAssets;
 	}
-
-	/**
-	 * @param $htmlSource
-	 *
-	 * @return mixed
-	 */
-	/*
-	public static function removeHtmlCommentsExceptMSIE($htmlSource)
-	{
-		// No comments? Do not continue
-		if (strpos($htmlSource, '<!--') === false) {
-			return $htmlSource;
-		}
-
-		if (! (function_exists('libxml_use_internal_errors') && function_exists('libxml_clear_errors') && class_exists('\DOMDocument'))) {
-			return $htmlSource;
-		}
-
-		// First, collect all MSIE comments
-		preg_match_all('#<!--\[if(.*?)]>(<!-->|-->|\s|)(.*?)(<!--<!|<!)\[endif]-->#si', $htmlSource, $matchedMSIEComments);
-
-		$allMSIEComments = array();
-
-		if (isset($matchedMSIEComments[0]) && ! empty($matchedMSIEComments[0])) {
-			foreach ($matchedMSIEComments[0] as $matchedMSIEComment) {
-				$allMSIEComments[] = $matchedMSIEComment;
-			}
-		}
-
-		if (! ($domTag = ObjectCache::wpacu_cache_get('wpacu_html_dom_tag'))) {
-			$domTag = new \DOMDocument();
-			libxml_use_internal_errors( true );
-			$domTag->loadHTML( $htmlSource );
-		}
-
-		$xpathComments = new \DOMXPath($domTag);
-		$comments = $xpathComments->query('//comment()');
-
-		libxml_clear_errors();
-
-		if ($comments === null) {
-			return $htmlSource;
-		}
-
-		preg_match_all('#<!--(.*?)-->#s', $htmlSource, $matchesRegExpComments);
-
-		// "comments" within tag attributes or script tags?
-		// e.g. <script>var type='<!-- A comment here -->';</script>
-		// e.g. <div data-info="This is just a <!-- comment --> text">Content here</div>
-		$commentsWithinQuotes = array();
-
-		if (isset($matchesRegExpComments[1]) && count($matchesRegExpComments[1]) !== count($comments)) {
-			preg_match_all('#=(|\s+)([\'"])(|\s+)<!--(.*?)-->(|\s+)([\'"])#s', $htmlSource, $matchesCommentsWithinQuotes);
-
-			if (isset($matchesCommentsWithinQuotes[0]) && ! empty($matchesCommentsWithinQuotes[0])) {
-				foreach ($matchesCommentsWithinQuotes[0] as $matchedDataOriginal) {
-					$matchedDataUpdated = str_replace(
-						array('', '<!--', '-->'),
-						array('--wpacu-space-del--', '--wpacu-start-comm--', '--wpacu-end-comm--'),
-						$matchedDataOriginal
-					);
-
-					$htmlSource = str_replace($matchedDataOriginal, $matchedDataUpdated, $htmlSource);
-
-					$commentsWithinQuotes[] = array(
-						'original' => $matchedDataOriginal,
-						'updated'  => $matchedDataUpdated
-					);
-				}
-			}
-		}
-
-		foreach ($comments as $comment) {
-			$entireComment = CleanUp::getOuterHTML($comment);
-
-			$htmlSource = str_replace(
-				array(
-					$entireComment,
-					'<!--' . $comment->nodeValue . '-->'
-				),
-				'',
-				$htmlSource
-			);
-		}
-
-		if (! empty($commentsWithinQuotes)) {
-			foreach ($commentsWithinQuotes as $commentQuote) {
-				$htmlSource = str_replace($commentQuote['updated'], $commentQuote['original'], $htmlSource);
-			}
-		}
-
-		return $htmlSource;
-	}
-	*/
-	//endRemoveIf(development)
 
 	/**
 	 * @param $htmlSource
@@ -486,7 +392,6 @@ class HardcodedAssets
 
 			if ($targetedTag === $tagFromList || strpos($targetedTag, $tagFromList) !== false) {
 				return $contentWithinConditionalComments['conditions'][$tagIndex]; // Stops here and returns the condition
-				break;
 			}
 		}
 
@@ -528,18 +433,17 @@ class HardcodedAssets
 	public static function getHardCodedManageAreaForFrontEndView($data)
 	{
 		$dataSettingsFrontEnd = ObjectCache::wpacu_cache_get('wpacu_settings_frontend_data') ?: array();
-		$dataSettingsFrontEnd['page_unload_text'] = $data['page_unload_text'];
-		// The following string will be replaced by the values got the from the AJAX call to /?wpassetcleanup_load=1&wpacu_just_hardcoded
-		$dataWpacuSettingsFrontend = base64_encode(json_encode($dataSettingsFrontEnd));
-		$imgLoadingSpinnerUrl = admin_url('images/spinner.gif');
+		$dataSettingsFrontEnd['page_unload_text'] = esc_html($data['page_unload_text']);
+		// The following string will be replaced by the values got from the AJAX call to /?wpassetcleanup_load=1&wpacu_just_hardcoded
+		$dataWpacuSettingsFrontend = base64_encode(wp_json_encode($dataSettingsFrontEnd));
 
 		$currentHardcodedAssetRules = '';
 
 		// When the form is submitted it will clear some values if they are not sent anymore which can happen with a failed AJAX call to retrieve the list of hardcoded assets
-		// Place the current values to the area in case the AJAX call fails and it won't print the list
+		// Place the current values to the area in case the AJAX call fails, and it won't print the list
 		// If the user presses "Update", it won't clear any existing rules
 		// If the list is printed, obviously it will be with all the fields in place as they should be
-		foreach (array('current', 'load_exceptions', 'handle_unload_regex', 'handle_load_regex', 'handle_load_logged_in') as $ruleKey) {
+		foreach (array('current_unloaded_page_level', 'load_exceptions', 'handle_unload_regex', 'handle_load_regex', 'handle_load_logged_in') as $ruleKey) {
 			foreach ( array( 'styles', 'scripts' ) as $assetType ) {
 				if ( isset( $dataSettingsFrontEnd[$ruleKey][ $assetType ] ) && ! empty( $dataSettingsFrontEnd[$ruleKey][$assetType] ) ) {
 					// Go through the values, depending on how the array is structured
@@ -561,10 +465,10 @@ class HardcodedAssets
 							}
 						}
 					} else {
-						// current, load_exceptions, handle_load_logged_in
+						// current unloaded on a page level, load_exceptions, handle_load_logged_in
 						foreach ( $dataSettingsFrontEnd[ $ruleKey ][ $assetType ] as $assetHandle ) {
 							if ( strpos( $assetHandle, 'wpacu_hardcoded_' ) !== false ) {
-								if ( $ruleKey === 'current' ) {
+								if ( $ruleKey === 'current_unloaded_page_level' ) {
 									$currentHardcodedAssetRules .= '<input type="hidden" name="wpassetcleanup[' . $assetType . '][]" value="' . $assetHandle . '" />';
 								} elseif ( $ruleKey === 'load_exceptions' ) {
 									$currentHardcodedAssetRules .= '<input type="hidden" name="wpacu_styles_load_it[]" value="' . $assetHandle . '" />';
@@ -578,16 +482,12 @@ class HardcodedAssets
 			}
 		}
 
-		$hardcodedManageAreaHtml = <<<HTML
-<div class="wpacu-assets-collapsible-wrap wpacu-wrap-area wpacu-hardcoded" id="wpacu-assets-collapsible-wrap-hardcoded-list" data-wpacu-settings-frontend="{$dataWpacuSettingsFrontend}">
+		return '<div class="wpacu-assets-collapsible-wrap wpacu-wrap-area wpacu-hardcoded" id="wpacu-assets-collapsible-wrap-hardcoded-list" data-wpacu-settings-frontend="'.esc_attr($dataWpacuSettingsFrontend).'">
     <a class="wpacu-assets-collapsible wpacu-assets-collapsible-active" href="#" style="padding: 15px 15px 15px 44px;"><span class="dashicons dashicons-code-standards"></span> Hardcoded (non-enqueued) Styles &amp; Scripts</a>
     <div class="wpacu-assets-collapsible-content" style="max-height: inherit;">
-        <div style="padding: 20px 0; margin: 0;"><img src="{$imgLoadingSpinnerUrl}" align="top" width="20" height="20" alt="" /> The list of hardcoded assets is fetched... Please wait...</div>
-        {$currentHardcodedAssetRules}
+        <div style="padding: 20px 0; margin: 0;"><img src="'.esc_url(admin_url('images/spinner.gif')).'" align="top" width="20" height="20" alt="" /> The list of hardcoded assets is fetched... Please wait...</div>
+        '.wp_kses($currentHardcodedAssetRules, array('input' => array('type' => array(), 'name' => array(), 'value' => array()))).'
     </div>
-</div>
-HTML;
-
-		return $hardcodedManageAreaHtml;
+</div>';
 	}
 }

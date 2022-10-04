@@ -225,7 +225,7 @@ class OptimizeCommon
 
 		// The admin is editing the CSS/JS list within the front-end view
 		if (HardcodedAssets::useBufferingForEditFrontEndView()) {
-			ObjectCache::wpacu_cache_set('wpacu_hardcoded_assets_encoded', base64_encode( json_encode($anyHardCodedAssetsList) ));
+			ObjectCache::wpacu_cache_set('wpacu_hardcoded_assets_encoded', base64_encode( wp_json_encode($anyHardCodedAssetsList) ));
 		}
 
 		$htmlSource = OptimizeCss::alterHtmlSource( $htmlSource );
@@ -327,9 +327,9 @@ class OptimizeCommon
 
 	/**
 	 * @param $htmlSource
-	 * @param $for
+	 * @param string $for
 	 *
-	 * @return bool|\DOMDocument|mixed
+	 * @return \DOMDocument
 	 */
 	public static function getDomLoadedTag($htmlSource, $for = '')
 	{
@@ -528,7 +528,7 @@ class OptimizeCommon
 	/**
 	 * @param $assetHref
 	 *
-	 * @return bool|mixed|string
+	 * @return array|false|string|string[]
 	 */
 	public static function getPathToAssetDir($assetHref)
 	{
@@ -747,7 +747,7 @@ class OptimizeCommon
 	 * @param $cdnUrl
 	 * @param $hrefAlt
 	 *
-	 * @return mixed
+	 * @return array
 	 */
 	public static function getCleanHrefAfterCdnStrip($cdnUrl, $hrefAlt)
 	{
@@ -1235,7 +1235,7 @@ SQL;
 				if ($isUriRequest) { echo '<br />'; }
 
 				foreach ($clearedOutput as $clearedInfo) {
-					echo $clearedInfo."\n";
+					echo esc_html($clearedInfo)."\n";
 					if ($isUriRequest) { echo '<br />'; }
 				}
 			}
@@ -1245,7 +1245,7 @@ SQL;
 				if ($isUriRequest) { echo '<br />'; }
 
 				foreach ($keptOutput as $keptInfo) {
-					echo $keptInfo."\n";
+					echo esc_html($keptInfo)."\n";
 					if ($isUriRequest) { echo '<br />'; }
 				}
 			}
@@ -1282,7 +1282,7 @@ SQL;
 
 	/**
 	 * This is usually done when the plugin is deactivated
-	 * e.g. if you use Autoptimize and it remains active, you will likely want to have its caching cleared with traces from Asset CleanUp
+	 * e.g. if you use Autoptimize, and it remains active, you will likely want to have its caching cleared with traces from Asset CleanUp
 	 */
 	public static function clearOtherPluginsCache()
 	{
@@ -1294,9 +1294,11 @@ SQL;
 	}
 
 	/**
+	 * @param bool $includeHtmlTags
+	 *
 	 * @return array
 	 */
-	public static function getStorageStats()
+	public static function getStorageStats($includeHtmlTags = true)
 	{
 		$assetCleanUpCacheDir = WP_CONTENT_DIR . self::getRelPathPluginCacheDir();
 
@@ -1336,10 +1338,10 @@ SQL;
 			ksort($fileDirs, SORT_ASC);
 
 			return array(
-				'total_size'         => Misc::formatBytes($totalSize),
+				'total_size'         => Misc::formatBytes($totalSize, 2, '', $includeHtmlTags),
 				'total_files'        => $totalFiles,
 
-				'total_size_assets'  => Misc::formatBytes($totalSizeAssets),
+				'total_size_assets'  => Misc::formatBytes($totalSizeAssets, 2, '', $includeHtmlTags),
 				'total_files_assets' => $totalFilesAssets,
 
 				'dirs_files_sizes'   => $fileDirs,
@@ -1372,7 +1374,7 @@ SQL;
 	/**
 	 * @param $fileName
 	 *
-	 * @return mixed
+	 * @return array|string|string[]
 	 */
 	public static function filterStorageFileName($fileName)
 	{
@@ -1403,9 +1405,9 @@ SQL;
 	}
 
 	/**
-	 * @param $anyCdnUrl
+	 * @param string $anyCdnUrl
 	 *
-	 * @return mixed|string
+	 * @return array|string|string[]
 	 */
 	public static function filterWpContentUrl($anyCdnUrl = '')
 	{
@@ -1416,8 +1418,7 @@ SQL;
 
 		// Perhaps WPML plugin is used and the content URL is different then the current domain which might be for a different language
 		if ( ($parseContentUrl['host'] !== $parseBaseUrl['host']) &&
-		     (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== $parseContentUrl['host']) &&
-		     isset($parseContentUrl['path']) &&
+		     (isset($_SERVER['HTTP_HOST'], $parseContentUrl['path']) && $_SERVER['HTTP_HOST'] !== $parseContentUrl['host']) &&
 			 is_dir(rtrim(ABSPATH, '/') . $parseContentUrl['path']) ) {
 			$wpContentUrl = str_replace($parseContentUrl['host'], $parseBaseUrl['host'], $wpContentUrl);
 		}
@@ -1466,13 +1467,13 @@ SQL;
 	}
 
 	/**
-	 * @param $assetType
+	 * @param $for ("css" or "js")
 	 *
 	 * @return bool
 	 */
-	public static function appendInlineCodeToCombineAssetType($assetType)
+	public static function appendInlineCodeToCombineAssetType($for)
 	{
-		$settingsIndex = '_combine_loaded_'.$assetType.'_append_handle_extra';
+		$settingsIndex = '_combine_loaded_'.$for.'_append_handle_extra';
 		return (Misc::isWpVersionAtLeast('5.5') &&
 		        isset(Main::instance()->settings[$settingsIndex]) &&
 	            Main::instance()->settings[$settingsIndex]);
@@ -1815,7 +1816,7 @@ SQL;
 			$existingList[$assetType]['already_minified'] = array_slice($existingList[$assetType]['already_minified'], 0, 100);
 		}
 
-		update_option($optionToUpdate, json_encode(Misc::filterList($existingList)));
+		update_option($optionToUpdate, wp_json_encode(Misc::filterList($existingList)));
 	}
 
 	// [START] For debugging purposes
@@ -1868,7 +1869,7 @@ SQL;
 			unset($existingList['scripts']['already_minified']);
 		}
 
-		update_option($optionToUpdate, json_encode(Misc::filterList($existingList)));
+		update_option($optionToUpdate, wp_json_encode(Misc::filterList($existingList)));
 	}
 
 	/**
@@ -1895,7 +1896,7 @@ SQL;
 			}
 		}
 
-		update_option($optionToUpdate, json_encode(Misc::filterList($existingList)));
+		update_option($optionToUpdate, wp_json_encode(Misc::filterList($existingList)));
 	}
 	// [END] For debugging purposes
 }

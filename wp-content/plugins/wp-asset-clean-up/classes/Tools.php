@@ -95,7 +95,7 @@ class Tools
 
 		if (isset($_GET['page']) && $_GET['page'] === WPACU_PLUGIN_ID. '_tools') {
 			// "Import" Completed
-			if ($importDoneInfo = get_transient('wpacu_import_done')) {
+			if (Misc::getVar('get', 'wpacu_import_done') && $importDoneInfo = get_transient('wpacu_import_done')) {
 				$resetDoneListArray = @json_decode($importDoneInfo, ARRAY_A);
 
 				if (! is_array($resetDoneListArray)) {
@@ -111,7 +111,7 @@ class Tools
 			}
 
 			// "Reset" Completed
-			if ($resetDoneInfo = get_transient('wpacu_reset_done')) {
+			if (Misc::getVar('get', 'wpacu_reset_done') && $resetDoneInfo = get_transient('wpacu_reset_done')) {
 				$resetDoneInfoArray = @json_decode($resetDoneInfo, ARRAY_A);
 
 				if (! is_array($resetDoneInfoArray)) {
@@ -149,7 +149,7 @@ class Tools
 	}
 
 	/**
-	 * @return bool|string
+	 * @return string
 	 */
 	public function maybeGetHost()
     {
@@ -363,11 +363,11 @@ class Tools
 
 	    $return .= 'Manage in the Dashboard:             '. (($settings['dashboard_show'] == 1) ? 'Yes ('.$settings['dom_get_type'].')' : 'No');
 
-	    if ( ! $settings['show_assets_meta_box'] ) {
+	    if ( ! (isset($settings['show_assets_meta_box']) && $settings['show_assets_meta_box']) ) {
 		    $return .= ' - Assets Meta Box is Hidden';
 	    }
 
-	    if ($settings['hide_options_meta_box']) {
+	    if ( isset($settings['hide_options_meta_box']) && $settings['hide_options_meta_box'] ) {
 		    $return .= ' - Side Options Meta Box is Hidden';
 	    }
 
@@ -421,7 +421,7 @@ class Tools
 
 	    $return .= "\n" . '# '.WPACU_PLUGIN_TITLE.': CSS/JS Caching Storage'. "\n";
 
-	    $storageStats = OptimizeCommon::getStorageStats();
+	    $storageStats = OptimizeCommon::getStorageStats(false);
 
 	    if (isset($storageStats['total_size'], $storageStats['total_files'])) {
 		    $return .= 'Total cached files: '.$storageStats['total_files'].' ('.$storageStats['total_size'].') of which '.$storageStats['total_files_assets'].' are CSS/JS assets ('.$storageStats['total_size_assets'].')';
@@ -473,7 +473,7 @@ SQL;
 				        $rowIdVal = 'Post ID: '.$metaResult['post_id'];
                     } elseif (isset($metaResult['user_id'])) {
 				        $rowIdVal = 'User ID: '.$metaResult['user_id'];
-			        } elseif (isset($metaResult['term_id'])) {
+			        } elseif (isset($metaResult['term_id']) && term_exists((int)$metaResult['term_id'])) {
 			            $term = get_term($metaResult['term_id']);
 				        $rowIdVal = 'Taxonomy Name: '.$term->taxonomy.'; Taxonomy ID: '.$metaResult['term_id'];
 			        }
@@ -517,7 +517,7 @@ SQL;
             }
         }
 
-	    return json_encode($arrayFromJson);
+	    return wp_json_encode($arrayFromJson);
     }
 
 	/**
@@ -701,7 +701,7 @@ SQL;
         );
 
         set_transient('wpacu_reset_done',
-            json_encode(array(
+	        wp_json_encode(array(
 	                'reset_choice'          => $this->resetChoice,
 	                'license_data_removed'  => $this->licenseDataRemoved,
 	                'cached_assets_removed' => $this->cachedAssetsRemoved
@@ -710,7 +710,7 @@ SQL;
             30
         );
 
-        wp_redirect(admin_url('admin.php?page=wpassetcleanup_tools&wpacu_time='.time()));
+        wp_redirect(admin_url('admin.php?page=wpassetcleanup_tools&wpacu_reset_done=1&wpacu_time='.time()));
         exit;
 	}
 
@@ -770,7 +770,7 @@ SQL;
 		}
 		?>
 		<div class="updated notice wpacu-notice wpacu-reset-notice is-dismissible">
-			<p><span class="dashicons dashicons-yes"></span> <?php echo $msg; ?></p>
+			<p><span class="dashicons dashicons-yes"></span> <?php echo wp_kses($msg, array('span' => array('id' => array()))); ?></p>
 		</div>
 		<?php
 	}
@@ -790,17 +790,31 @@ SQL;
 
 	    foreach ($this->data['import_done_list'] as $importedKey) {
             if ($importedKey === 'settings') {
-	            $importedMessage .= '<li>"'.__('Settings', 'wp-asset-clean-up').'"</li>';
+	            $importedMessage .= '<li>"'.esc_html__('Settings', 'wp-asset-clean-up').'"</li>';
             } elseif ($importedKey === 'homepage_unloads') {
-	            $importedMessage .= '<li>'.__('Homepage Unload Rules', 'wp-asset-clean-up').'</li>';
+	            $importedMessage .= '<li>'.esc_html__('Homepage Unload Rules', 'wp-asset-clean-up').'</li>';
             } elseif ($importedKey === 'homepage_exceptions') {
-	            $importedMessage .= '<li>'.__('Homepage Load Exceptions (for site-wide and bulk unloads)', 'wp-asset-clean-up').'</li>';
+	            $importedMessage .= '<li>'.esc_html__('Homepage Load Exceptions (for site-wide and bulk unloads)', 'wp-asset-clean-up').'</li>';
             } elseif ($importedKey === 'sitewide_unloads') {
-	            $importedMessage .= '<li>'.__('Site-wide unloads', 'wp-asset-clean-up').'</li>';
+	            $importedMessage .= '<li>'.esc_html__('Site-wide unloads', 'wp-asset-clean-up').'</li>';
             } elseif ($importedKey === 'bulk_unloads') {
-	            $importedMessage .= '<li>'.__('Bulk Unloads (e.g. for all pages of `post` post type)', 'wp-asset-clean-up').'</li>';
+	            $importedMessage .= '<li>'.esc_html__('Bulk Unloads (e.g. for all pages of `post` post type)', 'wp-asset-clean-up').'</li>';
+            } elseif ($importedKey === 'post_type_exceptions') {
+	            $importedMessage .= '<li>'.esc_html__('Load exceptions for all pages belonging to specific post types', 'wp-asset-clean-up').'</li>';
+            } elseif ($importedKey === 'post_type_via_tax_exceptions') {
+	            $importedMessage .= '<li>'.esc_html__('Load exceptions for all pages having specific taxonomies set', 'wp-asset-clean-up').'</li>';
+            } elseif ($importedKey === 'global_data') {
+                // [wpacu_pro]
+	            $importedMessage .= '<li>'.esc_html__('Any CSS/JS updated positions (to &lt;HEAD&gt; or &lt;BODY&gt;)', 'wp-asset-clean-up').'</li>';
+	            $importedMessage .= '<li>'.esc_html__('Any CSS/JS preloading (rel="preload")', 'wp-asset-clean-up').'</li>';
+	            $importedMessage .= '<li>'.esc_html__('Any defer/async attributes added to the JS files', 'wp-asset-clean-up').'</li>';
+	            // [/wpacu_pro]
+            } elseif ($importedKey === 'extras_exceptions') {
+                // [wpacu_pro]
+	            $importedMessage .= '<li>'.esc_html__('Load exceptions for all pages belonging to some or all of the following page types: archive, author, search, 404 pages', 'wp-asset-clean-up').'</li>';
+	            // [/wpacu_pro]
             } elseif ($importedKey === 'posts_metas') {
-	            $importedMessage .= '<li>'.__('Posts, Pages &amp; Custom Post Types: Rules &amp; Page Options (Side Meta Box)', 'wp-asset-clean-up').'</li>';
+	            $importedMessage .= '<li>'.esc_html__('Posts, Pages &amp; Custom Post Types: Rules &amp; Page Options (Side Meta Box)', 'wp-asset-clean-up').'</li>';
             }
         }
 
@@ -808,7 +822,7 @@ SQL;
         ?>
         <div class="clearfix"></div>
         <div class="updated notice wpacu-notice wpacu-imported-notice is-dismissible">
-            <p><span class="dashicons dashicons-yes"></span> <?php echo $importedMessage; ?></p>
+            <p><span class="dashicons dashicons-yes"></span> <?php echo wp_kses($importedMessage, array('ul' => array('style' => array()), 'li' => array())); ?></p>
             <p>If you're using a caching plugin (e.g. WP Rocket, WP Fastest Cache, W3 Total Cache etc.) it's recommended to clear its cache if the website is working as you expect after this import, so the changes will take effect for every visitor.</p>
         </div>
         <?php

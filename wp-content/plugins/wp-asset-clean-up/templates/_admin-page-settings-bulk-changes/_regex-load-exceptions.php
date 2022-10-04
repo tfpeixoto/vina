@@ -17,4 +17,4 @@ if (! isset($data)) {
 
 <div class="wpacu-clearfix"></div>
 
-<p>This feature is available only in the<img style="opacity: 0.6;" width="20" height="20" src="<?php echo WPACU_PLUGIN_URL; ?>/assets/icons/icon-lock.svg" valign="top" alt="" /> <a href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=plugin_bulk_changes&utm_medium=regex_unloads"> Pro version</a>.</p>
+<p>This feature is available only in the<img style="opacity: 0.6;" width="20" height="20" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" valign="top" alt="" /> <a href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=plugin_bulk_changes&utm_medium=regex_unloads"> Pro version</a>.</p>

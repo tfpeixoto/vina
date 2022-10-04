@@ -24,8 +24,8 @@ if (! empty($data['all']['styles']) || ! empty($data['all']['scripts'])) {
 	require_once __DIR__.'/_asset-script-rows.php';
 
 	$sizesText = array(
-        'with_size'   => '<span class="dashicons dashicons-yes"></span>&nbsp; Local enqueued files ordered by their size (.css &amp; .js)',
-        'external_na' => '<span class="dashicons dashicons-flag"></span>&nbsp; External enqueued files or non-existent (.css &amp; .js)',
+        'with_size'   => '<span class="dashicons dashicons-yes"></span>&nbsp; '.esc_html__('Local enqueued files ordered by their size (.css &amp; .js)', 'wp-asset-clean-up'),
+        'external_na' => '<span class="dashicons dashicons-flag"></span>&nbsp; '.esc_html__('External enqueued files or non-existent (.css &amp; .js)', 'wp-asset-clean-up')
     );
 
 	if (! empty($data['rows_assets'])) {
@@ -61,9 +61,9 @@ if (! empty($data['all']['styles']) || ! empty($data['all']['scripts'])) {
 				}
 			}
 			?>
-            <div class="wpacu-assets-collapsible-wrap wpacu-by-preloads wpacu-wrap-area wpacu-<?php echo $sizeStatus; ?>">
-                <a class="wpacu-assets-collapsible <?php if ($listAreaStatus !== 'contracted') { ?>wpacu-assets-collapsible-active<?php } ?>" href="#wpacu-assets-collapsible-content-<?php echo $sizeStatus; ?>">
-					<?php echo $sizesText[$sizeStatus]; ?> &#10141; Total files: <?php echo $totalFiles; ?>
+            <div class="wpacu-assets-collapsible-wrap wpacu-by-preloads wpacu-wrap-area wpacu-<?php echo esc_attr($sizeStatus); ?>">
+                <a class="wpacu-assets-collapsible <?php if ($listAreaStatus !== 'contracted') { ?>wpacu-assets-collapsible-active<?php } ?>" href="#wpacu-assets-collapsible-content-<?php echo esc_attr($sizeStatus); ?>">
+					<?php echo wp_kses($sizesText[$sizeStatus], array('span' => array('class' => array()))); ?> &#10141; Total files: <?php echo (int)$totalFiles; ?>
                 </a>
 
                 <div class="wpacu-assets-collapsible-content <?php if ($listAreaStatus !== 'contracted') { ?>wpacu-open<?php } ?>">
@@ -84,7 +84,7 @@ if (! empty($data['all']['styles']) || ! empty($data['all']['scripts'])) {
                         <table class="wpacu_list_table wpacu_list_by_size wpacu_widefat wpacu_striped">
                             <tbody>
 							<?php
-							echo $assetRowsOutput;
+							echo \WpAssetCleanUp\Misc::stripIrrelevantHtmlTags($assetRowsOutput);
 							?>
                             </tbody>
                         </table>
@@ -99,8 +99,8 @@ if (! empty($data['all']['styles']) || ! empty($data['all']['scripts'])) {
 if ( isset( $data['all']['hardcoded'] ) && ! empty( $data['all']['hardcoded'] ) ) {
 	$data['print_outer_html'] = true; // AJAX call from the Dashboard
 	include_once __DIR__ . '/_assets-hardcoded-list.php';
-} elseif (isset($hardcodedManageAreaHtml, $data['is_frontend_view']) && $data['is_frontend_view']) {
-	echo $hardcodedManageAreaHtml; // AJAX call from the front-end view
+} elseif (isset($data['is_frontend_view']) && $data['is_frontend_view']) {
+	echo \WpAssetCleanUp\HardcodedAssets::getHardCodedManageAreaForFrontEndView($data); // AJAX call from the front-end view
 }
 /*
 * ------------------------------------
