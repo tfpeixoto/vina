@@ -4,21 +4,7 @@ if (! isset($data)) {
 }
 
 $totalFoundHardcodedTags = $totalHardcodedTags = 0;
-$hardcodedTags      = $data['all']['hardcoded'];
-
-// Use the WordPress cache mostly for retrieval of the values if the Dashboard retrieval was used
-// Otherwise, default to $data if no valid value was set for the cache
-$dataKeys = array(
-	'page_unload_text'
-);
-
-foreach ($dataKeys as $dataKey) {
-	if ( ! ( $dataValue = \WpAssetCleanUp\ObjectCache::wpacu_cache_get( 'wpacu_data_' . $dataKey ) ) ) {
-		$dataValue = isset( $data[ $dataKey ] ) ? $data[ $dataKey ] : '';
-	}
-
-	$data[$dataKey] = $dataValue;
-}
+$hardcodedTags = $data['all']['hardcoded'];
 
 $contentWithinConditionalComments = \WpAssetCleanUp\ObjectCache::wpacu_cache_get('wpacu_hardcoded_content_within_conditional_comments');
 
@@ -32,7 +18,7 @@ if ($totalFoundHardcodedTags === 0) {
 <?php if (isset($data['print_outer_html']) && $data['print_outer_html']) { ?>
 <div class="wpacu-assets-collapsible-wrap wpacu-wrap-area wpacu-hardcoded">
     <a class="wpacu-assets-collapsible wpacu-assets-collapsible-active" href="#" style="padding: 15px 15px 15px 44px;">
-        <span class="dashicons dashicons-code-standards"></span> Hardcoded (non-enqueued) Styles &amp; Scripts &#10141; Total: <?php echo $totalFoundHardcodedTags; ?>
+        <span class="dashicons dashicons-code-standards"></span> Hardcoded (non-enqueued) Styles &amp; Scripts &#10141; Total: <?php echo (int)$totalFoundHardcodedTags; ?>
     </a>
     <div class="wpacu-assets-collapsible-content" style="max-height: inherit;">
 <?php } ?>
@@ -49,7 +35,7 @@ if ($totalFoundHardcodedTags === 0) {
 	                     href="https://developer.wordpress.org/reference/functions/wp_add_inline_script/">wp_add_inline_script()</a>. The tags could have been added via editing the PHP code (not using the right standard functions), directly inside posts content, widgets or via plugins such as "Insert Headers and Footers", "Head, Footer and Post Injections", etc. Be careful when unloading any of these tags as they might be related to Google Analytics/AdWords, StatCounter, Facebook Pixel, etc.
                 </p>
                 <!-- [wpacu_lite] -->
-                <div style="margin: 20px 0; border-left: solid 4px green; background: #f2faf2; padding: 10px;"><img width="20" height="20" src="<?php echo WPACU_PLUGIN_URL; ?>/assets/icons/icon-lock.svg" valign="top" alt="" /> &nbsp;Managing hardcoded LINK/STYLE/SCRIPT tags is an option <a target="_blank" href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=manage_hardcoded_assets&utm_medium=top_notice">available in the Pro version</a>.</div>
+                <div style="margin: 20px 0; border-left: solid 4px green; background: #f2faf2; padding: 10px;"><img width="20" height="20" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" valign="top" alt="" /> &nbsp;Managing hardcoded LINK/STYLE/SCRIPT tags is an option <a target="_blank" href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=manage_hardcoded_assets&utm_medium=top_notice">available in the Pro version</a>.</div>
                 <!-- [/wpacu_lite] -->
             </div>
 			<?php
@@ -105,8 +91,9 @@ if ($totalFoundHardcodedTags === 0) {
 										}
 
 										$dataHH = $data;
-										$dataHH['row']        = array();
-										$dataHH['row']['obj'] = $dataRowObj;
+										$dataHH['row']               = array();
+                                        $dataHH['row']['asset_type'] = 'styles';
+										$dataHH['row']['obj']        = $dataRowObj;
 
 										$templateRowOutput = \WpAssetCleanUp\Main::instance()->parseTemplate(
 											'/meta-box-loaded-assets/_hardcoded/_asset-style-single-row-hardcoded',
@@ -129,8 +116,9 @@ if ($totalFoundHardcodedTags === 0) {
 										$dataRowObj->inside_conditional_comment = \WpAssetCleanUp\HardcodedAssets::isWithinConditionalComment($tagOutput, $contentWithinConditionalComments);
 
 										$dataHH = $data;
-										$dataHH['row']        = array();
-										$dataHH['row']['obj'] = $dataRowObj;
+										$dataHH['row']               = array();
+										$dataHH['row']['asset_type'] = 'styles';
+										$dataHH['row']['obj']        = $dataRowObj;
 
 										$templateRowOutput = \WpAssetCleanUp\Main::instance()->parseTemplate(
 											'/meta-box-loaded-assets/_hardcoded/_asset-style-single-row-hardcoded',
@@ -150,7 +138,7 @@ if ($totalFoundHardcodedTags === 0) {
 									if (stripos($tagOutput, 'src') !== false) {
 										$srcHrefOriginal = false;
 
-										if (function_exists('libxml_use_internal_errors') && function_exists('libxml_clear_errors') && class_exists('DOMDocument')) {
+										if (\WpAssetCleanUp\Misc::isDOMDocumentOn()) {
 											$domForTag = new \DOMDocument();
 											libxml_use_internal_errors( true );
 
@@ -186,7 +174,7 @@ if ($totalFoundHardcodedTags === 0) {
 										$generatedHandle  = 'wpacu_hardcoded_script_src_' . $contentUniqueStr;
 									}
 
-									// It it a SCRIPT without "src" attribute? Then it's an inline one
+									// Is it a SCRIPT without "src" attribute? Then it's an inline one
 									if (! $generatedHandle) {
 										$generatedHandle  = 'wpacu_hardcoded_script_inline_' . $contentUniqueStr;
 									}
@@ -212,8 +200,9 @@ if ($totalFoundHardcodedTags === 0) {
                                     }
 
 									$dataHH = $data;
-									$dataHH['row']        = array();
-									$dataHH['row']['obj'] = $dataRowObj;
+									$dataHH['row']               = array();
+									$dataHH['row']['asset_type'] = 'scripts';
+									$dataHH['row']['obj']        = $dataRowObj;
 
                                     $templateRowOutput = \WpAssetCleanUp\Main::instance()->parseTemplate(
 										'/meta-box-loaded-assets/_hardcoded/_asset-script-single-row-hardcoded',
@@ -226,7 +215,7 @@ if ($totalFoundHardcodedTags === 0) {
 								}
 							}
 
-							echo $hardcodedTagsOutput;
+							echo \WpAssetCleanUp\Misc::stripIrrelevantHtmlTags($hardcodedTagsOutput);
 							?>
 							</tbody>
 						</table>

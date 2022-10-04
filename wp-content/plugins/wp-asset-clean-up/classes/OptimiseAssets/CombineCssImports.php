@@ -235,10 +235,15 @@ class CombineCssImports extends Minify
 	 */
 	protected function alterImportsBetweenComments($css)
 	{
-		preg_match_all('~/\*.*?@import(.*?)\*/~', $css, $commentsMatches);
+		// RegEx Source: https://blog.ostermiller.org/finding-comments-in-source-code-using-regular-expressions/
+		preg_match_all('#/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/#', $css, $commentsMatches);
 
 		if (isset($commentsMatches[0]) && ! empty($commentsMatches[0])) {
 			foreach ($commentsMatches[0] as $commentMatch) {
+				if (strpos($commentMatch, '@import') === false) {
+					continue; // the comment needs to have @import
+				}
+
 				$newComment = str_replace('@import', '(wpacu)(at)import', $commentMatch);
 				$css = str_replace($commentMatch, $newComment, $css);
 			}
@@ -246,7 +251,6 @@ class CombineCssImports extends Minify
 
 		return $css;
 	}
-
 
 	/**
 	 * Import files into the CSS, base64-sized.

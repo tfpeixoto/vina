@@ -16,7 +16,7 @@ require_once __DIR__.'/_assets-top-area.php';
 ?>
 <div class="wpacu-assets-collapsible-wrap wpacu-wrap-area">
     <a class="wpacu-assets-collapsible <?php if ($listAreaStatus !== 'contracted') { ?>wpacu-assets-collapsible-active<?php } ?>" href="#wpacu-assets-styles-collapsible-content">
-        <span class="dashicons dashicons-admin-appearance"></span> &nbsp; <?php _e('Styles (.css files)', 'wp-asset-clean-up'); ?> &#10141; Total enqueued (+ core files): <?php echo $data['total_styles']; ?>
+        <span class="dashicons dashicons-admin-appearance"></span> &nbsp; <?php esc_html_e('Styles (.css files)', 'wp-asset-clean-up'); ?> &#10141; <?php esc_html_e('Total enqueued (+ core files)', 'wp-asset-clean-up'); ?>: <?php echo (int)$data['total_styles']; ?>
     </a>
 
     <div id="wpacu-assets-styles-collapsible-content"
@@ -55,7 +55,7 @@ require_once __DIR__.'/_assets-top-area.php';
 ?>
 <div class="wpacu-assets-collapsible-wrap wpacu-wrap-area">
     <a class="wpacu-assets-collapsible <?php if ($listAreaStatus !== 'contracted') { ?>wpacu-assets-collapsible-active<?php } ?>" href="#wpacu-assets-scripts-collapsible-content">
-        <span class="dashicons dashicons-media-code"></span> &nbsp; <?php _e('Scripts (.js files)', 'wp-asset-clean-up'); ?> &#10141; Total enqueued (+ core files): <?php echo $data['total_scripts']; ?>
+        <span class="dashicons dashicons-media-code"></span> &nbsp; <?php _e('Scripts (.js files)', 'wp-asset-clean-up'); ?> &#10141; <?php esc_html_e('Total enqueued (+ core files)', 'wp-asset-clean-up'); ?>: <?php echo (int)$data['total_scripts']; ?>
     </a>
 
     <div id="wpacu-assets-scripts-collapsible-content"
@@ -83,8 +83,8 @@ require_once __DIR__.'/_assets-top-area.php';
 if ( isset( $data['all']['hardcoded'] ) && ! empty( $data['all']['hardcoded'] ) ) {
 	$data['print_outer_html'] = true; // AJAX call from the Dashboard
 	include_once __DIR__ . '/_assets-hardcoded-list.php';
-} elseif (isset($hardcodedManageAreaHtml, $data['is_frontend_view']) && $data['is_frontend_view']) {
-	echo $hardcodedManageAreaHtml; // AJAX call from the front-end view
+} elseif (isset($data['is_frontend_view']) && $data['is_frontend_view']) {
+	echo \WpAssetCleanUp\HardcodedAssets::getHardCodedManageAreaForFrontEndView($data); // AJAX call from the front-end view
 }
 
 include_once __DIR__ . '/_page-options.php';

@@ -61,11 +61,13 @@ class Settings
 		'combine_loaded_css_for',
 		'combine_loaded_js_for',
 
-		// No longer used since v1.1.7.3 (Pro) & v1.3.6.4 (Lite)
-		//'combine_loaded_css_for_admin_only', // Since v1.1.1.4 (Pro) & v1.3.1.1 (Lite)
-
-        // [wpacu_pro]
+		// [wpacu_pro]
         'defer_css_loaded_body',
+
+        // [CRITICAL CSS]
+        'critical_css_status',
+        // [/CRITICAL CSS]
+
         // [/wpacu_pro]
 
         'cache_dynamic_loaded_css',
@@ -112,6 +114,11 @@ class Settings
 		'cdn_rewrite_url_js',
 
         'disable_emojis',
+
+		// v1.2.1.2+ (Pro), v1.3.8.6 (Lite)
+		'disable_rss_feed',
+        'disable_rss_feed_message',
+
 		'disable_oembed',
 
 		// Stored in 'wpassetcleanup_global_unload' option
@@ -255,6 +262,11 @@ class Settings
 
 	        // [wpacu_pro]
             'defer_css_loaded_body' => 'moved',
+
+	        // [CRITICAL CSS]
+	        'critical_css_status' => 'on',
+	        // [/CRITICAL CSS]
+
 	        // [/wpacu_pro]
 
 	        'input_style' => 'enhanced',
@@ -268,6 +280,8 @@ class Settings
 
             // Starting from v1.3.6.9 (Lite) & v1.1.7.9 (Pro), /cart/ & /checkout/ pages are added to the exclusion list by default
             'do_not_load_plugin_patterns' => '/cart/'. "\n". '/checkout/',
+
+	        'disable_rss_feed_message' => __('There is no RSS feed available.', 'wp-asset-clean-up'),
 
 	        // [Hidden Settings]
             // They are prefixed with underscore _
@@ -308,7 +322,7 @@ class Settings
     {
     	$settings = $this->getAll();
 
-    	// When all ways to manage the assets are not enabled
+    	// When no retrieval method for fetching the assets is enabled
     	if ($settings['dashboard_show'] != 1 && $settings['frontend_show'] != 1) {
 		    ?>
 		    <div class="notice notice-warning">
@@ -318,7 +332,7 @@ class Settings
 	    }
 
 	    // After "Save changes" is clicked
-        if (get_transient('wpacu_settings_updated')) {
+        if (Misc::getVar('get', 'wpacu_selected_tab_area') && get_transient('wpacu_settings_updated')) {
             delete_transient('wpacu_settings_updated');
             ?>
             <div class="notice notice-success is-dismissible">
@@ -433,6 +447,17 @@ class Settings
 
         $settingsOption = get_option(WPACU_PLUGIN_ID . '_settings');
 
+	    $applyDefaultToNeverSaved = array(
+		    'frontend_show_exceptions',
+		    'minify_loaded_css_exceptions',
+		    'inline_css_files_below_size_input',
+		    'minify_loaded_js_exceptions',
+		    'inline_js_files_below_size_input',
+		    'clear_cached_files_after',
+		    'hide_meta_boxes_for_post_types',
+            'disable_rss_feed_message'
+	    );
+
         // If there's already a record in the database
         if ($settingsOption !== '' && is_string($settingsOption)) {
             $settings = (array)json_decode($settingsOption);
@@ -446,7 +471,7 @@ class Settings
 
                         // If it doesn't exist, it was never saved (Exception: "show_assets_meta_box")
                         // Make sure the default value is added
-	                    if (in_array($settingsKey, array('frontend_show_exceptions', 'minify_loaded_css_exceptions', 'inline_css_files_below_size_input', 'minify_loaded_js_exceptions', 'inline_js_files_below_size_input', 'clear_cached_files_after', 'hide_meta_boxes_for_post_types'))) {
+	                    if (in_array($settingsKey, $applyDefaultToNeverSaved)) {
 	                        $settings[ $settingsKey ] = isset( $this->defaultSettings[ $settingsKey ] ) ? $this->defaultSettings[ $settingsKey ] : '';
                         }
 
@@ -630,7 +655,7 @@ class Settings
             }
         }
 
-	    if (json_encode($this->defaultSettings) === json_encode($settingsNotNull)) {
+	    if (wp_json_encode($this->defaultSettings) === wp_json_encode($settingsNotNull)) {
 	        // Do not keep a record in the database (no point of having an extra entry)
             // if the submitted values are the same as the default ones
 	        delete_option(WPACU_PLUGIN_ID . '_settings');
@@ -707,7 +732,9 @@ class Settings
 	        }
         }
 
-	    Misc::addUpdateOption(WPACU_PLUGIN_ID . '_settings', json_encode(Misc::filterList($settings)));
+	    Misc::addUpdateOption(WPACU_PLUGIN_ID . '_settings', wp_json_encode(Misc::filterList($settings)));
+
+        Misc::w3TotalCacheFlushObjectCache();
 
         // New Plugin Update (since 6 April 2020): the cache is cleared after page load via AJAX
 	    // This is done in case the cache directory is large and more time is required to clear it
@@ -885,7 +912,7 @@ class Settings
 		    $wpacuQueryString['wpacu_selected_sub_tab_area'] = $subTabArea;
         }
 
-	    wp_redirect(add_query_arg($wpacuQueryString, admin_url('admin.php')));
+	    wp_redirect(add_query_arg($wpacuQueryString, esc_url(admin_url('admin.php'))));
 	    exit();
     }
 
@@ -927,6 +954,7 @@ class Settings
 	    curl_setopt_array($ch, $curlParams);
 
 	    $response = curl_exec($ch);
+
 	    if (! $response) {
 		    echo curl_error($ch); // something else happened causing the request to fail
 	    }
@@ -943,8 +971,7 @@ class Settings
 
 	    curl_close($ch);
 
-	    echo json_encode($result);
-
+	    echo wp_json_encode($result);
 	    exit();
     }
 
@@ -1001,7 +1028,7 @@ class Settings
 	    ?>
 	    <script type="text/javascript">
 		    jQuery(document).ready(function($) {
-                $.post('<?php echo admin_url('admin-ajax.php'); ?>', {
+                $.post('<?php echo esc_url(admin_url('admin-ajax.php')); ?>', {
                     'action': '<?php echo WPACU_PLUGIN_ID; ?>_do_verifications',
                     'wpacu_nonce': '<?php echo wp_create_nonce('wpacu_do_verifications'); ?>'
                 }, function (obj) {
@@ -1033,16 +1060,16 @@ class Settings
     {
         ob_start();
         ?>
-        <select id="wpacu_assets_list_layout" style="max-width: inherit;" name="<?php echo $name; ?>">
-            <option <?php if ($value === 'by-location') { echo 'selected="selected"'; } ?> value="by-location"><?php _e('Grouped by location (themes, plugins, core &amp; external)', 'wp-asset-clean-up'); ?></option>
-            <option <?php if ($value === 'by-position') { echo 'selected="selected"'; } ?> value="by-position"><?php _e('Grouped by tag position: &lt;head&gt; &amp; &lt;body&gt;', 'wp-asset-clean-up'); ?></option>
-            <option <?php if ($value === 'by-preload') { echo 'selected="selected"'; } ?> value="by-preload"><?php _e('Grouped by preloaded or not-preloaded status', 'wp-asset-clean-up'); ?></option>
-            <option <?php if ($value === 'by-parents') { echo 'selected="selected"'; } ?> value="by-parents"><?php _e('Grouped by dependencies: Parents, Children, Independent', 'wp-asset-clean-up'); ?></option>
-            <option <?php if ($value === 'by-loaded-unloaded') { echo 'selected="selected"'; } ?> value="by-loaded-unloaded"><?php _e('Grouped by loaded or unloaded status', 'wp-asset-clean-up'); ?></option>
-            <option <?php if ($value === 'by-size') { echo 'selected="selected"'; } ?> value="by-size"><?php _e('Grouped by their size (sorted in descending order)', 'wp-asset-clean-up'); ?></option>
-            <option <?php if ($value === 'by-rules') { echo 'selected="selected"'; } ?> value="by-rules"><?php _e('Grouped by having at least one rule &amp; no rules', 'wp-asset-clean-up'); ?></option>
-            <option <?php if (in_array($value, array('two-lists', 'default'))) { echo 'selected="selected"'; } ?> value="two-lists"><?php _e('All enqueued CSS, followed by all enqueued JavaScript', 'wp-asset-clean-up'); ?></option>
-            <option <?php if ($value === 'all') { echo 'selected="selected"'; } ?> value="all"> <?php _e('All enqueues in one list', 'wp-asset-clean-up'); ?></option>
+        <select id="wpacu_assets_list_layout" style="max-width: inherit;" name="<?php echo esc_attr($name); ?>">
+            <option <?php if ($value === 'by-location') { echo 'selected="selected"'; } ?> value="by-location"><?php esc_html_e('Grouped by location (themes, plugins, core &amp; external)', 'wp-asset-clean-up'); ?></option>
+            <option <?php if ($value === 'by-position') { echo 'selected="selected"'; } ?> value="by-position"><?php esc_html_e('Grouped by tag position: &lt;head&gt; &amp; &lt;body&gt;', 'wp-asset-clean-up'); ?></option>
+            <option <?php if ($value === 'by-preload') { echo 'selected="selected"'; } ?> value="by-preload"><?php esc_html_e('Grouped by preloaded or not-preloaded status', 'wp-asset-clean-up'); ?></option>
+            <option <?php if ($value === 'by-parents') { echo 'selected="selected"'; } ?> value="by-parents"><?php esc_html_e('Grouped by dependencies: Parents, Children, Independent', 'wp-asset-clean-up'); ?></option>
+            <option <?php if ($value === 'by-loaded-unloaded') { echo 'selected="selected"'; } ?> value="by-loaded-unloaded"><?php esc_html_e('Grouped by loaded or unloaded status', 'wp-asset-clean-up'); ?></option>
+            <option <?php if ($value === 'by-size') { echo 'selected="selected"'; } ?> value="by-size"><?php esc_html_e('Grouped by their size (sorted in descending order)', 'wp-asset-clean-up'); ?></option>
+            <option <?php if ($value === 'by-rules') { echo 'selected="selected"'; } ?> value="by-rules"><?php esc_html_e('Grouped by having at least one rule &amp; no rules', 'wp-asset-clean-up'); ?></option>
+            <option <?php if (in_array($value, array('two-lists', 'default'))) { echo 'selected="selected"'; } ?> value="two-lists"><?php esc_html_e('All enqueued CSS, followed by all enqueued JavaScript', 'wp-asset-clean-up'); ?></option>
+            <option <?php if ($value === 'all') { echo 'selected="selected"'; } ?> value="all"> <?php esc_html_e('All enqueues in one list', 'wp-asset-clean-up'); ?></option>
         </select>
         <?php
         return ob_get_clean();

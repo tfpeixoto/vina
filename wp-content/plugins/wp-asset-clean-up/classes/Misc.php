@@ -14,7 +14,7 @@ class Misc
 	 * @var array
 	 */
 	public static $potentialCachePlugins = array(
-		'breeze/breeze.php', // Breeze – WordPress Cache Plugin
+		'breeze/breeze.php', // Breeze WordPress Cache Plugin
 		'cache-enabler/cache-enabler.php', // Cache Enabler
 		'cachify/cachify.php', // Cachify
 		'comet-cache/comet-cache.php', // Comet Cache
@@ -99,7 +99,17 @@ class Misc
 	}
 
 	/**
-	 * @return string
+	 * @param $content
+	 *
+	 * @return array|string|string[]|null
+	 */
+	public static function stripIrrelevantHtmlTags($content)
+	{
+		return preg_replace( '@<(script|style|iframe)[^>]*?>.*?</\\1>@si', '', $content );
+	}
+
+	/**
+	 * @return bool
 	 */
 	public static function isHttpsSecure()
 	{
@@ -169,7 +179,7 @@ class Misc
      */
     private static function _filterPageUrl($postUrl)
     {
-        // If we are in the Dashboard on a HTTPS connection,
+        // If we are in the Dashboard on an HTTPS connection,
         // then we will make the AJAX call over HTTPS as well for the front-end
         // to avoid blocking
         if (self::isHttpsSecure() && strpos($postUrl, 'http://') === 0) {
@@ -193,6 +203,32 @@ class Misc
 
 	    return str_replace( $rootUrl, '', $dbPageUrl );
     }
+
+	/**
+	 * @param $postTypes
+	 *
+	 * @return mixed
+	 */
+	public static function filterPostTypesList($postTypes)
+	{
+		foreach ($postTypes as $postTypeKey => $postTypeValue) {
+			// Exclude irrelevant custom post types
+			if (in_array($postTypeKey, MetaBoxes::$noMetaBoxesForPostTypes)) {
+				unset($postTypes[$postTypeKey]);
+			}
+
+			// Polish existing values
+			if ($postTypeKey === 'product' && self::isPluginActive('woocommerce/woocommerce.php')) {
+				$postTypes[$postTypeKey] = 'product &#10230; WooCommerce';
+			}
+
+			if ($postTypeKey === 'download' && self::isPluginActive('easy-digital-downloads/easy-digital-downloads.php')) {
+				$postTypes[$postTypeKey] = 'download &#10230; Easy Digital Downloads';
+			}
+		}
+
+		return $postTypes;
+	}
 
 	/**
 	 * Note: If plugins are disabled via "Plugins Manager" -> "IN THE DASHBOARD /wp-admin/"
@@ -244,6 +280,19 @@ class Misc
 	}
 
 	/**
+	 * @return void
+	 */
+	public static function w3TotalCacheFlushObjectCache()
+	{
+		// Flush "W3 Total Cache" before printing the list as sometimes the old list shows after the CSS/JS manager is reloaded
+		if (function_exists('w3tc_objectcache_flush') && Misc::isPluginActive('w3-total-cache/w3-total-cache.php')) {
+			try {
+				w3tc_objectcache_flush();
+			} catch(\Exception $e) {}
+		}
+	}
+
+	/**
 	 * @return bool
 	 */
 	public static function isElementorMaintenanceModeOn()
@@ -286,7 +335,7 @@ class Misc
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public static function isHomePage()
     {
@@ -534,7 +583,7 @@ class Misc
     }
 
 	/**
-	 * @return bool|mixed
+	 * @return bool
 	 */
 	public static function isWpRocketMinifyHtmlEnabled()
     {
@@ -576,6 +625,14 @@ class Misc
 
     	return false;
     }
+
+	/**
+	 * @return bool
+	 */
+	public static function isDOMDocumentOn()
+	{
+		return function_exists('libxml_use_internal_errors') && function_exists('libxml_clear_errors') && class_exists('\DOMDocument') && class_exists('\DOMXpath');
+	}
 
 	/**
 	 * @return array|string
@@ -623,10 +680,10 @@ var sheets=doc.styleSheets;if(attributes){for(var attributeName in attributes){i
 ss.rel="stylesheet";ss.href=href;ss.media="only x";function ready(cb){if(doc.body){return cb()}
 setTimeout(function(){ready(cb)})}
 ready(function(){ref.parentNode.insertBefore(ss,(before?ref:ref.nextSibling))});var onwpaculoadcssdefined=function(cb){var resolvedHref=ss.href;var i=sheets.length;while(i--){if(sheets[i].href===resolvedHref){return cb()}}
-setTimeout(function(){onwpaculoadcssdefined(cb)})};function loadCB(){if(ss.addEventListener){ss.removeEventListener("load",loadCB)}
+setTimeout(function(){onwpaculoadcssdefined(cb)})};function wpacuLoadCB(){if(ss.addEventListener){ss.removeEventListener("load",wpacuLoadCB)}
 ss.media=media||"all"}
-if(ss.addEventListener){ss.addEventListener("load",loadCB)}
-ss.onwpaculoadcssdefined=onwpaculoadcssdefined;onwpaculoadcssdefined(loadCB);return ss};if(typeof exports!=="undefined"){exports.wpacuLoadCSS=wpacuLoadCSS}else{w.wpacuLoadCSS=wpacuLoadCSS}}(typeof global!=="undefined"?global:this))
+if(ss.addEventListener){ss.addEventListener("load",wpacuLoadCB)}
+ss.onwpaculoadcssdefined=onwpaculoadcssdefined;onwpaculoadcssdefined(wpacuLoadCB);return ss};if(typeof exports!=="undefined"){exports.wpacuLoadCSS=wpacuLoadCSS}else{w.wpacuLoadCSS=wpacuLoadCSS}}(typeof global!=="undefined"?global:this))
 </script>
 HTML;
 	}
@@ -634,7 +691,7 @@ HTML;
 	/**
 	 * @param $array
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public static function arrayKeyFirst($array)
 	{
@@ -648,7 +705,7 @@ HTML;
 	}
 
 	/**
-	 * @return bool|int
+	 * @return int
 	 */
 	public static function jsonLastError()
 	{
@@ -688,7 +745,7 @@ HTML;
 	 * @param $requestMethod
 	 * @param $key
 	 *
-	 * @return bool|mixed
+	 * @return bool
 	 */
 	public static function isValidRequest($requestMethod, $key)
     {
@@ -713,7 +770,7 @@ HTML;
     	    return;
 	    }
 
-	    $pageOptionsJson = json_encode(array(
+	    $pageOptionsJson = wp_json_encode(array(
 		    'no_css_minify'   => 1,
 		    'no_css_optimize' => 1,
 		    'no_js_minify'    => 1,
@@ -841,9 +898,18 @@ SQL;
 			$bulkUnloadArray  = @json_decode($bulkUnloadListJson, ARRAY_A);
 
 			$bulkUnloadedAllTypes = array('search', 'date', '404', 'taxonomy', 'post_type', 'author');
+			foreach (array('styles', 'scripts') as $assetType) {
+				if ( isset( $bulkUnloadArray[ $assetType ] ) ) {
+					foreach ( array_keys( $bulkUnloadArray[ $assetType ] ) as $dataType ) {
+						if ( strpos( $dataType, 'custom_post_type_archive_' ) !== false ) {
+							$bulkUnloadedAllTypes[] = $dataType;
+						}
+					}
+				}
+			}
 
-			foreach ($bulkUnloadedAllTypes as $bulkUnloadedType) {
-				if (in_array($bulkUnloadedType, array('search', 'date', '404'))) {
+			foreach ( $bulkUnloadedAllTypes as $bulkUnloadedType ) {
+				if (in_array($bulkUnloadedType, array('search', 'date', '404')) || (strpos($bulkUnloadedType, 'custom_post_type_archive_') !== false)) {
 					foreach (array('styles', 'scripts') as $assetType) {
 						if ( isset( $bulkUnloadArray[$assetType][ $bulkUnloadedType ] ) && ! empty( $bulkUnloadArray[$assetType][ $bulkUnloadedType ] ) ) {
 							$unloadedTotalAssets += count( $bulkUnloadArray[$assetType][ $bulkUnloadedType ] );
@@ -930,6 +996,18 @@ SQL;
 	}
 
 	/**
+	 * @return string
+	 */
+	public static function getThemesDirRel()
+	{
+		$relPathCurrentTheme = str_replace( site_url(), '', get_template_directory_uri() );
+
+		$posLastForwardSlash = strrpos($relPathCurrentTheme,'/');
+
+		return substr($relPathCurrentTheme, 0, $posLastForwardSlash) . '/';
+	}
+
+	/**
 	 * Needed when the plugins' directory is different than the default one: /wp-content/plugins/
 	 *
 	 * @param $values
@@ -952,58 +1030,98 @@ SQL;
 	/**
 	 * @param $src
 	 *
-	 * @return bool|mixed
+	 * @return bool|array
 	 */
 	public static function maybeIsInactiveAsset($src)
 	{
-		// Quickest way
 		$pluginsDirRel = self::getPluginsDir();
-		preg_match_all('#/'.$pluginsDirRel.'/(.*?)/#', $src, $matches, PREG_PATTERN_ORDER);
-
-		if (isset($matches[1][0]) && $matches[1][0]) {
-			$pluginDirName = $matches[1][0];
-
-			$activePlugins = self::getActivePlugins();
-			$activePluginsStr = implode(',', $activePlugins);
-
-			if (strpos($activePluginsStr, $pluginDirName.'/') === false) {
-				return $pluginDirName; // it belongs to an inactive plugin
-			}
-		}
-
-		$relPluginsUrl = str_replace(site_url(), '', plugins_url());
 
 		$srcAlt = $src;
 
-		if (strpos($srcAlt, '//') === 0) {
-			$srcAlt = str_replace(
-				str_replace(array('http://', 'https://'),'//', site_url()),
-				'',
-				$srcAlt
-			);
+		if ( strpos( $srcAlt, '//' ) === 0 ) {
+			$srcAlt = str_replace( str_replace( array( 'http://', 'https://' ), '//', site_url() ), '', $srcAlt );
 		}
 
 		$relSrc = str_replace( site_url(), '', $srcAlt );
 
-		if (strpos($relSrc, '/'.$pluginsDirRel) !== false) {
-			list (,$relSrc) = explode('/'.$pluginsDirRel, $relSrc);
-		}
+		/*
+		 * [START] plugin path
+		 */
+		if (strpos($src, $pluginsDirRel) !== false) {
+			// Quickest way
+			preg_match_all( '#/' . $pluginsDirRel . '/(.*?)/#', $src, $matches, PREG_PATTERN_ORDER );
 
-		if (strpos($relSrc, $relPluginsUrl) !== false) {
-			// Determine the plugin behind the $src
-			$relSrc = trim(str_replace($relPluginsUrl, '', $relSrc), '/');
+			if ( isset( $matches[1][0] ) && $matches[1][0] ) {
+				$pluginDirName = $matches[1][0];
 
-			if (strpos($relSrc, '/') !== false) {
-				list ( $pluginDirName, ) = explode( '/', $relSrc );
+				$activePlugins    = self::getActivePlugins();
+				$activePluginsStr = implode( ',', $activePlugins );
 
-				$activePlugins = self::getActivePlugins();
-				$activePluginsStr = implode(',', $activePlugins);
+				if ( strpos( $activePluginsStr, $pluginDirName . '/' ) === false ) {
+					return array(
+						'from' => 'plugin',
+						'name' => $pluginDirName
+					); // it belongs to an inactive plugin
+				}
+			}
 
-				if (strpos($activePluginsStr, $pluginDirName.'/') === false) {
-					return $pluginDirName; // it belongs to an inactive plugin
+			$relPluginsUrl = str_replace( site_url(), '', plugins_url() );
+
+			if ( strpos( $relSrc, '/' . $pluginsDirRel ) !== false ) {
+				list ( , $relSrc ) = explode( '/' . $pluginsDirRel, $relSrc );
+			}
+
+			if ( strpos( $relSrc, $relPluginsUrl ) !== false ) {
+				// Determine the plugin behind the $src
+				$relSrc = trim( str_replace( $relPluginsUrl, '', $relSrc ), '/' );
+
+				if ( strpos( $relSrc, '/' ) !== false ) {
+					list ( $pluginDirName, ) = explode( '/', $relSrc );
+
+					$activePlugins    = self::getActivePlugins();
+					$activePluginsStr = implode( ',', $activePlugins );
+
+					if ( strpos( $activePluginsStr, $pluginDirName . '/' ) === false ) {
+						return array(
+							'from' => 'plugin',
+							'name' => $pluginDirName
+						); // it belongs to an inactive plugin
+					}
 				}
 			}
 		}
+		/*
+		 * [END] plugin path
+		 */
+
+		/*
+		 * [START] theme path
+		 */
+		$themesDirRel = self::getThemesDirRel();
+
+		if (strpos($relSrc, $themesDirRel) !== false) {
+			if ( strpos( $relSrc, $themesDirRel ) !== false ) {
+				list ( , $relSrc ) = explode( $themesDirRel, $relSrc );
+			}
+
+			if ( strpos( $relSrc, '/' ) !== false ) {
+				list ( $themeDirName, ) = explode( '/', $relSrc );
+			}
+
+			if (isset($themeDirName)) {
+				$activeThemes = self::getActiveThemes();
+
+				if ( ! empty( $activeThemes ) && ! in_array($themeDirName, $activeThemes) ) {
+					return array(
+						'from' => 'theme',
+						'name' => $themeDirName
+					);
+				}
+			}
+		}
+		/*
+		 * [END] theme path
+		 */
 
 		return false;
 	}
@@ -1034,31 +1152,65 @@ SQL;
 	}
 
 	/**
+	 * @return array
+	 */
+	public static function getActiveThemes()
+	{
+		$activeThemes     = array();
+		$currentThemeSlug = get_stylesheet();
+
+		if ( current_user_can( 'switch_themes' ) ) {
+			$themes = wp_get_themes( array( 'allowed' => true ) );
+		} else {
+			$themes = array( wp_get_theme() );
+		}
+
+		foreach ( $themes as $theme ) {
+			$themeSlug = $theme->get_stylesheet();
+
+			if ( $themeSlug === $currentThemeSlug ) {
+				// Make sure both the parent and the child theme are in the list of active themes
+				// in case there are references from
+				$activeThemes[] = $currentThemeSlug;
+
+				$childEndsWith = '-child';
+				if ( self::endsWith( $currentThemeSlug, $childEndsWith ) ) {
+					$activeThemes[] = substr( $currentThemeSlug, 0, - strlen( $childEndsWith ) );
+				} else {
+					$activeThemes[] = $currentThemeSlug . $childEndsWith;
+				}
+			}
+		}
+
+		return $activeThemes;
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getCachedActiveFreePluginsIcons()
+	{
+		$activePluginsIconsJson = get_transient( 'wpacu_active_plugins_icons' );
+
+		if ( $activePluginsIconsJson ) {
+			$activePluginsIcons = @json_decode( $activePluginsIconsJson, ARRAY_A );
+
+			if ( ! empty( $activePluginsIcons ) && is_array( $activePluginsIcons ) ) {
+				return $activePluginsIcons;
+			}
+		}
+
+		return array(); // default
+	}
+
+	/**
 	 * @param bool $onlyTransient
 	 * @param bool $forceDownload
 	 *
 	 * @return array|bool|mixed|object
 	 */
-	public static function fetchActiveFreePluginsIcons($onlyTransient = false, $forceDownload = false)
+	public static function fetchActiveFreePluginsIconsFromWordPressOrg()
     {
-    	// Check the transient if $forceDownload is set to false (default)
-    	if ( ! $forceDownload ) {
-		    $activePluginsIconsJson = get_transient( 'wpacu_active_plugins_icons' );
-
-		    if ( $activePluginsIconsJson ) {
-			    $activePluginsIcons = @json_decode( $activePluginsIconsJson, ARRAY_A );
-		    }
-
-		    if ( ! empty( $activePluginsIcons ) && is_array( $activePluginsIcons ) ) {
-			    return $activePluginsIcons;
-		    }
-
-		    // Do not fetch the icons from the WordPress.org repository if only transient was required
-		    if ( $onlyTransient ) {
-			    return array();
-		    }
-	    }
-
 	    $allActivePlugins = self::getActivePlugins();
 
 	    if (empty($allActivePlugins)) {
@@ -1143,7 +1295,7 @@ SQL;
 
 	    $expiresInSeconds = 604800; // one week
 
-	    set_transient('wpacu_active_plugins_icons', json_encode($activePluginsIcons), $expiresInSeconds);
+	    set_transient('wpacu_active_plugins_icons', wp_json_encode($activePluginsIcons), $expiresInSeconds);
 
 	    return $activePluginsIcons;
     }
@@ -1166,7 +1318,7 @@ SQL;
 		    'wp-rocket'     => WPACU_PLUGIN_URL . '/assets/icons/premium-plugins/wp-rocket.png'
 	    );
 
-	    $allActivePluginsIcons = self::fetchActiveFreePluginsIcons(true) ?: array();
+	    $allActivePluginsIcons = self::getCachedActiveFreePluginsIcons();
 
 	    if ( ! is_array($allActivePluginsIcons) ) {
 		    $allActivePluginsIcons = array();
@@ -1225,7 +1377,7 @@ SQL;
 			$typeAttr = " type='text/css'";
 		}
 
-		return $typeAttr;
+		return wp_kses($typeAttr, array('type' => array()));
 	}
 
 	/**
@@ -1299,13 +1451,15 @@ SQL;
 	 * @param $size
 	 * @param int $precision
 	 * @param string $getItIn
+	 * @param bool $includeHtmlTags
 	 *
 	 * @return string
 	 */
-	public static function formatBytes($size, $precision = 2, $getItIn = '')
+	public static function formatBytes($size, $precision = 2, $getItIn = '', $includeHtmlTags = true)
 	{
 		if ((int)$size === 0) {
-			return '<span style="vertical-align: middle;" class="dashicons dashicons-warning"></span> '.__('The file appears to be empty', 'wp-asset-clean-up');
+			return (($includeHtmlTags) ? '<span style="vertical-align: middle;" class="dashicons dashicons-warning"></span> ' : '') .
+					__('The file appears to be empty', 'wp-asset-clean-up');
 		}
 
 		// In case a string is passed, make it to float
@@ -1342,7 +1496,7 @@ SQL;
 
 		$resultForPrint = $result;
 
-		if ($suffixes[$floorBase] === 'KB' && $floorBase !== 1) {
+		if ($includeHtmlTags && $suffixes[$floorBase] === 'KB' && $floorBase !== 1) {
 			$resultForPrint = str_replace('.', '<span style="font-size: 80%; font-weight: 200;">.', $result).'</span>';
 		}
 
@@ -1353,7 +1507,7 @@ SQL;
 			$output .= ' ('.number_format($result / 1024, 4).' MB)';
 		}
 
-		return $output;
+		return wp_kses($output, array('span' => array('style' => array(), 'class' => array())));
 	}
 
 	/**
@@ -1384,7 +1538,7 @@ SQL;
 	 * @param array $targetDirs
 	 * @param string $filterExt
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
 	public static function getSizeOfDirectoryRootFiles($targetDirs = array(), $filterExt = '')
 	{
@@ -1491,7 +1645,7 @@ SQL;
 
 		foreach ($array as $key => $value) {
 			if (is_array($value) || is_object($value)) {
-				$array[$key] = self::arrayUnsetRecursive($array[$key]);
+				$array[$key] = self::arrayUnsetRecursive($value);
 			}
 
 			// Values such as '0' are not considered empty values

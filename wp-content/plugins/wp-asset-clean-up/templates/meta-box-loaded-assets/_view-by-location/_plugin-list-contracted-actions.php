@@ -12,10 +12,10 @@ if (! isset($showUnloadOnThisPageCheckUncheckAll, $showLoadItOnThisPageCheckUnch
         <div class="wpacu-plugin-toggle-all">
             &#10230; "Unload on this page" -
             <a class="wpacu-plugin-check-all"
-               data-wpacu-plugin="<?php echo $locationChild; ?>" href="#">Check All</a>
+               data-wpacu-plugin="<?php echo esc_html($locationChild); ?>" href="#">Check All</a>
             |
             <a class="wpacu-plugin-uncheck-all"
-               data-wpacu-plugin="<?php echo $locationChild; ?>" href="#">Uncheck
+               data-wpacu-plugin="<?php echo esc_html($locationChild); ?>" href="#">Uncheck
                 All</a>
         </div>
     <?php }  ?>
@@ -28,10 +28,10 @@ if (! isset($showUnloadOnThisPageCheckUncheckAll, $showLoadItOnThisPageCheckUnch
         <div class="wpacu-plugin-toggle-all">
             &#10230; Make an exception from bulk unload, "Load it on this page" -
             <a class="wpacu-plugin-check-load-all"
-               data-wpacu-plugin="<?php echo $locationChild; ?>" href="#">Check All</a>
+               data-wpacu-plugin="<?php echo esc_html($locationChild); ?>" href="#">Check All</a>
             |
             <a class="wpacu-plugin-uncheck-load-all"
-               data-wpacu-plugin="<?php echo $locationChild; ?>" href="#">Uncheck
+               data-wpacu-plugin="<?php echo esc_html($locationChild); ?>" href="#">Uncheck
                 All</a> * <small>relevant if bulk unload rules (e.g. site-wide) are already applied</small>
         </div>
         <?php

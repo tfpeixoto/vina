@@ -2,9 +2,9 @@
 Contributors: gabelivan
 Tags: minify css, minify javascript, defer css javascript, page speed, dequeue, performance
 Donate link: https://www.gabelivan.com/items/wp-asset-cleanup-pro/?utm_source=wp_org_lite&utm_medium=donate
-Requires at least: 4.5
-Tested up to: 5.8.2
-Stable tag: 1.3.8.5
+Requires at least: 4.6
+Tested up to: 6.0.2
+Stable tag: 1.3.8.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -32,6 +32,7 @@ The plugin works best in combination with a cache plugin (e.g. WP Rocket, WP Fas
 * Inline CSS Files (automatically & by specifying the path to the stylesheets)
 * Defer combined JavaScript files by applying "defer" attribute to the SCRIPT tags
 * Site-wide removal for Emojis, Dashicons for guest users and Comment Reply if they are not used
+* Disable RSS Feeds
 * Reduces the HTML code of the actual page (that's even better if GZIP compression is enabled)
 * Makes source code easier to scan in case you're a developer and want to search for something
 * Remove possible conflicts between plugins/theme (e.g. 2 JavaScript files that are loading from different plugins and they interfere one with another)
@@ -190,6 +191,42 @@ With the recently released "Test Mode" feature, you can safely unload assets on 
 4. Homepage CSS & JS Management (List sorted by location)
 
 == Changelog ==
+= 1.3.8.6 =
+* New option in the settings' vertical menu: Disable RSS Feed
+* Show any special settings in "Overview" -- read more: https://www.assetcleanup.com/docs/?p=1495
+* PHP 8 compatibility: Make sure no deprecated notices are shown when WP_DEBUG is ON due to older PHP code that is still compatible with PHP 5.6
+* Notify the admin when the tracking notice is shown that he/she can manage this option in the "Settings" area (e.g. in case closing the notice box doesn't work because of some JavaScript errors on that page, coming from a different plugin or the theme)
+* Make sure the list of unloaded assets/plugins from the top admin bar is not broken due to the theme used that might have CSS interfering with Asset CleanUp Pro's one
+* Make sure the user is redirected only once to the "Getting Started" page after the plugin is activated the first time (not after every re-activation as many developers are doing debugging)
+* "Transliterator - WordPress Transliteration" compatibility: Avoid breaking the HTML content in Asset CleanUp Pro's admin pages
+* Added "wpacu_print_info_comments_in_cached_assets" filter hook for the option to avoid printing by default of plugin's comments in the CSS/JS files (e.g. the relative path to the file)
+* Reduced the total number of template files (e.g. some were redundant)
+* Reduce the total plugin's size by compressing some of its images
+* Higher accuracy in detecting Zion Page Builder to prevent Asset CleanUp Pro from triggering when the page builder is used
+* "Bricks – Visual Site Builder for WordPress": Do not trigger Asset CleanUp Pro whenever the page builder is used
+* Bricks builder edit mode: Allow Asset CleanUp to trigger plugin & CSS/JS unload rules when the page editor is in use to make the editor load faster via define('WPACU_LOAD_ON_BRICKS_BUILDER', true); that can be set in wp-config.php / read more: https://www.assetcleanup.com/docs/?p=1450
+* Improvement: On pages without any unloading rules, do not make any DB calls or trigger extra PHP code to retrieve any load exceptions as they are irrelevant in this situation since the assets are loaded anyway
+* Improvement: Optimised the code to avoid triggering DB calls to the "options" table to check specific transient values
+* Improvement: Do extra checks to avoid calling get_transient() when it's not needed on specific pages (to reduce the number of DB calls)
+* Improvement: Remove extra DB queries related to "post_format" as this taxonomy is irrelevant for managing in Asset CleanUp
+* Improvement: When Asset CleanUp is prevented from loading via the rules from "Settings" -- "Plugin Usage Preferences" -- "Do not load the plugin on certain pages" OR from "Do not load Asset CleanUp Pro on this page (this will disable any functionality of the plugin)" within "Page Options" area (when managing assets for a specific page), make sure the checking is done earlier to avoid an extra DB query that would become irrelevant if the plugin would not be loaded on that page
+* Improvement: Add more uniqueness to the plugin's JS code deferring the CSS to avoid any conflicts with other similar codes
+* Improvement: Escape as late as possible all variables when echoed
+* Improvement: Load jQuery UI files locally, thus removing any unnecessary dependency on another site (e.g. not from "ajax.googleapis.com")
+* Improvement: Replaced json_encode() with wp_json_encode() for better security
+* Improvement: "Overview" area / Make sure the unloaded CSS/JS from inactive themes is highlighted to alert the admin that the rules might never be needed and can be safely removed
+* Compatibility with the "WordPress Popular Posts" plugin & other plugins (when optimizing the JavaScript code) that change the type of inline script tags to "application/json" (having a JSON string that is later read by the plugin's script)
+* Fix: "Google Fonts" -- "Apply font-display: CSS property value" was not applying for hardcoded LINK tags when the Google fonts were not combined
+* Fix: "Plugin Usage Preferences" -- "Manage in the Dashboard" -- "Fetch the assets on a button click": if the user updates a post (when Gutenberg editor is used), the CSS/JS manager loads, when it shouldn't as the admin never used the button to fetch the CSS/JS list in the first place
+* Fix: Better RegEx for detecting "@import" within CSS comments when optimizing the CSS, thus avoiding useless attempts to fetch the information from the @import locations, since they are commented and not needed in the final CSS version
+* Fix: When a word containing "calc" (e.g. calculation) was included in CSS comments, sometimes, the code following the comment was stripped
+* Fix: Minify CSS / If there are new lines within calc(), the content minified ends up without spaces between the operators (e.g. the plus sign), which breaks the CSS code
+* Fix: When CSS content gets cached, make sure to avoid altering incorrectly the "url" value when it starts with # - e.g. clip-path: url(#elementIdHere);
+* Fix: The list "Grouped by loaded or unloaded status" was sometimes showing unloaded assets as "loaded", confusing the admin
+* Fix: Make sure all load exceptions for any unload rule are included in "Tools" -> "Import & Export"
+* Fix: Sometimes when a static page was set as the homepage in "Settings" - "Reading" and then unset, the CSS/JS manager was not showing up and the "Page Options" was shown instead
+* Fix: "Overview" area / The confirmation for clearing rules belonging to inactive CSS/JS wasn't always showing the right handle, thus confusing the admin when confirming the action
+
 = 1.3.8.5 =
 * Added the "wpacu_settings" filter - add_filter() - so the plugin's "Settings" can be altered via code (e.g. adding if clauses programmatically to alter the value of a certain textarea or have an option disabled on specific pages) when necessary
 * Prevent the following option from being accidentally disabled: 'Ignore dependency rule and keep the "children" loaded' (e.g. in rare cases, some CSS/JS have dependencies on certain pages only)

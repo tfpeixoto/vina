@@ -427,7 +427,7 @@ class OptimizeCss
 		$newLocalPath    = WP_CONTENT_DIR . $newFilePathUri; // Ful Local path
 		$newLocalPathUrl = WP_CONTENT_URL . $newFilePathUri; // Full URL path
 
-		if ($cssContent && $cssContent !== '/**/') {
+		if ($cssContent && $cssContent !== '/**/' && apply_filters('wpacu_print_info_comments_in_cached_assets', true)) {
 			$cssContent = '/*!' . $sourceBeforeOptimization . '*/' . $cssContent;
 		}
 
@@ -445,7 +445,7 @@ class OptimizeCss
 		);
 
 		// Re-add transient
-		OptimizeCommon::setTransient($transientName, json_encode($saveValues));
+		OptimizeCommon::setTransient($transientName, wp_json_encode($saveValues));
 
 		return array(
 			OptimizeCommon::getSourceRelPath($src), // Original SRC (Relative path)
@@ -611,8 +611,8 @@ class OptimizeCss
 			// Rare cases
 			$cssContent = preg_replace('/url\((\s+)http/i', 'url(http', $cssContent);
 
-			// Avoid Background URLs starting with "data", "http" or "https" as they do not need to have a path updated
-			preg_match_all('/url\((?![\'"]?(?:data|http|https):)[\'"]?([^\'")]*)[\'"]?\)/i', $cssContent, $matches);
+			// Avoid Background URLs starting with "#", "data", "http" or "https" as they do not need to have a path updated
+			preg_match_all('/url\((?![\'"]?(?:#|data|http|https):)[\'"]?([^\'")]*)[\'"]?\)/i', $cssContent, $matches);
 
 			// If it start with forward slash (/), it doesn't need fix, just skip it
 			// Also skip ../ types as they were already processed
@@ -636,7 +636,7 @@ class OptimizeCss
 
 				$alteredMatch = trim($alteredMatch);
 
-				if (! in_array($fullUrlMatch[4], array("'", '"', '/', '.'))) {
+				if (! in_array($fullUrlMatch[4], array("'", '"', '/', '.', '#'))) {
 					$alteredMatch = str_replace('url(', 'url(' . $appendBefore, $alteredMatch);
 					$alteredMatch = str_replace(array('")', '\')'), ')', $alteredMatch);
 				}
@@ -806,7 +806,7 @@ class OptimizeCss
 	 * @param $sourceUrlList array
 	 * @param $optimizeUrl string
 	 *
-	 * @return mixed
+	 * @return array|string|string[]|null
 	 */
 	public static function updateOriginalToOptimizedTag($linkSourceTag, $sourceUrlList, $optimizeUrl)
 	{
@@ -1040,7 +1040,7 @@ class OptimizeCss
 			return $cssContent;
 		}
 
-		if (mb_strlen($cssContent) < 40000) { // Smaller than than ~40KB? Do not cache it
+		if (mb_strlen($cssContent) < 40000) { // Smaller than ~40KB? Do not cache it
 			$useCacheForInlineStyle = false;
 		}
 
@@ -1423,7 +1423,7 @@ class OptimizeCss
 	/**
 	 * @param $htmlSource
 	 *
-	 * @return mixed
+	 * @return array|string|string[]
 	 */
 	public function appendNoScriptCertainLinkTags($htmlSource)
 	{

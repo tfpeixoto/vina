@@ -25,7 +25,7 @@ class CombineJs
 	 */
 	public static function doCombine($htmlSource)
 	{
-		if (! (function_exists('libxml_use_internal_errors') && function_exists('libxml_clear_errors') && class_exists('\DOMDocument'))) {
+		if ( ! Misc::isDOMDocumentOn() ) {
 			return $htmlSource;
 		}
 
@@ -77,7 +77,7 @@ class CombineJs
 				libxml_use_internal_errors(true);
 
 				// Strip irrelevant tags to boost the speed of the parser (e.g. NOSCRIPT / SCRIPT(inline) / STYLE)
-				// Sometimes, inline CODE can be too large and it takes extra time for loadHTML() to parse
+				// Sometimes, inline CODE can be too large, and it takes extra time for loadHTML() to parse
 				$htmlSourceAlt = preg_replace( '@<script(| (type=(\'|"|)text/(javascript|template|html)(\'|"|)))>.*?</script>@si', '', $htmlSource );
 				$htmlSourceAlt = preg_replace( '@<(style|noscript)[^>]*?>.*?</\\1>@si', '', $htmlSourceAlt );
 				$htmlSourceAlt = preg_replace( '#<link([^<>]+)/?>#iU', '', $htmlSourceAlt );
@@ -155,10 +155,10 @@ class CombineJs
 								$getInlineAssociatedWithHandle = OptimizeJs::getInlineAssociatedWithScriptHandle($handleToCheck, $wpacuRegisteredScripts, 'handle');
 
 								if ( ($getInlineAssociatedWithHandle['data'] || $getInlineAssociatedWithHandle['before'] || $getInlineAssociatedWithHandle['after'])
-									|| in_array(trim($tagObject->nodeValue), array($getInlineAssociatedWithHandle['data'], $getInlineAssociatedWithHandle['before'], $getInlineAssociatedWithHandle['after']))
-									|| (strpos(trim($tagObject->nodeValue), '/* <![CDATA[ */') === 0 && Misc::endsWith(trim($tagObject->nodeValue), '/* ]]> */')) ) {
+								     || in_array(trim($tagObject->nodeValue), array($getInlineAssociatedWithHandle['data'], $getInlineAssociatedWithHandle['before'], $getInlineAssociatedWithHandle['after']))
+								     || (strpos(trim($tagObject->nodeValue), '/* <![CDATA[ */') === 0 && Misc::endsWith(trim($tagObject->nodeValue), '/* ]]> */')) ) {
 
-									// It's associated with the enqueued scripts or it's a (standalone) CDATA inline tag added via wp_localize_script()
+									// It's associated with the enqueued scripts, or it's a (standalone) CDATA inline tag added via wp_localize_script()
 									// Skip it instead and if the CDATA is not standalone (e.g. not associated with any script tag), the loop will "stay" in the same combined group
 									continue;
 								}
@@ -217,16 +217,12 @@ class CombineJs
 						if ( $localAssetPath = OptimizeCommon::getLocalAssetPath( $src, 'js' ) ) {
 							$scriptExtra = array();
 
-							if ( OptimizeCommon::appendInlineCodeToCombineAssetType('js') ) {
-								if ( isset( $scriptAttributes['data-wpacu-script-handle'], $wpacuRegisteredScripts[ $scriptAttributes['data-wpacu-script-handle'] ]->extra ) ) {
-									$scriptExtra = $wpacuRegisteredScripts[ $scriptAttributes['data-wpacu-script-handle'] ]->extra;
-								}
+							if ( isset( $scriptAttributes['data-wpacu-script-handle'], $wpacuRegisteredScripts[ $scriptAttributes['data-wpacu-script-handle'] ]->extra ) && OptimizeCommon::appendInlineCodeToCombineAssetType('js') ) {
+								$scriptExtra = $wpacuRegisteredScripts[ $scriptAttributes['data-wpacu-script-handle'] ]->extra;
 
-								$anyScriptTranslations = false;
-
-								if (method_exists('wp_scripts', 'print_translations')) {
-									$anyScriptTranslations = wp_scripts()->print_translations( $scriptAttributes['data-wpacu-script-handle'], false );
-								}
+								$anyScriptTranslations = method_exists('wp_scripts', 'print_translations')
+									? wp_scripts()->print_translations( $scriptAttributes['data-wpacu-script-handle'], false )
+									: false;
 
 								if ( $anyScriptTranslations ) {
 									$scriptExtra['translations'] = $anyScriptTranslations;
@@ -361,14 +357,12 @@ class CombineJs
 				}
 			}
 
-			OptimizeCommon::setAssetCachedData(self::$jsonStorageFile, OptimizeJs::getRelPathJsCacheDir(), json_encode($finalCacheList));
+			OptimizeCommon::setAssetCachedData(self::$jsonStorageFile, OptimizeJs::getRelPathJsCacheDir(), wp_json_encode($finalCacheList));
 		}
 
 		if (! empty($finalCacheList)) {
 			$cdnUrls = OptimizeCommon::getAnyCdnUrls();
 			$cdnUrlForJs = isset($cdnUrls['js']) ? $cdnUrls['js'] : false;
-
-			$typeAttr = Misc::getScriptTypeAttribute();
 
 			foreach ( $finalCacheList as $docLocationScript => $cachedGroupsList ) {
 				foreach ($cachedGroupsList as $groupNo => $cachedValues) {
@@ -394,18 +388,21 @@ class CombineJs
 						$finalJsTagAttrsOutput = trim($finalJsTagAttrsOutput);
 					}
 
-					$finalJsTag = <<<HTML
-<script {$finalJsTagAttrsOutput} id='wpacu-combined-js-{$docLocationScript}-group-{$groupNo}' {$typeAttr} src='{$finalTagUrl}'></script>
-HTML;
-					// In case one needs to alter it (e.g. developers that might want to add custom attributes such as data-cfasync="false")
+					// No async or defer? Add the preloading for the combined JS from the BODY
+					if ( ! $finalJsTagAttrsOutput && $docLocationScript === 'body' ) {
+						$finalJsTagAttrsOutput = ' data-wpacu-to-be-preloaded-basic=\'1\' ';
+						if ( ! defined('WPACU_REAPPLY_PRELOADING_FOR_COMBINED_JS') ) { define('WPACU_REAPPLY_PRELOADING_FOR_COMBINED_JS', true); }
+					}
+
+					// e.g. For developers that might want to add custom attributes such as data-cfasync="false"
 					$finalJsTag = apply_filters(
 						'wpacu_combined_js_tag',
-						$finalJsTag,
+						'<script '.$finalJsTagAttrsOutput.' '.Misc::getScriptTypeAttribute().' id=\'wpacu-combined-js-'.$docLocationScript.'-group-'.$groupNo.'\' src=\''.$finalTagUrl.'\'></script>',
 						array(
 							'attrs'        => $extraAttrs,
-					        'doc_location' => $docLocationScript,
-					        'group_no'     => $groupNo,
-					        'src'          => $finalTagUrl
+							'doc_location' => $docLocationScript,
+							'group_no'     => $groupNo,
+							'src'          => $finalTagUrl
 						)
 					);
 
@@ -443,10 +440,8 @@ HTML;
 
 		if (isset($finalCacheList['body']) && (! empty($finalCacheList['body'])) && Main::instance()->settings['combine_loaded_js_defer_body']) {
 			// CACHE RE-BUILT
-			$typeAttr = Misc::getScriptTypeAttribute();
-
 			if ($isDeferAppliedOnBodyCombineGroupNo > 0 && $domTag = ObjectCache::wpacu_cache_get('wpacu_html_dom_body_tag_for_js')) {
-				$strPart = "id='wpacu-combined-js-body-group-".$isDeferAppliedOnBodyCombineGroupNo."' $typeAttr ";
+				$strPart = "id='wpacu-combined-js-body-group-".$isDeferAppliedOnBodyCombineGroupNo."' ";
 
 				if (strpos($htmlSource, $strPart) === false) {
 					return $htmlSource; // something is funny, do not continue
@@ -469,7 +464,7 @@ HTML;
 					return $htmlSource;
 				}
 
-				$strPart = "id='wpacu-combined-js-body-group-".$isDeferAppliedOnBodyCombineGroupNo."' $typeAttr ";
+				$strPart = 'id=\'wpacu-combined-js-body-group-'.$isDeferAppliedOnBodyCombineGroupNo.'\'';
 
 				$htmlAfterFirstCombinedDeferScriptMaybeChanged = false;
 
@@ -620,7 +615,11 @@ HTML;
 
 				$pathToAssetDir = OptimizeCommon::getPathToAssetDir($assetHref);
 
-				$contentToAddToCombinedFile = '/*!'.str_replace(Misc::getWpRootDirPath(), '/', $localAssetsPath)."*/\n";
+				$contentToAddToCombinedFile = '';
+
+				if (apply_filters('wpacu_print_info_comments_in_cached_assets', true)) {
+					$contentToAddToCombinedFile = '/*!' . str_replace( Misc::getWpRootDirPath(), '/', $localAssetsPath ) . "*/\n";
+				}
 
 				// This includes the extra from 'data' (CDATA added via wp_localize_script()) & 'before' as they are both printed BEFORE the SCRIPT tag
 				$contentToAddToCombinedFile .= self::maybeWrapBetweenTryCatch(self::appendToCombineJs('translations', $localAssetsExtra, $assetHref, $pathToAssetDir), $assetHref);
@@ -671,7 +670,10 @@ HTML;
 				if (self::isInlineJsCombineable($dataValue) && trim($dataValue) !== '') {
 					$cData = $doJsMinifyInline ? MinifyJs::applyMinification( $dataValue ) : $dataValue;
 					$cData = OptimizeJs::maybeDoJsFixes( $cData, $pathToAssetDir . '/' );
-					$extraContentToAppend .= '/* [inline: cdata] */' . $cData . '/* [/inline: cdata] */' . "\n";
+					$extraContentToAppend .= apply_filters('wpacu_print_info_comments_in_cached_assets', true) ? '/* [inline: cdata] */' : '';
+					$extraContentToAppend .= $cData;
+					$extraContentToAppend .= apply_filters('wpacu_print_info_comments_in_cached_assets', true) ? '/* [/inline: cdata] */' : '';
+					$extraContentToAppend .= "\n";
 				}
 			}
 
@@ -679,7 +681,7 @@ HTML;
 				$inlineBeforeJsData = '';
 
 				foreach ($localAssetsExtra[$assetHref]['before'] as $beforeData) {
-					if (! is_bool($beforeData)) {
+					if (! is_bool($beforeData) && self::isInlineJsCombineable($beforeData)) {
 						$inlineBeforeJsData .= $beforeData . "\n";
 					}
 				}
@@ -687,7 +689,10 @@ HTML;
 				if (trim($inlineBeforeJsData)) {
 					$inlineBeforeJsData = OptimizeJs::maybeAlterContentForInlineScriptTag( $inlineBeforeJsData, $doJsMinifyInline );
 					$inlineBeforeJsData = OptimizeJs::maybeDoJsFixes( $inlineBeforeJsData, $pathToAssetDir . '/' );
-					$extraContentToAppend .= '/* [inline: before] */' . $inlineBeforeJsData . '/* [/inline: before] */' . "\n";
+					$extraContentToAppend .= apply_filters('wpacu_print_info_comments_in_cached_assets', true) ? '/* [inline: before] */' : '';
+					$extraContentToAppend .= $inlineBeforeJsData;
+					$extraContentToAppend .= apply_filters('wpacu_print_info_comments_in_cached_assets', true) ? '/* [/inline: before] */' : '';
+					$extraContentToAppend .= "\n";
 				}
 			}
 			// [/Before JS Content]
@@ -697,7 +702,7 @@ HTML;
 				$inlineAfterJsData = '';
 
 				foreach ($localAssetsExtra[$assetHref]['after'] as $afterData) {
-					if (! is_bool($afterData)) {
+					if (! is_bool($afterData) && self::isInlineJsCombineable($afterData)) {
 						$inlineAfterJsData .= $afterData."\n";
 					}
 				}
@@ -705,14 +710,20 @@ HTML;
 				if ( trim($inlineAfterJsData) ) {
 					$inlineAfterJsData = OptimizeJs::maybeAlterContentForInlineScriptTag( $inlineAfterJsData, $doJsMinifyInline );
 					$inlineAfterJsData = OptimizeJs::maybeDoJsFixes( $inlineAfterJsData, $pathToAssetDir . '/' );
-					$extraContentToAppend .= '/* [inline: after] */' . $inlineAfterJsData . '/* [/inline: after] */' . "\n";
+					$extraContentToAppend .= apply_filters('wpacu_print_info_comments_in_cached_assets', true) ? '/* [inline: after] */' : '';
+					$extraContentToAppend .= $inlineAfterJsData;
+					$extraContentToAppend .= apply_filters('wpacu_print_info_comments_in_cached_assets', true) ? '/* [/inline: after] */' : '';
+					$extraContentToAppend .= "\n";
 				}
 			}
 			// [/After JS Content]
 		} elseif ($addItLocation === 'translations' && isset($localAssetsExtra[$assetHref]['translations']) && $localAssetsExtra[$assetHref]['translations']) {
 			$inlineAfterJsData = OptimizeJs::maybeAlterContentForInlineScriptTag( $localAssetsExtra[$assetHref]['translations'], $doJsMinifyInline );
 			$inlineAfterJsData = OptimizeJs::maybeDoJsFixes( $inlineAfterJsData, $pathToAssetDir . '/' );
-			$extraContentToAppend .= '/* [inline: translations] */' . $inlineAfterJsData . '/* [/inline: translations] */' . "\n";
+			$extraContentToAppend .= apply_filters('wpacu_print_info_comments_in_cached_assets', true) ? '/* [inline: translations] */' : '';
+			$extraContentToAppend .= $inlineAfterJsData;
+			$extraContentToAppend .= apply_filters('wpacu_print_info_comments_in_cached_assets', true) ? '/* [/inline: translations] */' : '';
+			$extraContentToAppend .= "\n";
 		}
 
 		return $extraContentToAppend;
@@ -781,7 +792,7 @@ JS;
 					$htmlSource = str_replace(array_keys($repsBefore), array_values($repsBefore), $htmlSource );
 				}
 
-				if ($scriptExtraBeforeValue) {
+				if ($scriptExtraBeforeValue && self::isInlineJsCombineable($scriptExtraBeforeValue)) {
 					$repsBefore = array(
 						$scriptExtraBeforeHtml => '',
 						str_replace( '<script ', '<script data-wpacu-script-handle=\'' . $scriptHandle . '\' ', $scriptExtraBeforeHtml ) => '',
@@ -791,7 +802,7 @@ JS;
 					$htmlSource = str_replace(array_keys($repsBefore), array_values($repsBefore), $htmlSource );
 				}
 
-				if ($scriptExtraAfterValue) {
+				if ($scriptExtraAfterValue && self::isInlineJsCombineable($scriptExtraAfterValue)) {
 					$repsBefore = array(
 						$scriptExtraAfterHtml => '',
 						str_replace( '<script ', '<script data-wpacu-script-handle=\'' . $scriptHandle . '\' ', $scriptExtraAfterHtml ) => '',
@@ -824,6 +835,14 @@ JS;
 		// WooCommerce Cart Fragments
 		if (strpos($jsInlineValue, 'wc_cart_hash_') !== false && strpos($jsInlineValue, 'cart_hash_key') !== false) {
 			return false;
+		}
+
+		if (substr(trim($jsInlineValue), 0, 1) === '{' && substr(trim($jsInlineValue), -1, 1) === '}') {
+			json_decode($jsInlineValue);
+
+			if (json_last_error() === JSON_ERROR_NONE) {
+				return false; // it's a JSON format (e.g. type="application/json" from "wordpress-popular-posts" plugin)
+			}
 		}
 
 		return true; // default

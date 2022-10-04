@@ -30,8 +30,8 @@ class Lite
 				?>
 				<tr class="form-field">
 					<th scope="row" valign="top"><label for="wpassetcleanup_list"><?php echo WPACU_PLUGIN_TITLE; ?>: <?php _e('CSS &amp; JavaScript Load Manager', 'wp-asset-clean-up'); ?></label></th>
-					<td data-wpacu-taxonomy="<?php echo $tag->taxonomy; ?>">
-						<img width="20" height="20" src="<?php echo WPACU_PLUGIN_URL; ?>/assets/icons/icon-lock.svg" valign="top" alt="" /> &nbsp;
+					<td data-wpacu-taxonomy="<?php echo esc_attr($tag->taxonomy); ?>">
+						<img width="20" height="20" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" valign="top" alt="" /> &nbsp;
 						<?php
 						echo sprintf(
 							__('Managing the loading of the styles &amp; scripts files for this <strong>%s</strong> taxonomy is %savailable in the Pro version%s', 'wp-asset-clean-up'),

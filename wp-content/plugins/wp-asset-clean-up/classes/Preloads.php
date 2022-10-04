@@ -22,7 +22,7 @@ class Preloads
 	/**
 	 * @var array
 	 */
-	public $preloads = array();
+	public $preloads = array('styles' => array(), 'scripts' => array());
 
 	/**
 	 * @var Preloads|null
@@ -97,10 +97,10 @@ class Preloads
             return $htmlSource;
         }
 
-	    $preloads = $this->getPreloads();
+	    $this->preloads = $this->getPreloads();
 
-	    if (isset($preloads['styles']) && ! empty($preloads['styles'])) {
-		    $htmlSource = self::appendPreloadsForStylesToHead($htmlSource, array_keys($preloads['styles']));
+	    if (isset($this->preloads['styles']) && ! empty($this->preloads['styles'])) {
+		    $htmlSource = self::appendPreloadsForStylesToHead($htmlSource, array_keys($this->preloads['styles']));
 	    }
 
 	    return $htmlSource;
@@ -116,11 +116,9 @@ class Preloads
 	        return false;
         }
 
-	    if ($for === 'css' && ! (isset($this->preloads['styles']) && ! empty($this->preloads['styles']))) {
-			return false;
-		}
+	    $assetType = ($for === 'css') ? 'styles' : 'scripts';
 
-		if ($for === 'js' && ! (isset($this->preloads['scripts']) && ! empty($this->preloads['scripts']))) {
+	    if (! (isset($this->preloads[$assetType]) && ! empty($this->preloads[$assetType]))) {
 			return false;
 		}
 
@@ -183,12 +181,6 @@ class Preloads
 	 */
 	public function getPreloads()
 	{
-		if (array_key_exists('styles', $this->preloads) && array_key_exists('scripts', $this->preloads)) {
-			return $this->preloads;
-		}
-
-		$preloads = array('styles' => array(), 'scripts' => array());
-
 		$preloadsListJson = get_option(WPACU_PLUGIN_ID . '_global_data');
 
 		if ($preloadsListJson) {
@@ -196,18 +188,16 @@ class Preloads
 
 			// Issues with decoding the JSON file? Return an empty list
 			if (Misc::jsonLastError() !== JSON_ERROR_NONE) {
-				return $preloads;
+				return $this->preloads;
 			}
 
 			// Are new positions set for styles and scripts?
 			foreach (array('styles', 'scripts') as $assetKey) {
 				if ( isset( $preloadsList[$assetKey]['preloads'] ) && ! empty( $preloadsList[$assetKey]['preloads'] ) ) {
-					$preloads[$assetKey] = $preloadsList[$assetKey]['preloads'];
+					$this->preloads[$assetKey] = $preloadsList[$assetKey]['preloads'];
 				}
 			}
 		}
-
-		$this->preloads = $preloads;
 
 		return $this->preloads;
 	}
@@ -239,7 +229,7 @@ class Preloads
 		}
 
 		if (array_key_exists($handle, $this->preloads['styles']) && $this->preloads['styles'][$handle]) {
-            if (isset($_GET['wpacu_no_css_preload_basic'])) { // do not apply it for debugging purposes
+            if (isset($_REQUEST['wpacu_no_css_preload_basic'])) { // do not apply it for debugging purposes
 	            return str_replace('<link ', '<link data-wpacu-skip-preload=\'1\' ', $htmlTag);
             }
 
@@ -261,7 +251,7 @@ class Preloads
 			return $htmlTag;
 		}
 
-		if (isset($_GET['wpacu_no_js_preload_basic'])) {
+		if (isset($_REQUEST['wpacu_no_js_preload_basic'])) {
 			return str_replace('<script ', '<script data-wpacu-skip-preload=\'1\' ', $htmlTag);
         }
 
@@ -324,7 +314,7 @@ class Preloads
 		}
 
 		// Something might not be right with the RegEx; Fallback to DOMDocument, more accurate, but slower
-		if (! $stickToRegEx && function_exists('libxml_use_internal_errors') && function_exists('libxml_clear_errors') && class_exists('\DOMDocument')) {
+		if (! $stickToRegEx && Misc::isDOMDocumentOn()) {
 			$documentForCSS = new \DOMDocument();
 			libxml_use_internal_errors(true);
 
@@ -379,10 +369,8 @@ class Preloads
         }
 
         if (OptimizeCss::wpfcMinifyCssEnabledOnly()) {
-		    // [wpacu_lite]
             return '<link rel=\'preload\' data-from-rel=\'stylesheet\' as=\'style\' data-href-before=\''.$linkHref.'\' href=\''.esc_attr($linkHref).'\' data-wpacu-preload-css-basic=\'1\' />' . "\n";
-		    // [/wpacu_lite]
-		}
+        }
 
 		return '<link rel=\'preload\' as=\'style\' href=\''.esc_attr($linkHref).'\' data-wpacu-preload-css-basic=\'1\' />'."\n";
 	}
@@ -426,16 +414,24 @@ class Preloads
 	 */
 	public static function updatePreloads()
 	{
+		$useGlobalPost = false;
+
 		if ( (isset($_POST[WPACU_FORM_ASSETS_POST_KEY]['styles']) && ! empty($_POST[WPACU_FORM_ASSETS_POST_KEY]['styles']))
 		     || (isset($_POST[WPACU_FORM_ASSETS_POST_KEY]['scripts']) && ! empty($_POST[WPACU_FORM_ASSETS_POST_KEY]['scripts'])) ) {
 			$mainVarToUse = self::updatePreloadsAdapt($_POST[WPACU_FORM_ASSETS_POST_KEY]); // New form fields (starting from v1.1.9.9)
 		} elseif (Misc::isValidRequest('post', 'wpacu_preloads')) {
-			$mainVarToUse = $_POST;
+			$useGlobalPost = true;
 		} else {
 			return;
 		}
 
-		if (! isset($mainVarToUse['wpacu_preloads']['styles']) && ! isset($mainVarToUse['wpacu_preloads']['scripts'])) {
+		if (! $useGlobalPost && isset($mainVarToUse['wpacu_preloads'])) {
+			$bucketToUse = $mainVarToUse['wpacu_preloads'];
+		} else if (isset($_POST['wpacu_preloads'])) {
+			$bucketToUse = $_POST['wpacu_preloads'];
+		}
+
+		if (! isset($bucketToUse['styles']) && ! isset($bucketToUse['scripts'])) {
 			return;
 		}
 
@@ -448,31 +444,21 @@ class Preloads
 		$existingListData = Main::instance()->existingList($existingListJson, $existingListEmpty);
 		$existingList = $existingListData['list'];
 
-		if ( isset( $mainVarToUse['wpacu_preloads']['styles'] ) && ! empty( $mainVarToUse['wpacu_preloads']['styles'] ) ) {
-			foreach ( $mainVarToUse['wpacu_preloads']['styles'] as $styleHandle => $stylePreload ) {
-				$stylePreload = trim( $stylePreload );
+		foreach (array('styles', 'scripts') as $assetType) {
+			if ( isset( $bucketToUse[$assetType] ) && ! empty( $bucketToUse[$assetType] ) ) {
+				foreach ( $bucketToUse[$assetType] as $assetHandle => $assetPreload ) {
+					$assetPreload = trim( $assetPreload );
 
-				if ( $stylePreload === '' && isset( $existingList['styles'][ $globalKey ][ $styleHandle ] ) ) {
-					unset( $existingList['styles'][ $globalKey ][ $styleHandle ] );
-				} elseif ( $stylePreload !== '' ) {
-					$existingList['styles'][ $globalKey ][ $styleHandle ] = $stylePreload;
+					if ( $assetPreload === '' && isset( $existingList[$assetType][ $globalKey ][ $assetHandle ] ) ) {
+						unset( $existingList[$assetType][ $globalKey ][ $assetHandle ] );
+					} elseif ( $assetPreload !== '' ) {
+						$existingList[$assetType][ $globalKey ][ $assetHandle ] = $assetPreload;
+					}
 				}
 			}
 		}
 
-		if ( isset( $mainVarToUse['wpacu_preloads']['scripts'] ) && ! empty( $mainVarToUse['wpacu_preloads']['scripts'] ) ) {
-			foreach ( $mainVarToUse['wpacu_preloads']['scripts'] as $scriptHandle => $scriptPreload ) {
-				$scriptPreload = trim( $scriptPreload );
-
-				if ( $scriptPreload === '' && isset( $existingList['scripts'][ $globalKey ][ $scriptHandle ] ) ) {
-					unset( $existingList['scripts'][ $globalKey ][ $scriptHandle ] );
-				} elseif ( $scriptPreload !== '' ) {
-					$existingList['scripts'][ $globalKey ][ $scriptHandle ] = $scriptPreload;
-				}
-			}
-		}
-
-		Misc::addUpdateOption($optionToUpdate, json_encode(Misc::filterList($existingList)));
+		Misc::addUpdateOption($optionToUpdate, wp_json_encode(Misc::filterList($existingList)));
 	}
 
 	/**
@@ -541,7 +527,7 @@ class Preloads
 			}
 		}
 
-		Misc::addUpdateOption($optionToUpdate, json_encode(Misc::filterList($existingList)));
+		Misc::addUpdateOption($optionToUpdate, wp_json_encode(Misc::filterList($existingList)));
 
 		set_transient('wpacu_preloads_just_removed', 1, 30);
 
