@@ -20,9 +20,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&display=swap" rel="stylesheet">
   <?php wp_head(); ?>
   <link rel="stylesheet" href="<?= get_template_directory_uri() . '/assets/css/' . $estiloPagina ?>" as="style" media="print" onload="this.media='all'; this.onload=null;" crossorigin>
 </head>
@@ -31,7 +31,8 @@
   <header class="header header__home">
     <div class="container">
       <nav class="navbar navbar-expand-lg">
-        <a href="<?php $url = home_url(); echo $url; ?>" class="custom-logo-link" title="<?php bloginfo('title'); ?>">
+        <a href="<?php $url = home_url();
+                  echo $url; ?>" class="custom-logo-link" title="<?php bloginfo('title'); ?>">
           <img src="<?= get_template_directory_uri(); ?>/assets/images/marca-vina.svg" width="150" height="46" class="custom-logo" alt="<?php bloginfo('title'); ?>" />
         </a>
 
