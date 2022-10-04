@@ -21,7 +21,24 @@ header {
 
   //header home
   &.header__home {
-    background: none;
+    background: #000000;
+
+    /* purgecss ignore */
+    #navheader {
+      &.show {
+        .nav-item {
+          &.active {
+            .nav-link {
+              color: $primary;
+
+              @include media-breakpoint-up(md) {
+                color: $primary;
+              }
+            }
+          }
+        }
+      }
+    }
 
     .navbar-nav {
       margin-top: 2rem;
@@ -30,13 +47,18 @@ header {
       @include media-breakpoint-up(md) {
         margin-top: 0;
       }
-      /* purgecss ignore */
+
       .nav-item {
         &.active {
           .nav-link {
             color: $secondary;
+
+            @include media-breakpoint-up(md) {
+              color: $primary;
+            }
           }
         }
+
         .nav-link {
           color: $white;
           font-size: 1rem;
@@ -45,7 +67,7 @@ header {
           transition: all ease-in-out 0.25s;
 
           &:hover {
-            color: $secondary;
+            color: $primary;
             font-weight: 700;
           }
         }
