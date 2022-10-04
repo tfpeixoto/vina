@@ -48,7 +48,7 @@ require_once('header-home.php');
 
             <img class="d-none d-md-block img-desktop" src="<?php the_post_thumbnail_url(); ?>" width="1920" height="1080" alt="<?php the_title(); ?>">
 
-            <div class="carousel-caption d-none d-md-block">
+            <div class="carousel-caption">
               <img src="<?= get_template_directory_uri(); ?>/assets/images/marca-vina.svg" class="marca-slide" width="250" height="76" alt="<?php bloginfo('title'); ?>" />
               <h5><?php the_title(); ?></h5>
             </div>

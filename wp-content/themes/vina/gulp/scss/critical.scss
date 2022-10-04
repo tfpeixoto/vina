@@ -17,5 +17,7 @@
 
 // CONTEUDO
 @import "components/banner-interno";
+/*! purgecss start ignore */
 @import "components/header";
+/*! purgecss end ignore */
 @import "components/slideshow";
