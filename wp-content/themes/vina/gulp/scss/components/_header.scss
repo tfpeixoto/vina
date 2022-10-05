@@ -21,11 +21,14 @@ header {
 
   //header home
   &.header__home {
-    background: #000000;
+    background: $black;
 
-    /* purgecss ignore */
     #navheader {
+      display: none;
+
       &.show {
+        display: block;
+
         .nav-item {
           &.active {
             .nav-link {
@@ -79,6 +82,26 @@ header {
   &.header__geral {
     background: $secondary;
     color: $white;
+
+    #navheader {
+      display: none;
+
+      &.show {
+        display: block;
+
+        .nav-item {
+          &.active {
+            .nav-link {
+              color: $primary;
+
+              @include media-breakpoint-up(md) {
+                color: $primary;
+              }
+            }
+          }
+        }
+      }
+    }
 
     .navbar-nav {
       margin-top: 2rem;
