@@ -5,7 +5,7 @@ $estiloPagina = 'home.css';
 require_once('header-home.php');
 ?>
 
-<section class="slideshow">
+<section id="galeria-home" class="slideshow">
   <div id="slideHome" class="carousel slide" data-ride="carousel">
     <ol class="carousel-indicators" href="#slideHome">
       <?php

@@ -6,7 +6,7 @@ $ancora = 0;
 
 if ($images) : ?>
 
-  <section class="slideshow">
+  <section id="galeria-interna" class="slideshow">
     <div id="<?= $ancora ? "slide-${ancora}" : "slideGaleria" ?>" class="carousel slide" data-ride="carousel">
       <div class="carousel-inner">
         <?php foreach ($images as $image) : ?>
