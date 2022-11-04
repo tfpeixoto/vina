@@ -94,14 +94,24 @@ class OptimizeCommon
 			return self::alterHtmlSource($htmlSource, true);
 		});
 
-		// Make sure HTML changes are applied to cached pages from "Cache Enabler" plugin
-		add_filter('cache_enabler_before_store', static function($htmlSource) {
-			return self::alterHtmlSource($htmlSource); // deprecated, include it in case other users have an older version of "Cache Enabler"
-		}, 1, 1);
+		if (Misc::isPluginActive('cache-enabler/cache-enabler.php')) {
+			if (defined('CE_VERSION') && version_compare(CE_VERSION, '1.6.0', '<')) {
+				// Cache Enabler: BEFORE 1.6.0 (1.5.5 and below)
+				// Make sure HTML changes are applied to cached pages from "Cache Enabler" plugin
+				add_filter( 'cache_enabler_before_store', static function( $htmlSource ) {
+					return self::alterHtmlSource( $htmlSource ); // deprecated, include it in case other users have an older version of "Cache Enabler"
+				}, 1, 1 );
+			} else {
+				// Cache Enabler: 1.6.0+
+				global $cache_enabler_constants;
 
-		add_filter('cache_enabler_page_contents_before_store', static function($htmlSource) {
-			return self::alterHtmlSource($htmlSource);
-		}, 1, 1);
+				if (isset($cache_enabler_constants['CACHE_ENABLER_VERSION']) && version_compare($cache_enabler_constants['CACHE_ENABLER_VERSION'], '1.6.0', '>=')) {
+					add_filter( 'cache_enabler_page_contents_before_store', static function( $htmlSource ) {
+						return self::alterHtmlSource( $htmlSource );
+					}, 1, 1 );
+				}
+			}
+		}
 
 		// In case HTML Minify is enabled in W3 Total Cache, make sure any settings (e.g. JS combine) in Asset CleanUp will be applied
 		add_filter('w3tc_minify_before', static function ($htmlSource) {
@@ -1490,26 +1500,82 @@ SQL;
 		$isPreview = (isset($_GET['preview_id'], $_GET['preview_nonce'], $_GET['preview'])
 		              || isset($_GET['preview'])); // show the CSS/JS as combined IF the option is enabled despite the query string (for debugging purposes)
 
+		if ($isPreview) {
+			return true;
+		}
+
 		$ignoreQueryStrings = array(
-			'wpacu_do_combine', // show the CSS/JS as combined IF the option is enabled despite the query string (for debugging purposes)
-			'wpacu_no_css_minify', 'wpacu_no_js_minify', 'wpacu_no_css_combine', 'wpacu_no_js_combine', 'wpacu_debug', 'wpacu_preload', 'wpacu_skip_test_mode',
-			'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_expid', 'utm_referrer', // Google Analytics
-			'gclid', // Google Click ID
-			'fbclick', 'fbclid', 'fb_action_ids', 'fb_action_types', 'fb_source', // Facebook
-			'SSAID', 'sscid', // ShareASale
-			'ao_noptimize', // Autoptimize feature (strip its settings on page request for debugging purposes)
+			'wpacu_no_css_minify',
+			'wpacu_no_js_minify',
+			'wpacu_no_css_combine',
+			'wpacu_no_js_combine',
+			'wpacu_debug',
+			'wpacu_preload',
+			'wpacu_skip_test_mode',
+		);
+
+		$queryStringsToIgnoreFromTheURIForOptimizingAssets = array(
+			'_ga',
+			'_ke',
+			'adgroupid',
+			'adid',
+			'age-verified',
+			'ao_noptimize',
+			'campaignid',
+			'ck_subscriber_id', // ConvertKit's query parameter
+			'cn-reloaded',
+			'dclid',
+			'dm_i', // dotdigital
+			'dm_t', // dotdigital
+			'ef_id',
+			'epik', // Pinterest
+			'fb_action_ids',
+			'fb_action_types',
+			'fb_source',
+			'fbclick',
+			'fbclid',
+			'gclid',
+			'gclsrc',
+			'mc_cid',
+			'mc_eid',
+			'mkt_tok',      // Marketo (tracking users)
+			'msclkid',      // Microsoft Click ID
+			'mtm_campaign',
+			'mtm_cid',
+			'mtm_content',
+			'mtm_keyword',
+			'mtm_medium',
+			'mtm_source',
+			'pk_campaign',  // Piwik PRO URL builder
+			'pk_cid',       // Piwik PRO URL builder
+			'pk_content',   // Piwik PRO URL builder
+			'pk_keyword',   // Piwik PRO URL builder
+			'pk_medium',    // Piwik PRO URL builder
+			'pk_source',    // Piwik PRO URL builder
+			'ref',
+			'SSAID',
+			'sscid',
+			'usqp',
+			'utm_campaign',
+			'utm_content',
+			'utm_expid',
+			'utm_expid',
+			'utm_medium',
+			'utm_referrer',
+			'utm_source',
+			'utm_term',
 		);
 
 		$isQueryString = false;
 
-		foreach ($ignoreQueryStrings as $ignoreQueryString) {
+		foreach (array_merge($ignoreQueryStrings, $queryStringsToIgnoreFromTheURIForOptimizingAssets) as $ignoreQueryString) {
 			if (isset($_GET[$ignoreQueryString])) {
 				$isQueryString = true;
 				break;
 			}
 		}
 
-		return ($isPreview || $isQueryString);
+		return $isQueryString;
 	}
 
 	/**

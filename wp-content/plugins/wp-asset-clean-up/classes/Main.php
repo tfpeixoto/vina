@@ -2683,26 +2683,12 @@ SQL;
 
 	                if (! empty($localSrc)) {
 		                $data['all']['styles'][$key]->baseUrl = $localSrc['base_url'];
+
+		                if (Sorting::matchesWpCoreCriteria($obj, 'styles')) {
+                            $data['all']['styles'][ $key ]->wp = true;
+                            $data['core_styles_loaded']        = true;
+                        }
 	                }
-
-	                $part = str_replace(
-		                array(
-			                'http://',
-			                'https://',
-			                '//'
-		                ),
-		                '',
-		                $obj->src
-	                );
-
-	                $parts     = explode('/', $part);
-	                $parentDir = isset($parts[1]) ? $parts[1] : '';
-
-                    // Loaded from WordPress directories (Core)
-                    if (in_array($parentDir, array('wp-includes', 'wp-admin'))) {
-                        $data['all']['styles'][$key]->wp = true;
-                        $data['core_styles_loaded']      = true;
-                    }
 
                     // Determine source href (starting with '/' but not starting with '//')
                     if (strpos($obj->src, '/') === 0 && strpos($obj->src, '//') !== 0) {
@@ -2748,25 +2734,11 @@ SQL;
 
 	                    if (! empty($localSrc)) {
 		                    $data['all']['scripts'][$key]->baseUrl = $localSrc['base_url'];
-	                    }
 
-                        $part = str_replace(
-                            array(
-                                'http://',
-                                'https://',
-                                '//'
-                            ),
-                            '',
-                            $obj->src
-                        );
-
-	                    $parts     = explode('/', $part);
-	                    $parentDir = isset($parts[1]) ? $parts[1] : '';
-
-                        // Loaded from WordPress directories (Core)
-                        if (in_array($parentDir, array('wp-includes', 'wp-admin')) || strpos($obj->src, '/'.Misc::getPluginsDir('dir_name').'/jquery-updater/js/jquery-') !== false) {
-                            $data['all']['scripts'][$key]->wp = true;
-                            $data['core_scripts_loaded']      = true;
+                            if (Sorting::matchesWpCoreCriteria($obj, 'scripts')) {
+	                            $data['all']['scripts'][ $key ]->wp = true;
+	                            $data['core_scripts_loaded']        = true;
+                            }
                         }
 
                         // Determine source href

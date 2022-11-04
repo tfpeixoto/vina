@@ -4,7 +4,7 @@ Tags: minify css, minify javascript, defer css javascript, page speed, dequeue, 
 Donate link: https://www.gabelivan.com/items/wp-asset-cleanup-pro/?utm_source=wp_org_lite&utm_medium=donate
 Requires at least: 4.6
 Tested up to: 6.0.2
-Stable tag: 1.3.8.6
+Stable tag: 1.3.8.7
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -191,6 +191,14 @@ With the recently released "Test Mode" feature, you can safely unload assets on 
 4. Homepage CSS & JS Management (List sorted by location)
 
 == Changelog ==
+= 1.3.8.7 =
+* By default, the front-end optimization is not triggered for URIs with query strings (as they are usually not cacheable); Make more exceptions and trigger the optimization when there are common query strings (the page is cacheable) in the URI such as the ones starting with "utm_", "mtm_", "fb_", etc.
+* Higher accuracy in detecting WordPress core files (some of the undetected WP core files used to be shown in the "External 3rd Party" area)
+* Cache Enabler Compatibility: Avoid the deprecated error related to "cache_enabler_before_store" by checking the version of Cache Enabler and using the right filter
+* Improvement: Make sure all the unload rules from "Overview" are marked with red font as all load exceptions are marked with green font
+* Fix: When editing a post/page and "Classic Editor" plugin is activated (basically when the page looks the same as it used to before Gutenberg editor was implemented in WordPress), the "Preview Changes" button from the top right side box does not work if the CSS/JS manager is loaded
+* Fix: PHP 8.1 - Make sure substr() doesn't have any null parameters to avoid any errors
+
 = 1.3.8.6 =
 * New option in the settings' vertical menu: Disable RSS Feed
 * Show any special settings in "Overview" -- read more: https://www.assetcleanup.com/docs/?p=1495

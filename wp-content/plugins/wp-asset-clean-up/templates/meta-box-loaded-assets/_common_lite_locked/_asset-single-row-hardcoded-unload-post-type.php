@@ -22,7 +22,7 @@ if (isset($data['bulk_unloaded_type']) && $data['bulk_unloaded_type'] === 'post_
 					$unloadBulkText = __('Unload CSS on all Easy Digital Downloads "Download" pages', 'wp-asset-clean-up');
 					break;
 				default:
-					$unloadBulkText = sprintf(__('Unload on All Pages of "<strong>%s</strong>" post type', 'wp-asset-clean-up'), $data['post_type']);
+					$unloadBulkText = sprintf(__('Unload CSS on all pages of "<strong>%s</strong>" post type', 'wp-asset-clean-up'), $data['post_type']);
 			}
 			?>
             <li>
@@ -46,7 +46,7 @@ if (isset($data['bulk_unloaded_type']) && $data['bulk_unloaded_type'] === 'post_
 					    $unloadBulkText = __('Unload JS on all Easy Digital Downloads "Download" pages', 'wp-asset-clean-up');
 					    break;
 				    default:
-					    $unloadBulkText = sprintf(__('Unload on All Pages of "<strong>%s</strong>" post type', 'wp-asset-clean-up'), $data['post_type']);
+					    $unloadBulkText = sprintf(__('Unload JS on all pages of "<strong>%s</strong>" post type', 'wp-asset-clean-up'), $data['post_type']);
 			    }
 			    ?>
                 <li>

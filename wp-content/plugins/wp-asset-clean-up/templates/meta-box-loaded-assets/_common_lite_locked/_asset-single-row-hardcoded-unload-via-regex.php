@@ -15,7 +15,10 @@ $assetTypeS = substr($data['row']['asset_type'], 0, -1); // "styles" to "style" 
             <label class="wpacu-manage-hardcoded-assets-requires-pro-popup"
                    for="wpacu_unload_it_regex_option_<?php echo $assetTypeS; ?>_<?php echo esc_attr($data['row']['obj']->handle); ?>">
                 <span style="color: #ccc;" class="wpacu-manage-hardcoded-assets-requires-pro-popup dashicons dashicons-lock"></span>
-                Unload it for URLs with request URI matching this RegEx(es):
+                <?php
+                $assetTypeText = ($assetType === 'styles') ? 'CSS' : 'JS';
+                echo sprintf(__('Unload %s for URLs with request URI matching the following RegEx(es)', 'wp-asset-clean-up'), $assetTypeText);
+                ?>:
             </label>
             <a style="text-decoration: none; color: inherit; vertical-align: middle;" target="_blank"
                href="https://assetcleanup.com/docs/?p=313#wpacu-unload-by-regex"><span
