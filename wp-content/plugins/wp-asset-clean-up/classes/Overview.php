@@ -810,7 +810,7 @@ SQL;
 
 			if (isset($handleData['unload_bulk']['post_type'])) {
 				foreach ($handleData['unload_bulk']['post_type'] as $postType) {
-					$handleChangesOutput['bulk'] .= ' Unloaded on all pages of <strong>' . $postType . '</strong> post type, ';
+					$handleChangesOutput['bulk'] .= ' <span style="color: #cc0000;">Unloaded on all pages of <strong>' . $postType . '</strong> post type</span>, ';
 					$anyUnloadRule = true;
 				}
 			}
@@ -841,7 +841,7 @@ SQL;
 
 		// On this page: post, page, custom post type
 		if (isset($handleData['unload_on_this_page']['post'])) {
-			$handleChangesOutput['on_this_post'] = 'Unloaded in the following posts: ';
+			$handleChangesOutput['on_this_post'] = '<span style="color: #cc0000;">Unloaded in the following posts:</span> ';
 
 			$postsList = '';
 

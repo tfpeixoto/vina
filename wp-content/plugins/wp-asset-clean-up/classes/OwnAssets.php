@@ -467,7 +467,7 @@ class OwnAssets
 
 	    $scriptRelPath = '/assets/script.min.js';
 
-        wp_register_script(
+	    wp_register_script(
 	        WPACU_PLUGIN_ID . '-script',
             plugins_url($scriptRelPath, WPACU_PLUGIN_FILE),
             array('jquery'),

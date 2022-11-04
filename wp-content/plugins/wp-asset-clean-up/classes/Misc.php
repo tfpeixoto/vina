@@ -406,25 +406,26 @@ class Misc
 	 * @return bool
 	 */
 	public static function isRootUrl()
-    {
-    	$siteUrl = get_bloginfo('url');
+	{
+		$siteUrl = get_bloginfo('url');
 
-	    $urlPath = parse_url($siteUrl, PHP_URL_PATH);
-	    $requestURI = $_SERVER['REQUEST_URI'];
+		$urlPath = parse_url($siteUrl, PHP_URL_PATH);
 
-	    $urlPathNoForwardSlash = $urlPath;
-	    $requestURINoForwardSlash = $requestURI;
+		$requestURI = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
 
-	    if (substr($urlPath, -1) === '/') {
-	    	$urlPathNoForwardSlash = substr($urlPath, 0, -1);
-	    }
+		$urlPathNoForwardSlash = $urlPath;
+		$requestURINoForwardSlash = $requestURI;
 
-	    if (substr($requestURI, -1) === '/') {
-		    $requestURINoForwardSlash = substr($requestURI, 0, -1);
-	    }
+		if ($urlPath && substr($urlPath, -1) === '/') {
+			$urlPathNoForwardSlash = substr($urlPath, 0, -1);
+		}
 
-	    return ($urlPathNoForwardSlash === $requestURINoForwardSlash);
-    }
+		if ($requestURI && substr($requestURI, -1) === '/') {
+			$requestURINoForwardSlash = substr($requestURI, 0, -1);
+		}
+
+		return ($urlPathNoForwardSlash === $requestURINoForwardSlash);
+	}
 
 	/**
 	 * @param $handleData
@@ -625,6 +626,62 @@ class Misc
 
     	return false;
     }
+
+	/**
+	 *
+	 * @return array|string|void
+	 */
+	public static function getWpCoreCssHandlesFromWpIncludesBlocks()
+	{
+		$transientName = 'wpacu_wp_core_css_handles_from_wp_includes_blocks';
+
+		if ($transientValues = get_transient($transientName)) {
+			return $transientValues;
+		}
+
+		$blocksDir = ABSPATH.'wp-includes/blocks/';
+
+		$cssCoreHandlesList = array();
+
+		if (is_dir($blocksDir)) {
+			$list = scandir($blocksDir);
+
+			if ( ! empty($list) && count($list) > 2 ) {
+				foreach ($list as $fileOrDir) {
+					$targetJsonFile = $blocksDir.$fileOrDir.'/block.json';
+
+					if (is_dir($blocksDir.$fileOrDir) && is_file($targetJsonFile)) {
+						$jsonToArray = wp_json_file_decode($targetJsonFile, array('associative' => true));
+
+						if (isset($jsonToArray['style']) && $jsonToArray['style']) {
+							$cssCoreHandlesList[] = $jsonToArray['style'];
+						}
+
+						if (isset($jsonToArray['editorStyle']) && $jsonToArray['editorStyle']) {
+							$cssCoreHandlesList[] = $jsonToArray['editorStyle'];
+
+							if (Misc::endsWith($jsonToArray['editorStyle'], '-editor')) {
+								$cssCoreHandlesList[] = substr($jsonToArray['editorStyle'], 0, -strlen('-editor'));
+							}
+						}
+					}
+				}
+
+				$cssCoreHandlesList = array_unique($cssCoreHandlesList);
+			}
+		} else {
+			// Different WordPress version, perhaps no longer using that directory
+			set_transient($transientName, array(), 3600 * 24 * 7);
+
+			return array();
+		}
+
+		if ( ! empty($cssCoreHandlesList) ) {
+			set_transient($transientName, $cssCoreHandlesList, 3600 * 24 * 7);
+
+			return $cssCoreHandlesList;
+		}
+	}
 
 	/**
 	 * @return bool

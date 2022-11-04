@@ -474,8 +474,9 @@ if (! function_exists('assetCleanUpNoLoad')) {
 		// they can do that by adding the following constant in wp-config.php
 		// define('WPACU_LOAD_ON_DIVI_BUILDER_EDIT', true);
 		$loadPluginOnDiviBuilderEdit = defined('WPACU_LOAD_ON_DIVI_BUILDER_EDIT') && WPACU_LOAD_ON_DIVI_BUILDER_EDIT;
-		$isDiviBuilderLoaded = ( isset( $_GET['et_fb'] ) && $_GET['et_fb'] )
-           || ( isset($_GET['et_pb_preview'], $_GET['et_pb_preview_nonce']) && $_GET['et_pb_preview'] === 'true' && $_GET['et_pb_preview_nonce'] )
+		$isDiviBuilderLoaded = ( isset( $_GET['et_fb'] ) && $_GET['et_fb'] ) // e.g. /?et_fb=1&PageSpeed=off&et_tb=1
+           || ( is_admin() && isset($_GET['page']) && $_GET['page'] === 'et_theme_builder' ) // e.g. /wp-admin/admin.php?page=et_theme_builder
+           || ( isset($_GET['et_pb_preview'], $_GET['et_pb_preview_nonce']) && $_GET['et_pb_preview'] === 'true' && $_GET['et_pb_preview_nonce'] ) // /?et_pb_preview=true&et_pb_preview_nonce=[...]
            || ( isset( $_SERVER['REQUEST_URI'] ) && strpos( $_SERVER['REQUEST_URI'], 'et_fb=1' ) !== false );
 
 		if ( ! $loadPluginOnDiviBuilderEdit ) {

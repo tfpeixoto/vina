@@ -117,6 +117,12 @@ if (isset($data['handle_rows_contracted']['scripts'][$data['row']['obj']->handle
 		        // Unload on all pages of [post] post type (if applicable)
 		        include dirname(__DIR__).'/_common_lite_locked/_asset-single-row-hardcoded-unload-post-type.php';
 
+		        // Unload on all pages where this [post] post type has a certain taxonomy set for it (e.g. a Tag or a Category) (if applicable)
+		        // There has to be at least a taxonomy created for this [post] post type in order to show this option
+		        if (isset($data['post_type']) && $data['post_type'] !== 'attachment' && ! empty($data['post_type_has_tax_assoc'])) {
+			        include dirname( __DIR__ ) . '/_common_lite_locked/_asset-single-row-hardcoded-unload-post-type-taxonomy.php';
+		        }
+
 		        // Unload via RegEx (if site-wide is not already chosen)
 		        include dirname(__DIR__).'/_common_lite_locked/_asset-single-row-hardcoded-unload-via-regex.php';
 
