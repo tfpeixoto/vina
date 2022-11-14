@@ -42,7 +42,7 @@ if (! isset($data)) {
         }
         ?>
         <p>
-            <a class="go-pro-button" target="_blank" href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=front_end_manage&utm_medium=<?php echo esc_attr($utm_medium); ?>">
+            <a class="go-pro-button" target="_blank" href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL.'?utm_source=front_end_manage&utm_medium='.esc_attr($utm_medium)); ?>">
                 <span class="dashicons dashicons-cart"></span>&nbsp; <?php _e('Upgrade to Asset CleanUp Pro', 'wp-asset-clean-up'); ?></a>
         </p>
     </div>

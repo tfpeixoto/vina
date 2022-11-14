@@ -19,7 +19,7 @@ if (! isset($data)) {
 						       value="unload_site_wide" />
 						<a class="go-pro-link-no-style"
 						   target="_blank"
-						   href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=manage_asset&utm_medium=unload_plugin_all_pages_in_admin"><span class="wpacu-tooltip" style="width: 200px; margin-left: -108px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" valign="top" alt="" /></a>&nbsp; Unload on all admin pages</label>
+						   href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL . '?utm_source=manage_asset&utm_medium=unload_plugin_all_pages_in_admin'); ?>"><span class="wpacu-tooltip" style="width: 200px; margin-left: -108px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" valign="top" alt="" /></a>&nbsp; Unload on all admin pages</label>
 				</li>
 				<li>
 					<label for="wpacu_unload_it_regex_option_<?php echo esc_attr($data['plugin_path']); ?>"
@@ -32,7 +32,7 @@ if (! isset($data)) {
 						       value="unload_via_regex">
 						<a class="go-pro-link-no-style"
 						   target="_blank"
-						   href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=manage_asset&utm_medium=unload_plugin_via_regex_in_admin"><span class="wpacu-tooltip" style="width: 200px; margin-left: -108px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" valign="top" alt="" /></a> &nbsp;<span>Unload it for admin URLs with request URI matching the RegEx(es):</span></label>
+						   href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL . '?utm_source=manage_asset&utm_medium=unload_plugin_via_regex_in_admin'); ?>"><span class="wpacu-tooltip" style="width: 200px; margin-left: -108px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" valign="top" alt="" /></a> &nbsp;<span>Unload it for admin URLs with request URI matching the RegEx(es):</span></label>
 					<a class="help_link unload_it_regex"
 					   target="_blank"
 					   href="https://assetcleanup.com/docs/?p=372#wpacu-unload-plugins-via-regex"><span style="color: #74777b;" class="dashicons dashicons-editor-help"></span></a>

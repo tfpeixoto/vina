@@ -116,7 +116,7 @@ if ($showSettingsType === 'tabs') {
                     ?>
                         <a href="#<?php echo esc_attr($settingsTabKey); ?>"
                            class="wpacu-settings-tab-link <?php echo esc_attr($wpacuActiveTab); ?>"
-                           onclick="wpacuTabOpenSettingsArea(event, '<?php echo esc_js($settingsTabKey); ?>');"><?php
+                           data-wpacu-settings-tab-key="<?php echo esc_attr($settingsTabKey); ?>"><?php
 	                            echo \WpAssetCleanUp\Misc::stripIrrelevantHtmlTags($settingsTabText . $wpacuNavTextSub);
 	                        ?></a>
                     <?php

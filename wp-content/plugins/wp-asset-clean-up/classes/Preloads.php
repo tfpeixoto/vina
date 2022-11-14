@@ -314,45 +314,50 @@ class Preloads
 		}
 
 		// Something might not be right with the RegEx; Fallback to DOMDocument, more accurate, but slower
-		if (! $stickToRegEx && Misc::isDOMDocumentOn()) {
-			$documentForCSS = new \DOMDocument();
-			libxml_use_internal_errors(true);
+		if ( ! $stickToRegEx && Misc::isDOMDocumentOn() ) {
+			$documentForCSS = Misc::initDOMDocument();
 
 			$htmlSourceAlt = preg_replace( '@<(noscript|style|script)[^>]*?>.*?</\\1>@si', '', $htmlSource );
 			$documentForCSS->loadHTML($htmlSourceAlt);
 
             $linkTags = $documentForCSS->getElementsByTagName( 'link' );
 
-			$matchesSourcesFromLinkTags = array(); // reset its value; new fetch method was used
+            if ( count($linkTags) > 0 ) {
+	            $matchesSourcesFromLinkTags = array(); // reset its value; new fetch method was used
 
-			foreach ( $linkTags as $tagObject ) {
-				if (empty($tagObject->attributes)) { continue; }
+	            foreach ( $linkTags as $tagObject ) {
+		            if ( empty( $tagObject->attributes ) ) {
+			            continue;
+		            }
 
-				$linkAttributes = array();
+		            $linkAttributes = array();
 
-				foreach ($tagObject->attributes as $attrObj) {
-					$linkAttributes[$attrObj->nodeName] = trim($attrObj->nodeValue);
-				}
+		            foreach ( $tagObject->attributes as $attrObj ) {
+			            $linkAttributes[ $attrObj->nodeName ] = trim( $attrObj->nodeValue );
+		            }
 
-				if (isset($linkAttributes['data-wpacu-to-be-preloaded-basic'], $linkAttributes['href'])) {
-					$matchesSourcesFromLinkTags[][2] = $linkAttributes['href'];
-                }
-			}
+		            if ( isset( $linkAttributes['data-wpacu-to-be-preloaded-basic'], $linkAttributes['href'] ) ) {
+			            $matchesSourcesFromLinkTags[][2] = $linkAttributes['href'];
+		            }
+	            }
+            }
 
 			libxml_clear_errors();
         }
 
-		foreach ($matchesSourcesFromLinkTags as $linkTagArray) {
-			$linkHref = isset($linkTagArray[2]) ? $linkTagArray[2] : false;
+		if ( ! empty($matchesSourcesFromLinkTags) ) {
+	        foreach ( $matchesSourcesFromLinkTags as $linkTagArray ) {
+		        $linkHref = isset( $linkTagArray[2] ) ? $linkTagArray[2] : false;
 
-			if (! $linkHref) {
-				continue;
-			}
+		        if ( ! $linkHref ) {
+			        continue;
+		        }
 
-			$linkPreload = self::linkPreloadCssFormat($linkHref);
+		        $linkPreload = self::linkPreloadCssFormat( $linkHref );
 
-			$htmlSource = str_replace(self::DEL_STYLES_PRELOADS, $linkPreload . self::DEL_STYLES_PRELOADS, $htmlSource);
-		}
+		        $htmlSource = str_replace( self::DEL_STYLES_PRELOADS, $linkPreload . self::DEL_STYLES_PRELOADS, $htmlSource );
+	        }
+        }
 
 		return $htmlSource;
 	}

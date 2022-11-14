@@ -52,11 +52,11 @@ class FileSystem
 	 *
 	 * @return false|string
 	 */
-	public static function file_get_contents($localPathToFile, $alter = '')
+	public static function fileGetContents($localPathToFile, $alter = '')
 	{
 		// ONLY relevant for CSS files
 		if ($alter === 'combine_css_imports') {
-			// This custom class does not minify as it's custom made for combining @import
+			// This custom class does not minify as it's custom-made for combining @import
 			$optimizer = new \WpAssetCleanUp\OptimiseAssets\CombineCssImports($localPathToFile);
 			return $optimizer->minify();
 		}
@@ -75,7 +75,7 @@ class FileSystem
 	 *
 	 * @return string
 	 */
-	public static function file_put_contents($localPathToFile, $contents)
+	public static function filePutContents($localPathToFile, $contents)
 	{
 		if ( (strpos($localPathToFile, WP_CONTENT_DIR . OptimizeCss::getRelPathCssCacheDir()) !== false && ! is_dir(dirname($localPathToFile)))
 			|| (strpos($localPathToFile, WP_CONTENT_DIR . OptimizeJs::getRelPathJsCacheDir()) !== false && ! is_dir(dirname($localPathToFile)))

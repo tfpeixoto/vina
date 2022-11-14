@@ -18,7 +18,7 @@ include_once '_top-area.php';
     ?></p>
     <p><em><?php echo sprintf(
             __('To unlock all features and get premium support, you can %supgrade to the Pro version%s.', 'wp-asset-clean-up'),
-            '<a href="'.WPACU_PLUGIN_GO_PRO_URL.'?utm_source=plugin_license">', '</a>'
+            '<a href="'.apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL.'?utm_source=plugin_license').'">', '</a>'
         );
     ?></em></p>
 

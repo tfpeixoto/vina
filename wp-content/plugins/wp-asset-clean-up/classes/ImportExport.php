@@ -191,7 +191,7 @@ SQL;
 			return;
 		}
 
-		$valuesJson = FileSystem::file_get_contents($jsonTmpName);
+		$valuesJson = FileSystem::fileGetContents($jsonTmpName);
 
 		$valuesArray = json_decode($valuesJson, ARRAY_A);
 

@@ -8,7 +8,7 @@ if (! isset($data)) {
     $pluginsRows = array();
 
     foreach ($data['active_plugins'] as $pluginData) {
-        $pluginPath = $pluginData['path'];
+	    $data['plugin_path'] = $pluginPath = $pluginData['path'];
         list($pluginDir) = explode('/', $pluginPath);
         ob_start();
         ?>

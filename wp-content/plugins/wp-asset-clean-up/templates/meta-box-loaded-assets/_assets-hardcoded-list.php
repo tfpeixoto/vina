@@ -35,7 +35,7 @@ if ($totalFoundHardcodedTags === 0) {
 	                     href="https://developer.wordpress.org/reference/functions/wp_add_inline_script/">wp_add_inline_script()</a>. The tags could have been added via editing the PHP code (not using the right standard functions), directly inside posts content, widgets or via plugins such as "Insert Headers and Footers", "Head, Footer and Post Injections", etc. Be careful when unloading any of these tags as they might be related to Google Analytics/AdWords, StatCounter, Facebook Pixel, etc.
                 </p>
                 <!-- [wpacu_lite] -->
-                <div style="margin: 20px 0; border-left: solid 4px green; background: #f2faf2; padding: 10px;"><img width="20" height="20" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" valign="top" alt="" /> &nbsp;Managing hardcoded LINK/STYLE/SCRIPT tags is an option <a target="_blank" href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=manage_hardcoded_assets&utm_medium=top_notice">available in the Pro version</a>.</div>
+                <div style="margin: 20px 0; border-left: solid 4px green; background: #f2faf2; padding: 10px;"><img width="20" height="20" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" valign="top" alt="" /> &nbsp;Managing hardcoded LINK/STYLE/SCRIPT tags is an option <a target="_blank" href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL.'?utm_source=manage_hardcoded_assets&utm_medium=top_notice'); ?>">available in the Pro version</a>.</div>
                 <!-- [/wpacu_lite] -->
             </div>
 			<?php
@@ -139,25 +139,25 @@ if ($totalFoundHardcodedTags === 0) {
 										$srcHrefOriginal = false;
 
 										if (\WpAssetCleanUp\Misc::isDOMDocumentOn()) {
-											$domForTag = new \DOMDocument();
-											libxml_use_internal_errors( true );
+											$domForTag = \WpAssetCleanUp\Misc::initDOMDocument();
 
 											$domForTag->loadHTML( $tagOutput );
 
 											$scriptTagObj = $domForTag->getElementsByTagName( 'script' )->item( 0 );
 
-											$scriptAttributes = array();
+                                            if ($scriptTagObj->hasAttributes()) {
+	                                            $scriptAttributes = array();
 
-											foreach ( $scriptTagObj->attributes as $attrObj ) {
-												if ( $attrObj->nodeName === 'src' ) {
-													$srcHrefOriginal = trim( $attrObj->nodeValue );
-													break;
-												}
-											}
+	                                            foreach ( $scriptTagObj->attributes as $attrObj ) {
+		                                            if ( $attrObj->nodeName === 'src' ) {
+			                                            $srcHrefOriginal = trim( $attrObj->nodeValue );
+			                                            break;
+		                                            }
+	                                            }
+                                            }
 										} else { // Fallback in case DOMDocument is not active for any reason
 											// only look from <script to >
-											preg_match_all( '#<script(.*?)src=(["\'])' . '(.*)' . '(["\'])(>)#Usmi',
-												$tagOutput, $outputMatches );
+											preg_match_all( '#<script(.*?)src=(["\'])' . '(.*)' . '(["\'])(>)#Usmi', $tagOutput, $outputMatches );
 
 											if ( isset( $outputMatches[3][0] ) ) {
 												$srcHrefOriginal = trim( $outputMatches[3][0], '"\'' );

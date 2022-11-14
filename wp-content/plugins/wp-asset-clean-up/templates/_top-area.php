@@ -87,7 +87,7 @@ $isSettingsCurrentPage = ($wpacuCurrentPage !== WPACU_PLUGIN_ID . '_settings');
     <div id="wpacu-logo-wrap">
         <a href="<?php echo esc_url($wpacuDefaultPageUrl); ?>">
             <img alt="" src="<?php echo WPACU_PLUGIN_URL; ?>/assets/images/asset-cleanup-logo.png" />
-            <div class="wpacu-pro-sign wpacu-lite">
+            <div class="wpacu-version-sign wpacu-lite">
                 <div>
                     LITE<div class="wpacu-version-text">v<?php echo WPACU_PLUGIN_VERSION; ?></div>
                 </div>

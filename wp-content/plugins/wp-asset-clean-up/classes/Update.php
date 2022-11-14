@@ -91,7 +91,7 @@ HTML;
         // Clear cache (via AJAX) only if the user is logged-in (with the right privileges)
 	    add_action('wp_ajax_' . WPACU_PLUGIN_ID . '_clear_cache', array($this, 'ajaxClearCache'), PHP_INT_MAX);
 
-	    // After an update, preload the page for the guest view (the preload for the admin is done within script.min.js own plugin file)
+	    // After an update, preload the page for the guest view; the preload for the admin is done within /assets/script.min.js
 	    add_action('wp_ajax_' . WPACU_PLUGIN_ID . '_preload', array($this, 'ajaxPreloadGuest'), PHP_INT_MAX);
 
 	    // e.g. when "+" or "-" is used within an asset's row (CSS/JS manager), the state is updated in the background to be remembered

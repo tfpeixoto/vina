@@ -16,6 +16,129 @@ class OwnAssets
     public $loadPluginAssets = false; // default
 
 	/**
+	 * @var array[]
+	 */
+	public static $ownAssets = array('styles' => array(), 'scripts' => array());
+
+	/**
+	 *
+	 */
+	public function __construct()
+    {
+        self::prepareVars();
+    }
+
+	/**
+	 *
+	 */
+	public static function prepareVars()
+    {
+        self::$ownAssets['styles'] = array(
+            'style_core' => array(
+	            'handle'   => WPACU_PLUGIN_ID . '-style',
+	            'rel_path' => '/assets/style.min.css'
+            ),
+
+            'chosen' => array(
+                'handle'   => WPACU_PLUGIN_ID . '-chosen-style',
+                'rel_path' => '/assets/chosen/chosen.min.css'
+            ),
+
+            'tooltipster' => array(
+                'handle'   => WPACU_PLUGIN_ID . '-tooltipster-style',
+                'rel_path' => '/assets/tooltipster/tooltipster.bundle.min.css'
+            ),
+
+            'sweetalert2' => array(
+                'handle'   => WPACU_PLUGIN_ID . '-sweetalert2-style',
+                'rel_path' => '/assets/sweetalert2/dist/sweetalert2.min.css'
+            ),
+
+            'autocomplete_search_jquery_ui_custom' => array(
+                'handle' => WPACU_PLUGIN_ID.'-autocomplete-jquery-ui-custom',
+                'rel_path' => '/assets/auto-complete/smoothness/jquery-ui-custom.min.css'
+            )
+        );
+
+        self::$ownAssets['scripts'] = array(
+            'script_core' => array(
+                'handle'   => WPACU_PLUGIN_ID . '-script',
+                'rel_path' => '/assets/script.min.js'
+            ),
+
+            'chosen' => array(
+                'handle'   => WPACU_PLUGIN_ID . '-chosen-script',
+                'rel_path' => '/assets/chosen/chosen.jquery.min.js'
+            ),
+
+            'tooltipster' => array(
+	            'handle'   => WPACU_PLUGIN_ID . '-tooltipster-script',
+	            'rel_path' => '/assets/tooltipster/tooltipster.bundle.min.js'
+            ),
+
+            'sweetalert2' => array(
+	            'handle'   => WPACU_PLUGIN_ID . '-sweetalert2-js',
+	            'rel_path' => '/assets/sweetalert2/dist/sweetalert2.min.js'
+            ),
+
+            'autocomplete_search' => array(
+                'handle'   => WPACU_PLUGIN_ID . '-autocomplete-search',
+                'rel_path' => '/assets/auto-complete/main.min.js'
+            )
+        );
+
+        // If script debugging is enabled, load the non-minified versions of the plugin's assets
+        // Read more: https://wordpress.org/support/article/debugging-in-wordpress/#script_debug
+	    if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+		    self::$ownAssets['styles']['style_core']['rel_path']   = '/assets/style.css';
+		    self::$ownAssets['scripts']['script_core']['rel_path'] = '/assets/script.js';
+
+		    self::$ownAssets['styles']['chosen']['rel_path']       = '/assets/chosen/chosen.css';
+		    self::$ownAssets['scripts']['chosen']['rel_path']      = '/assets/chosen/chosen.jquery.js';
+
+		    self::$ownAssets['styles']['sweetalert2']['rel_path']  = '/assets/sweetalert2/dist/sweetalert2.css';
+		    self::$ownAssets['scripts']['sweetalert2']['rel_path'] = '/assets/sweetalert2/dist/sweetalert2.js';
+
+		    self::$ownAssets['styles']
+             ['autocomplete_search_jquery_ui_custom']['rel_path']  = '/assets/auto-complete/smoothness/jquery-ui-custom.css';
+		    self::$ownAssets['scripts']
+             ['autocomplete_search']['rel_path']                   = '/assets/auto-complete/main.js';
+	    }
+    }
+
+	/**
+	 * @return array[]
+	 */
+	public static function getOwnAssetsHandles($assetType = '')
+    {
+        self::prepareVars();
+
+	    $allPluginStyleHandles = $allPluginScriptHandles = array();
+
+        foreach (self::$ownAssets['styles'] as $assetValues) {
+            if (isset($assetValues['handle']) && $assetValues['handle']) {
+	            $allPluginStyleHandles[] = $assetValues['handle'];
+            }
+        }
+
+	    foreach (self::$ownAssets['scripts'] as $assetValues) {
+		    if (isset($assetValues['handle']) && $assetValues['handle']) {
+			    $allPluginScriptHandles[] = $assetValues['handle'];
+		    }
+	    }
+
+	    if ($assetType !== '') {
+            if ($assetType === 'styles') {
+                return $allPluginStyleHandles;
+            }
+
+            return $allPluginScriptHandles;
+	    }
+
+        return array_merge($allPluginStyleHandles, $allPluginScriptHandles);
+    }
+
+	/**
 	 *
 	 */
 	public function init()
@@ -39,9 +162,11 @@ class OwnAssets
 
 	    add_filter('wpacu_object_data', static function($wpacu_object_data) {
 		    $wpacu_object_data['source_load_error_msg'] = __('The source might not be reachable', 'wp-asset-clean-up');
-		    $wpacu_object_data['plugin_id'] = WPACU_PLUGIN_ID;
-		    $wpacu_object_data['plugin_title'] = WPACU_PLUGIN_TITLE;
-		    $wpacu_object_data['ajax_url']  = esc_url(admin_url('admin-ajax.php'));
+
+		    $wpacu_object_data['plugin_prefix']    = WPACU_PLUGIN_ID; // the same for both Lite & Pro
+		    $wpacu_object_data['plugin_slug']      = WPACU_PLUGIN_SLUG;
+		    $wpacu_object_data['plugin_title']     = WPACU_PLUGIN_TITLE;
+		    $wpacu_object_data['ajax_url']         = esc_url( admin_url( 'admin-ajax.php' ) );
 		    $wpacu_object_data['is_frontend_view'] = false;
 
 		    if ( isset($_GET['wpacu_manage_dash']) ) {
@@ -204,7 +329,7 @@ class OwnAssets
             }
         </style>
         <?php
-        if (wp_style_is(WPACU_PLUGIN_ID . '-style', 'enqueued')) {
+        if (wp_style_is(self::$ownAssets['styles']['style_core']['handle'])) {
             echo Misc::preloadAsyncCssFallbackOutput();
         }
 	}
@@ -306,7 +431,7 @@ class OwnAssets
                         };
                     });
 
-                    // When the user clicks anywhere outside of the modal, close it
+                    // When the user clicks anywhere outside the modal, close it
                     window.onclick = function (event) {
                         if (event.target === wpacuCurrentModal) {
                             wpacuCurrentModal.style.display = 'none';
@@ -425,8 +550,12 @@ class OwnAssets
 	 */
 	private function enqueueAdminStyles()
     {
-        $styleRelPath = '/assets/style.min.css';
-        wp_enqueue_style( WPACU_PLUGIN_ID . '-style', plugins_url($styleRelPath, WPACU_PLUGIN_FILE), array(), self::assetVer($styleRelPath));
+        wp_enqueue_style(
+            self::$ownAssets['styles']['style_core']['handle'],
+            plugins_url(self::$ownAssets['styles']['style_core']['rel_path'], WPACU_PLUGIN_FILE),
+            array(),
+            self::assetVer(self::$ownAssets['styles']['style_core']['rel_path'])
+        );
     }
 
 	/**
@@ -446,8 +575,6 @@ class OwnAssets
 
         if ($isDashAssetsManagerPage) {
 	        if ( $pageRequestFor === 'homepage' ) {
-		        $postId = 0; // default
-
 		        // Homepage tab / Check if the home page is one of the singular pages
 		        $pageOnFront = (int) get_option( 'page_on_front' );
 
@@ -465,13 +592,11 @@ class OwnAssets
 		    }
 	    }
 
-	    $scriptRelPath = '/assets/script.min.js';
-
 	    wp_register_script(
-	        WPACU_PLUGIN_ID . '-script',
-            plugins_url($scriptRelPath, WPACU_PLUGIN_FILE),
+	        self::$ownAssets['scripts']['script_core']['handle'],
+            plugins_url(self::$ownAssets['scripts']['script_core']['rel_path'], WPACU_PLUGIN_FILE),
             array('jquery'),
-            self::assetVer($scriptRelPath)
+            self::assetVer(self::$ownAssets['scripts']['script_core']['rel_path'])
         );
 
 	    if ($postId > 0)  {
@@ -491,8 +616,8 @@ HTML;
         $wpacuDomGetType = ($postStatus === 'private') ? 'direct' : Main::$domGetType;
 
 		$wpacuObjectData = array(
-			'plugin_name'       => WPACU_PLUGIN_ID,
-			'plugin_id'         => WPACU_PLUGIN_ID,
+			'plugin_prefix'     => WPACU_PLUGIN_ID, // the same for both Lite & Pro
+			'plugin_slug'       => WPACU_PLUGIN_SLUG,
 
 			'reload_icon'       => $svgReloadIcon,
 			'reload_msg'        => sprintf(__('Reloading %s area', 'wp-asset-clean-up'), '<strong style="margin: 0 4px;">' . WPACU_PLUGIN_TITLE . '</strong>'),
@@ -594,28 +719,46 @@ HTML;
             __('Please make sure you have a backup (e.g. an exported JSON file) before proceeding.', 'wp-asset-clean-up')."\n\n".
             __('Please confirm to continue or "Cancel" to abort it.', 'wp-asset-clean-up');
 
-		wp_localize_script(
-			WPACU_PLUGIN_ID . '-script',
+        wp_localize_script(
+	        self::$ownAssets['scripts']['script_core']['handle'],
 			'wpacu_object',
 			apply_filters('wpacu_object_data', $wpacuObjectData)
 		);
 
-		wp_enqueue_script(WPACU_PLUGIN_ID . '-script');
+		wp_enqueue_script(self::$ownAssets['scripts']['script_core']['handle']);
 
-		if ($page === WPACU_PLUGIN_ID . '_settings') {
-			$this->loadjQueryChosen();
+		// Load jQuery Chosen on "Settings", "CSS & JS Manager" -> "Manage CSS/JS" (homepage & any post type page)
+	    $isDashManageAssetsPage = false;
+
+        if ($page === WPACU_PLUGIN_ID . '_assets_manager') {
+	        $manageCssJsSubPage      = ( isset( $_GET['wpacu_sub_page'] ) && $_GET['wpacu_sub_page'] ) ? $_GET['wpacu_sub_page'] : 'manage_css_js';
+	        $isDashManageAssetsPage = ( $manageCssJsSubPage === 'manage_css_js' ) &&
+                  // if 'wpacu_for' is not used, it will be defaulted to either homepage or single post page
+                  // if it's used, it has to be in the list specified below, other jQuery Chosen would be irrelevant
+                  ( ! isset( $_GET['wpacu_for'] )
+                    || ( isset( $_GET['wpacu_for'] ) && in_array( $_GET['wpacu_for'], array(
+                              'homepage',
+                              'pages',
+                              'posts',
+                              'custom-post-types',
+                              'media-attachment'
+                          ) ) ) );
         }
 
 		// Standard edit post page
 	    global $pagenow;
 
-		$isEditPostArea = ($pagenow === 'post.php' && Misc::getVar('get', 'post') && Misc::getVar('get', 'action') === 'edit');
+	    $isEditPostArea = ($pagenow === 'post.php' && Misc::getVar('get', 'post') && Misc::getVar('get', 'action') === 'edit');
 
-        if ($page === WPACU_PLUGIN_ID . '_assets_manager' || $isEditPostArea) {
+		if ( $page === WPACU_PLUGIN_ID . '_settings' || $isDashManageAssetsPage || $isEditPostArea ) {
+		    $this->loadjQueryChosen();
+        }
+
+        if ($isEditPostArea || ($page === WPACU_PLUGIN_ID . '_assets_manager')) {
 			// [Start] SweetAlert
 			wp_enqueue_style(
-				WPACU_PLUGIN_ID . '-sweetalert2-style',
-				plugins_url('/assets/sweetalert2/dist/sweetalert2.css', WPACU_PLUGIN_FILE),
+				self::$ownAssets['styles']['sweetalert2']['handle'],
+				plugins_url(self::$ownAssets['styles']['sweetalert2']['rel_path'], WPACU_PLUGIN_FILE),
 				array(),
 				1
 			);
@@ -666,15 +809,15 @@ HTML;
 
 			// Changed "Swal" to "wpacuSwal" to avoid conflicts with other plugins using SweetAlert
 			wp_enqueue_script(
-				WPACU_PLUGIN_ID . '-sweetalert2-js',
-				plugins_url('/assets/sweetalert2/dist/sweetalert2.js', WPACU_PLUGIN_FILE),
+				self::$ownAssets['scripts']['sweetalert2']['handle'],
+				plugins_url(self::$ownAssets['scripts']['sweetalert2']['rel_path'], WPACU_PLUGIN_FILE),
 				array('jquery'),
 				1.1
 			);
 
 			// [wpacu_lite]
-			$upgradeToProLinkHardcodedAssets = WPACU_PLUGIN_GO_PRO_URL.'?utm_source=manage_hardcoded_assets&utm_medium=go_pro_modal';
-			$upgradeToProLinkMediaQueryLoad = WPACU_PLUGIN_GO_PRO_URL.'?utm_source=media_query_load&utm_medium=go_pro_modal';
+			$upgradeToProLinkHardcodedAssets = apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL.'?utm_source=manage_hardcoded_assets&utm_medium=go_pro_modal');
+			$upgradeToProLinkMediaQueryLoad = apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL.'?utm_source=media_query_load&utm_medium=go_pro_modal');
 
 			$sweetAlertTwoScriptInline = <<<JS
 jQuery(document).ready(function($) { 
@@ -721,8 +864,8 @@ JS;
 		if (in_array($page, array(WPACU_PLUGIN_ID . '_plugins_manager', WPACU_PLUGIN_ID . '_overview', WPACU_PLUGIN_ID . '_bulk_unloads'))) {
 			// [Start] Tooltipster Style
 			wp_enqueue_style(
-				WPACU_PLUGIN_ID . '-tooltipster-style',
-				plugins_url('/assets/tooltipster/tooltipster.bundle.min.css', WPACU_PLUGIN_FILE),
+				self::$ownAssets['styles']['tooltipster']['handle'],
+				plugins_url(self::$ownAssets['styles']['tooltipster']['rel_path'], WPACU_PLUGIN_FILE),
 				array(),
 				1
 			);
@@ -730,8 +873,8 @@ JS;
 
 			// [Start] Tooltipster Script
 			wp_enqueue_script(
-				WPACU_PLUGIN_ID . '-tooltipster-script',
-				plugins_url('/assets/tooltipster/tooltipster.bundle.min.js', WPACU_PLUGIN_FILE),
+				self::$ownAssets['scripts']['tooltipster']['handle'],
+				plugins_url(self::$ownAssets['scripts']['tooltipster']['rel_path'], WPACU_PLUGIN_FILE),
 				array('jquery'),
 				1
 			);
@@ -739,11 +882,10 @@ JS;
 			$tooltipsterScriptInline = <<<JS
 jQuery(document).ready(function($) { $('.wpacu-tooltip').tooltipster({ contentCloning: true, delay: 0 }); });
 JS;
-			wp_add_inline_script(WPACU_PLUGIN_ID . '-tooltipster-script', $tooltipsterScriptInline);
+			wp_add_inline_script(self::$ownAssets['scripts']['tooltipster']['handle'], $tooltipsterScriptInline);
 			// [End] Tooltipster Script
         }
     }
-
 
 	/**
 	 *
@@ -752,29 +894,29 @@ JS;
     {
         // [Start] Chosen Style
 		wp_register_style(
-			WPACU_PLUGIN_ID . '-chosen-style',
-			plugins_url('/assets/chosen/chosen.min.css', WPACU_PLUGIN_FILE),
+			self::$ownAssets['styles']['chosen']['handle'],
+			plugins_url(self::$ownAssets['styles']['chosen']['rel_path'], WPACU_PLUGIN_FILE),
 			array(),
 			'1.8.7'
 		);
 
-	    wp_enqueue_style(WPACU_PLUGIN_ID . '-chosen-style');
+	    wp_enqueue_style(self::$ownAssets['styles']['chosen']['handle']);
 
 		$chosenStyleInline = <<<CSS
 #wpacu_hide_meta_boxes_for_post_types_chosen { margin-top: 5px; min-width: 320px; }
 CSS;
-		wp_add_inline_style(WPACU_PLUGIN_ID . '-chosen-style', $chosenStyleInline);
+		wp_add_inline_style(self::$ownAssets['styles']['chosen']['handle'], $chosenStyleInline);
 		// [End] Chosen Style
 
 		// [Start] Chosen Script
 		wp_register_script(
-			WPACU_PLUGIN_ID . '-chosen-script',
-			plugins_url('/assets/chosen/chosen.jquery.min.js', WPACU_PLUGIN_FILE),
+			self::$ownAssets['scripts']['chosen']['handle'],
+			plugins_url(self::$ownAssets['scripts']['chosen']['rel_path'], WPACU_PLUGIN_FILE),
 			array('jquery'),
 			'1.8.7'
 		);
 
-		wp_enqueue_script(WPACU_PLUGIN_ID . '-chosen-script');
+		wp_enqueue_script(self::$ownAssets['scripts']['chosen']['handle']);
 		// [End] Chosen Script
 	}
 
@@ -783,8 +925,12 @@ CSS;
      */
     private function enqueuePublicStyles()
     {
-        $styleRelPath = '/assets/style.min.css';
-        wp_enqueue_style(WPACU_PLUGIN_ID . '-style', plugins_url($styleRelPath, WPACU_PLUGIN_FILE), array(), self::assetVer($styleRelPath));
+        wp_enqueue_style(
+            self::$ownAssets['styles']['style_core']['handle'],
+            plugins_url(self::$ownAssets['styles']['style_core']['rel_path'], WPACU_PLUGIN_FILE),
+            array(),
+            self::assetVer(self::$ownAssets['styles']['style_core']['rel_path'])
+        );
     }
 
     /**
@@ -792,25 +938,27 @@ CSS;
      */
     public function enqueuePublicScripts()
     {
-        $scriptRelPath = '/assets/script.min.js';
+        wp_register_script(
+            self::$ownAssets['scripts']['script_core']['handle'],
+            plugins_url(self::$ownAssets['scripts']['script_core']['rel_path'], WPACU_PLUGIN_FILE),
+            array('jquery'),
+            self::assetVer(self::$ownAssets['scripts']['script_core']['rel_path']),
+            true
+        );
 
-	    wp_register_script(WPACU_PLUGIN_ID . '-script', plugins_url($scriptRelPath, WPACU_PLUGIN_FILE), array('jquery'), self::assetVer($scriptRelPath), true);
-
-	    // [wpacu_pro]
 	    wp_localize_script(
-		    WPACU_PLUGIN_ID . '-script',
+		    self::$ownAssets['scripts']['script_core']['handle'],
 		    'wpacu_object',
 		    apply_filters('wpacu_object_data', array(
-                'ajax_url'    => esc_url(admin_url('admin-ajax.php')),
-                'plugin_id'   => WPACU_PLUGIN_ID,
-                'plugin_name' => WPACU_PLUGIN_ID,
-                'start_del_h' => Main::START_DEL_HARDCODED,
-                'end_del_h'   => Main::END_DEL_HARDCODED
+                'ajax_url'      => esc_url(admin_url('admin-ajax.php')),
+                'plugin_prefix' => WPACU_PLUGIN_ID, // the same for both Lite & Pro
+                'plugin_slug'   => WPACU_PLUGIN_SLUG,
+                'start_del_h'   => Main::START_DEL_HARDCODED,
+                'end_del_h'     => Main::END_DEL_HARDCODED
             ))
 	    );
-	    // [/wpacu_pro]
 
-	    wp_enqueue_script(WPACU_PLUGIN_ID . '-script');
+	    wp_enqueue_script(self::$ownAssets['scripts']['script_core']['handle']);
     }
 
 	/**
@@ -834,7 +982,7 @@ CSS;
 	 */
 	public function ownAssetLoaderSrc($src, $handle)
 	{
-	    if (in_array($handle, array(WPACU_PLUGIN_ID . '-style', WPACU_PLUGIN_ID . '-script'))) {
+	    if (in_array($handle, self::getOwnAssetsHandles())) {
 			$src = str_replace(
 				array('?ver=',          '&ver='),
 				array('?wpacuversion=', '&wpacuversion='),
@@ -854,7 +1002,7 @@ CSS;
 	public function ownAssetLoaderTag($tag, $handle)
     {
 		// Useful in case jQuery library is deferred too (rare situations)
-		if ($handle === WPACU_PLUGIN_ID . '-script') {
+		if (in_array($handle, self::getOwnAssetsHandles('scripts'))) {
 			$tag = str_replace(' src=', ' data-wpacu-plugin-script src=', $tag);
 		}
 

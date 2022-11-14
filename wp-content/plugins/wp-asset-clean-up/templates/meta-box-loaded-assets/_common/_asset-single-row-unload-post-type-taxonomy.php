@@ -54,7 +54,7 @@ if (! $data['row']['global_unloaded']) {
                            name="<?php echo WPACU_FORM_ASSETS_POST_KEY; ?>[styles][unload_post_type_via_tax][<?php echo htmlentities(esc_attr($data['row']['obj']->handle), ENT_QUOTES); ?>][enable]"
                            value="1"/>&nbsp;<span><?php echo $unloadViaTaxText; ?>:</span></label>
                 <a class="go-pro-link-no-style"
-                   href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=manage_asset&utm_medium=unload_style_post_type_via_tax"><span
+                   href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL.'?utm_source=manage_asset&utm_medium=unload_style_post_type_via_tax'); ?>"><span
                             class="wpacu-tooltip wpacu-larger" style="left: -26px;"><?php echo str_replace('the premium', 'the<br />premium', wp_kses(__('This feature is available in the premium version of the plugin.',
 			                'wp-asset-clean-up' ), array('br' => array()))); ?><br/> <?php _e( 'Click here to upgrade to Pro',
 				            'wp-asset-clean-up' ); ?>!</span><img width="20" height="20"

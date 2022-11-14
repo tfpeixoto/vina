@@ -36,7 +36,7 @@ class Lite
 						echo sprintf(
 							__('Managing the loading of the styles &amp; scripts files for this <strong>%s</strong> taxonomy is %savailable in the Pro version%s', 'wp-asset-clean-up'),
 							$tag->taxonomy,
-							'<a href="'.WPACU_PLUGIN_GO_PRO_URL.'?utm_source=taxonomy_edit_page&utm_medium=upgrade_link" target="_blank">',
+							'<a href="'.apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL.'?utm_source=taxonomy_edit_page&utm_medium=upgrade_link').'" target="_blank">',
 							'</a>'
 						);
 						?>

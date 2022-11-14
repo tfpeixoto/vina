@@ -291,7 +291,7 @@ $styleTabContent = ($selectedTabArea === $tabIdArea) ? 'style="display: table-ce
         <!-- Pro Feature -->
         <tr valign="top">
             <th scope="row" class="setting_title">
-                <label style="cursor: auto;"><?php _e('Defer CSS Loaded in the <code>&lt;BODY&gt;</code> (Footer)', 'wp-asset-clean-up'); ?> <a class="go-pro-link-no-style" target="_blank" href="<?php echo esc_url(WPACU_PLUGIN_GO_PRO_URL . '?utm_source=plugin_usage_settings&utm_medium=local_fonts_optimization'); ?>"><span class="wpacu-tooltip" style="width: 186px;"><?php _e('This is a feature available in the Pro version! Unlock it!', 'wp-asset-clean-up'); ?></span> <img style="opacity: 0.6;" width="20" height="20" src="<?php echo esc_url(WPACU_PLUGIN_URL.'/assets/icons/icon-lock.svg'); ?>" valign="top" alt="" /></a></label>
+                <label style="cursor: auto;"><?php _e('Defer CSS Loaded in the <code>&lt;BODY&gt;</code> (Footer)', 'wp-asset-clean-up'); ?> <a class="go-pro-link-no-style" target="_blank" href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL.'?utm_source=plugin_usage_settings&utm_medium=local_fonts_optimization'); ?>"><span class="wpacu-tooltip" style="width: 186px;"><?php _e('This is a feature available in the Pro version! Unlock it!', 'wp-asset-clean-up'); ?></span> <img style="opacity: 0.6;" width="20" height="20" src="<?php echo esc_url(WPACU_PLUGIN_URL.'/assets/icons/icon-lock.svg'); ?>" valign="top" alt="" /></a></label>
             </th>
             <td>
                 <div>

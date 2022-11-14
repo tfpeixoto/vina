@@ -8,21 +8,21 @@ if (! isset($data)) {
 		$pluginsRows = array();
 
 		foreach ($data['active_plugins'] as $pluginData) {
-			$pluginPath = $pluginData['path'];
+			$data['plugin_path'] = $pluginPath = $pluginData['path'];
 			list($pluginDir) = explode('/', $pluginPath);
 			ob_start();
 			?>
-            <tr>
+			<tr>
 				<td class="wpacu_plugin_icon" width="46">
 					<?php if (isset($data['plugins_icons'][$pluginDir])) { ?>
 						<img width="44" height="44" alt="" src="<?php echo esc_url($data['plugins_icons'][$pluginDir]); ?>" />
 					<?php } else { ?>
-                        <div><span class="dashicons dashicons-admin-plugins"></span></div>
+						<div><span class="dashicons dashicons-admin-plugins"></span></div>
 					<?php } ?>
-                </td>
+				</td>
 				<td class="wpacu_plugin_details" id="wpacu-front-manage-<?php echo esc_attr($pluginData['path']); ?>">
 					<span class="wpacu_plugin_title"><?php echo esc_html($pluginData['title']); ?></span>
-                    <span class="wpacu_plugin_path">&nbsp;<small><?php echo esc_html($pluginData['path']); ?></small></span>
+                    <span class="wpacu_plugin_path">&nbsp;<?php echo esc_html($pluginData['path']); ?></span>
 
 					<?php
                     if ($pluginData['network_activated']) {
@@ -33,7 +33,7 @@ if (! isset($data)) {
 					<div class="wpacu-clearfix"></div>
 
                     <!-- [Start] Unload Rules -->
-                    <?php
+					<?php
                     include '_front-areas/_unloads.php';
                     ?>
                     <!-- [End] Unload Rules -->
