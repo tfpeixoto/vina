@@ -175,6 +175,7 @@
           height: auto;
           width: 100%;
         }
+
         .carousel-caption {
           background: #c77c06;
           bottom: 0;
@@ -250,19 +251,24 @@
       font-weight: 400;
 
       &:before {
-        color: $secondary;
-        content: "\f054 ";
-        display: block;
-        float: left;
-        font-family: "Font Awesome 5 Free";
-        font-size: 1rem;
-        font-weight: 900;
-        height: 1rem;
-        opacity: 0;
-        padding: 0.6rem 0 3rem 0;
-        width: 1rem;
-        transition: all ease-in-out 0.25s;
+        display: none;
+
+        @include media-breakpoint-up(md) {
+          color: $secondary;
+          content: "\f054 ";
+          display: block;
+          float: left;
+          font-family: "Font Awesome 5 Free";
+          font-size: 1rem;
+          font-weight: 900;
+          height: 1rem;
+          opacity: 0;
+          padding: 0.6rem 0 3rem 0;
+          width: 1rem;
+          transition: all ease-in-out 0.25s;
+        }
       }
+
       &:hover {
         &:before {
           color: $white;
@@ -271,6 +277,7 @@
           opacity: 1;
         }
       }
+
       a {
         color: $secondary;
         text-decoration: none;
@@ -300,6 +307,7 @@
           text-decoration: underline;
         }
       }
+
       &:last-child {
         margin-bottom: 0;
       }
@@ -361,6 +369,7 @@
           color: $white;
           padding: 0.5rem 1rem;
         }
+
         a {
           color: $secondary;
           padding: 0.5rem 1rem;
@@ -369,10 +378,12 @@
             background: $secondary;
             color: $white;
           }
+
           &.next {
             background: $secondary;
             color: $white;
           }
+
           &:hover {
             background: $primary;
             color: $white;
