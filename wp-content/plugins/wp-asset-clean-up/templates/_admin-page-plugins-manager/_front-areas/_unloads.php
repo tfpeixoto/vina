@@ -19,7 +19,7 @@ if (! isset($data)) {
 						       type="checkbox"
 						       value="unload_site_wide" />
 						<a class="go-pro-link-no-style"
-						   href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=manage_asset&utm_medium=unload_plugin_site_wide"><span class="wpacu-tooltip" style="width: 200px; margin-left: -108px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" style="vertical-align: text-bottom;" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" alt="" /></a>&nbsp;
+						   href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL . '?utm_source=manage_asset&utm_medium=unload_plugin_site_wide'); ?>"><span class="wpacu-tooltip" style="width: 200px; margin-left: -108px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" style="vertical-align: text-bottom;" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" alt="" /></a>&nbsp;
 						<span>On all pages</span></label>
 				</li>
 				<li>
@@ -33,7 +33,7 @@ if (! isset($data)) {
                                name="wpacu_plugins[<?php echo esc_attr($data['plugin_path']); ?>][status][]"
                                value="unload_home_page" />
                         <a class="go-pro-link-no-style"
-                           href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=manage_asset&utm_medium=unload_plugin_on_home_page"><span class="wpacu-tooltip" style="width: 200px; margin-left: -108px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" style="vertical-align: text-bottom;" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" alt="" /></a>&nbsp;
+                           href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL . '?utm_source=manage_asset&utm_medium=unload_plugin_on_home_page'); ?>"><span class="wpacu-tooltip" style="width: 200px; margin-left: -108px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" style="vertical-align: text-bottom;" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" alt="" /></a>&nbsp;
 					<span>On the homepage</span></label>
 				</li>
                 <li>
@@ -47,7 +47,7 @@ if (! isset($data)) {
                                name="wpacu_plugins[<?php echo esc_attr($data['plugin_path']); ?>][status][]"
                                value="unload_via_post_type" />
                         <a class="go-pro-link-no-style"
-                           href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=manage_asset&utm_medium=unload_plugin_on_pages_of_post_types"><span class="wpacu-tooltip" style="width: 200px; margin-left: -108px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" style="vertical-align: text-bottom;" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" alt="" /></a>&nbsp;
+                           href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL . '?utm_source=manage_asset&utm_medium=unload_plugin_on_pages_of_post_types'); ?>"><span class="wpacu-tooltip" style="width: 200px; margin-left: -108px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" style="vertical-align: text-bottom;" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" alt="" /></a>&nbsp;
                         <span>On pages of the following post types:</span>
                     </label>
                 </li>
@@ -62,7 +62,7 @@ if (! isset($data)) {
                                name="wpacu_plugins[<?php echo esc_attr($data['plugin_path']); ?>][status][]"
                                value="unload_via_tax" />
                         <a class="go-pro-link-no-style"
-                           href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=manage_asset&utm_medium=unload_plugin_on_taxonomy_pages"><span class="wpacu-tooltip" style="width: 200px; margin-left: -108px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" style="vertical-align: text-bottom;" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" alt="" /></a>&nbsp;
+                           href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL . '?utm_source=manage_asset&utm_medium=unload_plugin_on_taxonomy_pages'); ?>"><span class="wpacu-tooltip" style="width: 200px; margin-left: -108px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" style="vertical-align: text-bottom;" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" alt="" /></a>&nbsp;
                         <span>On the following taxonomy pages:</span></label>
                 </li>
 				<li>
@@ -76,7 +76,7 @@ if (! isset($data)) {
 						       type="checkbox"
 						       value="unload_via_regex">
 						<a class="go-pro-link-no-style"
-						   href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=manage_asset&utm_medium=unload_plugin_via_regex"><span class="wpacu-tooltip" style="width: 200px; margin-left: -108px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" style="vertical-align: text-bottom;" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" alt="" /></a>&nbsp;
+						   href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL . '?utm_source=manage_asset&utm_medium=unload_plugin_via_regex'); ?>"><span class="wpacu-tooltip" style="width: 200px; margin-left: -108px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" style="vertical-align: text-bottom;" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" alt="" /></a>&nbsp;
                         <span>If request URI matches these RegEx(es):</span>
                     </label>
 					<a class="help_link unload_it_regex"
@@ -94,7 +94,7 @@ if (! isset($data)) {
 						       name="wpacu_plugins[<?php echo esc_attr($data['plugin_path']); ?>][status][]"
 						       value="unload_logged_in" />
 						<a class="go-pro-link-no-style"
-						   href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=manage_asset&utm_medium=unload_plugin_if_logged_in"><span class="wpacu-tooltip" style="width: 200px; margin-left: -132px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" style="vertical-align: text-bottom;" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" alt="" /></a>&nbsp;
+						   href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL . '?utm_source=manage_asset&utm_medium=unload_plugin_if_logged_in'); ?>"><span class="wpacu-tooltip" style="width: 200px; margin-left: -132px;">This feature is locked for Pro users<br />Click here to upgrade!</span><img width="20" height="20" style="vertical-align: text-bottom;" src="<?php echo esc_url(WPACU_PLUGIN_URL); ?>/assets/icons/icon-lock.svg" alt="" /></a>&nbsp;
 					    <span>If the user is logged in</span>
                     </label>
 				</li>

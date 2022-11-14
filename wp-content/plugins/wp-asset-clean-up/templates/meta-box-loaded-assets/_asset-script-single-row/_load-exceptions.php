@@ -74,7 +74,7 @@ if ($anyUnloadRuleSet || $data['row']['is_load_exception_per_page']) {
 						disabled="disabled"
 						value="1"/>
 					Load it for URLs with request URI matching this RegEx(es): <a class="go-pro-link-no-style"
-					                                                          href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=manage_asset&utm_medium=load_via_regex_make_exception"><span
+					                                                          href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL.'?utm_source=manage_asset&utm_medium=load_via_regex_make_exception'); ?>"><span
 							class="wpacu-tooltip wpacu-larger"><?php echo str_replace('the premium', 'the<br />premium', wp_kses(__('This feature is available in the premium version of the plugin.',
 								'wp-asset-clean-up' ), array('br' => array()))); ?><br/> <?php _e( 'Click here to upgrade to Pro',
 								'wp-asset-clean-up' ); ?>!</span><img width="20" height="20"

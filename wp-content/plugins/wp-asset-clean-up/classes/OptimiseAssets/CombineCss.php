@@ -338,9 +338,7 @@ HTML;
 			}
 
 			// The DOMDocument is already checked if it's enabled in doCombine()
-			$domTag = new \DOMDocument();
-
-			libxml_use_internal_errors(true);
+			$domTag = Misc::initDOMDocument();
 			$domTag->loadHTML($matchedSourceFromTag);
 
 			foreach ($domTag->getElementsByTagName('link') as $tagObject) {
@@ -438,7 +436,7 @@ HTML;
 			$uriToFinalCssFile = $localFinalCssFile = $finalCombinedCssContent = '';
 
 			foreach ($localAssetsPaths as $assetHref => $localAssetsPath) {
-				if ($cssContent = trim(FileSystem::file_get_contents($localAssetsPath, 'combine_css_imports'))) {
+				if ($cssContent = trim(FileSystem::fileGetContents($localAssetsPath, 'combine_css_imports'))) {
 					$pathToAssetDir = OptimizeCommon::getPathToAssetDir($assetHref);
 
 					// Does it have a source map? Strip it
@@ -473,7 +471,7 @@ HTML;
 				$localFinalCssFile = WP_CONTENT_DIR . OptimizeCss::getRelPathCssCacheDir() . $uriToFinalCssFile;
 
 				if (! is_file($localFinalCssFile)) {
-					FileSystem::file_put_contents($localFinalCssFile, $finalCombinedCssContent);
+					FileSystem::filePutContents($localFinalCssFile, $finalCombinedCssContent);
 				}
 			}
 

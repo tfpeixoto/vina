@@ -651,19 +651,34 @@ class Misc
 					$targetJsonFile = $blocksDir.$fileOrDir.'/block.json';
 
 					if (is_dir($blocksDir.$fileOrDir) && is_file($targetJsonFile)) {
-						$jsonToArray = wp_json_file_decode($targetJsonFile, array('associative' => true));
+						$jsonToArray = function_exists('wp_json_file_decode') ? wp_json_file_decode($targetJsonFile, array('associative' => true))
+						    : self::wpJsonFileDecode($targetJsonFile, array( 'associative' => true));
 
-						if (isset($jsonToArray['style']) && $jsonToArray['style']) {
-							$cssCoreHandlesList[] = $jsonToArray['style'];
-						}
-
-						if (isset($jsonToArray['editorStyle']) && $jsonToArray['editorStyle']) {
-							$cssCoreHandlesList[] = $jsonToArray['editorStyle'];
-
-							if (Misc::endsWith($jsonToArray['editorStyle'], '-editor')) {
-								$cssCoreHandlesList[] = substr($jsonToArray['editorStyle'], 0, -strlen('-editor'));
+						if (isset($jsonToArray['style'])) {
+							if ( is_array( $jsonToArray['style'] ) ) {
+								foreach ( $jsonToArray['style'] as $style ) {
+									$cssCoreHandlesList[] = $style;
+								}
+							} else {
+								$cssCoreHandlesList[] = $jsonToArray['style'];
 							}
 						}
+
+						if (isset($jsonToArray['editorStyle'])) {
+							if ( is_array( $jsonToArray['editorStyle'] ) ) {
+								foreach ( $jsonToArray['editorStyle'] as $editorStyle ) {
+									$cssCoreHandlesList[] = $editorStyle;
+								}
+							} else {
+								$cssCoreHandlesList[] = $jsonToArray['editorStyle'];
+							}
+						}
+					}
+				}
+
+				foreach ($cssCoreHandlesList as $style) {
+					if (self::endsWith($style, '-editor')) {
+						$cssCoreHandlesList[] = substr($style, 0, -strlen('-editor'));
 					}
 				}
 
@@ -684,11 +699,65 @@ class Misc
 	}
 
 	/**
+	 * Fallback in the case the WordPress version is below 5.9.0
+	 *
+	 * @param $filename
+	 * @param $options
+	 *
+	 * @return mixed|null
+	 */
+	public static function wpJsonFileDecode( $filename, $options = array() )
+	{
+		$filename = wp_normalize_path( realpath( $filename ) );
+
+		if ( ! file_exists( $filename ) ) {
+			trigger_error(
+				sprintf(
+					/* translators: %s: Path to the JSON file. */
+					__( "File %s doesn't exist!" ),
+					$filename
+				)
+			);
+			return null;
+		}
+
+		$options      = wp_parse_args( $options, array( 'associative' => false ) );
+		$decoded_file = json_decode( file_get_contents( $filename ), $options['associative'] );
+
+		if ( JSON_ERROR_NONE !== json_last_error() ) {
+			trigger_error(
+				sprintf(
+				/* translators: 1: Path to the JSON file, 2: Error message. */
+					__( 'Error when decoding a JSON file at path %1$s: %2$s' ),
+					$filename,
+					json_last_error_msg()
+				)
+			);
+			return null;
+		}
+
+		return $decoded_file;
+	}
+
+	/**
 	 * @return bool
 	 */
 	public static function isDOMDocumentOn()
 	{
 		return function_exists('libxml_use_internal_errors') && function_exists('libxml_clear_errors') && class_exists('\DOMDocument') && class_exists('\DOMXpath');
+	}
+
+	/**
+	 * @return \DOMDocument
+	 */
+	public static function initDOMDocument()
+	{
+		$dom = new \DOMDocument();
+
+		// Any document errors reported in the HTML source (lots of websites have them) are irrelevant for the functionality of the plugin
+		libxml_use_internal_errors(true);
+
+		return $dom;
 	}
 
 	/**
@@ -698,7 +767,7 @@ class Misc
 	{
 		if (! ObjectCache::wpacu_cache_get('wpacu_w3tc_master_config')) {
 			$w3tcConfigMasterFile = WP_CONTENT_DIR . '/w3tc-config/master.php';
-			$w3tcMasterConfig = FileSystem::file_get_contents($w3tcConfigMasterFile);
+			$w3tcMasterConfig = FileSystem::fileGetContents($w3tcConfigMasterFile);
 			ObjectCache::wpacu_cache_set('wpacu_w3tc_master_config', trim($w3tcMasterConfig));
 		} else {
 			$w3tcMasterConfig = ObjectCache::wpacu_cache_get('wpacu_w3tc_master_config');

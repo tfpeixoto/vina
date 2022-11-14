@@ -251,7 +251,7 @@ HTACCESS;
 
 		    if ( ! is_file( $cacheDir . 'index.php' ) ) {
 			    // /wp-content/cache/asset-cleanup/cache/(css|js)/index.php
-			    FileSystem::file_put_contents( $cacheDir . 'index.php', $emptyPhpFileContents );
+			    FileSystem::filePutContents( $cacheDir . 'index.php', $emptyPhpFileContents );
 		    }
 
 			if ( ! is_dir( $cacheDir . OptimizeCommon::$optimizedSingleFilesDir ) ) {
@@ -267,19 +267,19 @@ HTACCESS;
 
 		    if ( ! is_file( $cacheDir . OptimizeCommon::$optimizedSingleFilesDir.'/inline/index.php' ) ) {
 			    // /wp-content/cache/asset-cleanup/cache/(css|js)/item/inline/index.php
-			    FileSystem::file_put_contents( $cacheDir . OptimizeCommon::$optimizedSingleFilesDir.'/inline/index.php', $emptyPhpFileContents );
+			    FileSystem::filePutContents( $cacheDir . OptimizeCommon::$optimizedSingleFilesDir.'/inline/index.php', $emptyPhpFileContents );
 		    }
 
 		    $htAccessFilePath = dirname( $cacheDir ) . '/.htaccess';
 
 		    if ( ! is_file( $htAccessFilePath ) ) {
 			    // /wp-content/cache/asset-cleanup/.htaccess
-			    FileSystem::file_put_contents( $htAccessFilePath, $htAccessContents );
+			    FileSystem::filePutContents( $htAccessFilePath, $htAccessContents );
 		    }
 
 		    if ( ! is_file( dirname( $cacheDir ) . '/index.php' ) ) {
 			    // /wp-content/cache/asset-cleanup/index.php
-			    FileSystem::file_put_contents( dirname( $cacheDir ) . '/index.php', $emptyPhpFileContents );
+			    FileSystem::filePutContents( dirname( $cacheDir ) . '/index.php', $emptyPhpFileContents );
 		    }
 	    }
 
@@ -337,7 +337,7 @@ HTACCESS;
 
 		// If the Pro version is not installed (active or not), show the upgrade link
 		if (! array_key_exists('wp-asset-clean-up-pro/wpacu.php', $allPlugins)) {
-			$links['go_pro'] = '<a target="_blank" style="font-weight: bold;" href="'.WPACU_PLUGIN_GO_PRO_URL.'">'.__('Go Pro', 'wp-asset-clean-up').'</a>';
+			$links['go_pro'] = '<a target="_blank" style="font-weight: bold;" href="'.apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL).'">'.__('Go Pro', 'wp-asset-clean-up').'</a>';
 		}
 		// [/wpacu_lite]
 

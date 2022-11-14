@@ -68,7 +68,7 @@ class MinifyJs
 		}
 
 		$regExps = array(
-			'#/wp-content/plugins/wp-asset-clean-up(.*?).min.js#',
+			'#/wp-content/plugins/wp-asset-clean-up(.*?).js#',
 
 			// Other libraries from the core that end in .min.js
 			'#/wp-includes/(.*?).min.js#',
@@ -82,7 +82,7 @@ class MinifyJs
 			//'#/wp-content/uploads/(.*?).js#',
 			'#/wp-content/cache/(.*?).js#',
 
-			// Already minified and it also has a random name making the cache folder make bigger
+			// Already minified, and it also has a random name making the cache folder make bigger
 			'#/wp-content/bs-booster-cache/#',
 
 			// Elementor .min.js

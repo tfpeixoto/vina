@@ -36,6 +36,7 @@ if (! isset($data)) {
             this.classList.toggle('wpacu-assets-inline-code-collapsible-active');
 
             var assetInlineCodeContent = this.nextElementSibling;
+                assetInlineCodeContent = assetInlineCodeContent.nextElementSibling;
 
             if (assetInlineCodeContent.style.maxHeight) {
                 assetInlineCodeContent.style.maxHeight = null;
@@ -232,7 +233,7 @@ if (! isset($data)) {
     // [wpacu_lite]
     if (! is_admin()) {
         // Admin manages the list in the front-end view
-        $upgradeToProLink = WPACU_PLUGIN_GO_PRO_URL.'?utm_source=manage_hardcoded_assets&utm_medium=go_pro_frontend';
+        $upgradeToProLink = apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL.'?utm_source=manage_hardcoded_assets&utm_medium=go_pro_frontend');
     ?>
         var wpacuElGoPro = document.getElementsByClassName('wpacu-manage-hardcoded-assets-requires-pro-popup');
 

@@ -73,8 +73,7 @@ class CombineJs
 			$minifyJsInlineTagsIsNotEnabled = ! (MinifyJs::isMinifyJsEnabled() && in_array(Main::instance()->settings['minify_loaded_js_for'], array('inline', 'all')));
 
 			if ($minifyJsInlineTagsIsNotEnabled) {
-				$domTag = new \DOMDocument();
-				libxml_use_internal_errors(true);
+				$domTag = Misc::initDOMDocument();
 
 				// Strip irrelevant tags to boost the speed of the parser (e.g. NOSCRIPT / SCRIPT(inline) / STYLE)
 				// Sometimes, inline CODE can be too large, and it takes extra time for loadHTML() to parse
@@ -126,6 +125,7 @@ class CombineJs
 						$scriptNotCombinable = true;
 					}
 
+					$handleToCheck = isset($scriptAttributes['data-wpacu-script-handle']) ? $scriptAttributes['data-wpacu-script-handle'] : ''; // Maybe: JS Inline (Before, After)
 					$hasSrc = isset($scriptAttributes['src']) && trim($scriptAttributes['src']); // No valid SRC attribute? It's not combinable (e.g. an inline tag)
 					$isPluginScript = isset($scriptAttributes['data-wpacu-plugin-script']); // Only of the user is logged-in (skip it as it belongs to the Asset CleanUp (Pro) plugin)
 
@@ -137,7 +137,6 @@ class CombineJs
 
 						// Because of jQuery, we will not have the list of all inline scripts and then the combined files as it is in BODY
 						if ($docLocationScript === 'head') {
-							$handleToCheck = isset($scriptAttributes['data-wpacu-script-handle']) ? $scriptAttributes['data-wpacu-script-handle'] : ''; // Maybe: JS Inline (Before, After)
 							if ($handleToCheck === '' && isset($scriptAttributes['id'])) {
 								$replaceToGetHandle = '';
 								if (strpos($scriptAttributes['id'], '-js-extra') !== false)        { $replaceToGetHandle = '-js-extra';        }
@@ -175,7 +174,7 @@ class CombineJs
 					if (! $scriptNotCombinable) {
 						$src = (string)$scriptAttributes['src'];
 
-						if (self::skipCombine($src)) {
+						if (self::skipCombine($src, $handleToCheck)) {
 							$scriptNotCombinable = true;
 						}
 
@@ -191,7 +190,7 @@ class CombineJs
 						}
 
 						// Was it optimized and has the URL updated? Check the Source URL
-						if (! $scriptNotCombinable && isset($scriptAttributes['data-wpacu-script-rel-src-before']) && $scriptAttributes['data-wpacu-script-rel-src-before'] && self::skipCombine($scriptAttributes['data-wpacu-script-rel-src-before'])) {
+						if (! $scriptNotCombinable && isset($scriptAttributes['data-wpacu-script-rel-src-before']) && $scriptAttributes['data-wpacu-script-rel-src-before'] && self::skipCombine($scriptAttributes['data-wpacu-script-rel-src-before'], $handleToCheck)) {
 							$scriptNotCombinable = true;
 						}
 
@@ -478,11 +477,10 @@ class CombineJs
 					return $htmlSource;
 				}
 
-				$domTag = new \DOMDocument();
-				libxml_use_internal_errors(true);
+				$domTag = Misc::initDOMDocument();
 
 				// Strip irrelevant tags to boost the speed of the parser (e.g. NOSCRIPT / SCRIPT(inline) / STYLE)
-				// Sometimes, inline CODE can be too large and it takes extra time for loadHTML() to parse
+				// Sometimes, inline CODE can be too large, and it takes extra time for loadHTML() to parse
 				$htmlSourceAlt = preg_replace( '@<script(| type=\'text/javascript\'| type="text/javascript")>.*?</script>@si', '', $htmlAfterFirstCombinedDeferScript );
 				$htmlSourceAlt = preg_replace( '@<(style|noscript)[^>]*?>.*?</\\1>@si', '', $htmlSourceAlt );
 				$htmlSourceAlt = preg_replace( '#<link([^<>]+)/?>#iU', '', $htmlSourceAlt );
@@ -549,8 +547,13 @@ class CombineJs
 	 *
 	 * @return bool
 	 */
-	public static function skipCombine($src)
+	public static function skipCombine($src, $handle = '')
 	{
+		// In case the handle was appended
+		if ($handle !== '' && in_array($handle, Main::instance()->skipAssets['scripts'])) {
+			return true;
+		}
+
 		$regExps = array(
 			'#/wp-content/bs-booster-cache/#'
 		);
@@ -603,7 +606,7 @@ class CombineJs
 		$uriToFinalJsFile = $localFinalJsFile = $finalJsContents = '';
 
 		foreach ($localAssetsPaths as $assetHref => $localAssetsPath) {
-			if ($jsContent = trim(FileSystem::file_get_contents($localAssetsPath))) {
+			if ($jsContent = trim(FileSystem::fileGetContents($localAssetsPath))) {
 				if ($jsContent === '') {
 					continue;
 				}
@@ -640,7 +643,7 @@ class CombineJs
 			$localFinalJsFile  = WP_CONTENT_DIR . OptimizeJs::getRelPathJsCacheDir() . $uriToFinalJsFile;
 
 			if (! is_file($localFinalJsFile)) {
-				FileSystem::file_put_contents( $localFinalJsFile, $finalJsContents );
+				FileSystem::filePutContents( $localFinalJsFile, $finalJsContents );
 			}
 		}
 

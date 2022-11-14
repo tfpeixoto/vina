@@ -45,7 +45,7 @@ class Menu
         add_action('admin_menu', array($this, 'activeMenu'));
 
         if (isset($_GET['page']) && $_GET['page'] === WPACU_PLUGIN_ID . '_go_pro') {
-        	header('Location: '.WPACU_PLUGIN_GO_PRO_URL.'?utm_source=plugin_go_pro');
+        	header('Location: '.apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL.'?utm_source=plugin_go_pro'));
         	exit();
         }
 

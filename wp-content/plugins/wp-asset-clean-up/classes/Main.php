@@ -218,33 +218,35 @@ class Main
 	 */
 	public function __construct()
     {
-		$this->skipAssets['styles'] = array(
-			// Asset CleanUp (Pro) Styling (for admin use only)
-			WPACU_PLUGIN_ID . '-style',
-			WPACU_PLUGIN_ID . '-chosen-style',
-			'admin-bar',
-			// The top admin bar
-			'yoast-seo-adminbar',
-			// Yoast "WordPress SEO" plugin
-			'autoptimize-toolbar',
-			'query-monitor',
-			'wp-fastest-cache-toolbar',
-			// WP Fastest Cache plugin toolbar CSS
-			'litespeed-cache',
-			// LiteSpeed toolbar
-			'siteground-optimizer-combined-styles-header'
-			// Combine CSS in SG Optimiser (irrelevant as it made from the combined handles)
-		);
+		$this->skipAssets['styles'] = array_merge(
+            array(
+                'admin-bar',
+                // The top admin bar
+                'yoast-seo-adminbar',
+                // Yoast "WordPress SEO" plugin
+                'autoptimize-toolbar',
+                'query-monitor',
+                'wp-fastest-cache-toolbar',
+                // WP Fastest Cache plugin toolbar CSS
+                'litespeed-cache',
+                // LiteSpeed toolbar
+                'siteground-optimizer-combined-styles-header'
+                // Combine CSS in SG Optimiser (irrelevant as it made from the combined handles)
+            ),
+			// Own Scripts (for admin use only)
+			OwnAssets::getOwnAssetsHandles('styles')
+        );
 
-		$this->skipAssets['scripts'] = array(
-			// Asset CleanUp (Pro) Script (for admin use only)
-			WPACU_PLUGIN_ID . '-script',
-			WPACU_PLUGIN_ID . '-chosen-script',
-			'admin-bar',                 // The top admin bar
-			'autoptimize-toolbar',
-			'query-monitor',
-			'wpfc-toolbar' // WP Fastest Cache plugin toolbar JS
-		);
+		$this->skipAssets['scripts'] = array_merge(
+            array(
+                'admin-bar',            // The top admin bar
+                'autoptimize-toolbar',
+                'query-monitor',
+                'wpfc-toolbar'          // WP Fastest Cache plugin toolbar JS
+		    ),
+			// Own Scripts (for admin use only)
+			OwnAssets::getOwnAssetsHandles('scripts')
+        );
 
 	    // Filter before triggering the actual unloading through "wp_deregister_script", "wp_dequeue_script", "wp_deregister_style", "wp_dequeue_style"
 	    $this->fallbacks();
@@ -477,7 +479,7 @@ class Main
 				return $scriptTag;
 			}, PHP_INT_MAX, 2 );
 
-			Preloads::instance()->init();
+            Preloads::instance()->init();
 		}
 	    /*
 	     * [END] Front-end page visited (e.g. by the admin or a guest visitor)
@@ -1220,7 +1222,7 @@ SQL;
 		        continue;
 	        }
 
-            // Special Action for 'jquery-migrate' handler as its tied to 'jquery'
+            // Special Action for 'jquery-migrate' handler as it's tied to 'jquery'
             if ($handle === 'jquery-migrate' && isset($this->wpAllScripts['registered']['jquery'])) {
 	            $jQueryRegScript = $this->wpAllScripts['registered']['jquery'];
 

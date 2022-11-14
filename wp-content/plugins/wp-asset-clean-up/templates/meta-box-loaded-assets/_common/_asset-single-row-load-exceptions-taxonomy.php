@@ -32,7 +32,7 @@ switch ($data['post_type']) {
                disabled="disabled"
                value="1"/>&nbsp;<span><?php echo $loadBulkTextViaTax; ?>:</span></label>
     <a class="go-pro-link-no-style"
-       href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=manage_asset&utm_medium=load_exception_<?php echo $assetTypeS; ?>_post_type_via_tax"><span
+       href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL.'?utm_source=manage_asset&utm_medium=load_exception_'.$assetTypeS.'_post_type_via_tax'); ?>"><span
                 class="wpacu-tooltip wpacu-larger" style="left: -26px;"><?php echo str_replace('the premium', 'the<br />premium', wp_kses(__('This feature is available in the premium version of the plugin.',
 			    'wp-asset-clean-up' ), array('br' => array()))); ?><br/> <?php _e( 'Click here to upgrade to Pro',
 				'wp-asset-clean-up' ); ?>!</span><img width="20" height="20"

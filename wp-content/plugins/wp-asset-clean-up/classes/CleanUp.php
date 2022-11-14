@@ -317,8 +317,7 @@ class CleanUp
 	 */
 	public static function getOuterHTML($e)
 	{
-		$doc = new \DOMDocument();
-		libxml_use_internal_errors( true );
+		$doc = Misc::initDOMDocument();
 
 		$doc->appendChild($doc->importNode($e, true));
 

@@ -345,8 +345,7 @@ class OptimizeCommon
 	{
 		$htmlSourceBefore = $htmlSource;
 
-		$domTag = new \DOMDocument();
-		libxml_use_internal_errors( true );
+		$domTag = Misc::initDOMDocument();
 
 		$cleanerDomRegEx = '';
 
@@ -396,13 +395,114 @@ class OptimizeCommon
 
 		// Avoid "Warning: DOMDocument::loadHTML(): Empty string supplied as input"
 		// Just in case $htmlSource has been altered incorrectly for any reason, fallback to the original $htmlSource value ($htmlSourceBefore)
-		if (! $htmlSource) {
+		if ( ! $htmlSource ) {
 			$domTag->loadHTML($htmlSourceBefore);
 			return $domTag;
 		}
 
 		$domTag->loadHTML($htmlSource);
 		return $domTag;
+	}
+
+	/**
+	 * @param $htmlSource
+	 * @param $params
+	 *
+	 * @return array|mixed|string|string[]
+	 */
+	public static function matchAndReplaceLinkTags($htmlSource, $params = array())
+	{
+		if (isset($params['as']) && $params['as']) {
+			$fallbackToRegex = false;
+
+			/*
+			  * Option 1: DOM + Regular Expression (Best)
+			 */
+			if ( Misc::isDOMDocumentOn() ) {
+				$dom = Misc::initDOMDocument();
+
+				$dom->loadHTML($htmlSource);
+
+				$selector = new \DOMXPath($dom);
+
+				$domTagQuery = $selector->query('//link[@as="'.$params['as'].'"]');
+
+				if (count($domTagQuery) < 1) {
+					// No LINK tags found with the specified "as" attribute? Stop here!
+					return $htmlSource;
+				}
+
+				foreach($domTagQuery as $link) {
+					if ( ! $link->hasAttributes() ) {
+						continue;
+					}
+
+					$linkTagParts = array();
+					$linkTagParts[] = '<link ';
+
+					foreach ($link->attributes as $attr) {
+						$attrName = $attr->nodeName;
+						$attrValue = $attr->nodeValue;
+
+						if ($attrName) {
+							if ($attrValue !== '') {
+								$linkTagParts[] = '(\s+|)' . preg_quote($attrName, '/') . '(\s+|)=(\s+|)(|"|\')' . preg_quote($attrValue, '/') . '(|"|\')(|\s+)';
+							} else {
+								$linkTagParts[] = '(\s+|)' . preg_quote($attrName, '/') . '(|((\s+|)=(\s+|)(|"|\')(|"|\')))';
+							}
+						}
+					}
+
+					$linkTagParts[] = '(|\s+)(|/)>';
+
+					$linkTagFinalRegExPart = implode('', $linkTagParts);
+
+					preg_match_all(
+						'#'.$linkTagFinalRegExPart.'#Umi',
+						$htmlSource,
+						$matchSourceFromTag,
+						PREG_SET_ORDER
+					);
+
+					// It always has to be a match from the DOM generated tag
+					// Otherwise, default it to RegEx
+					if ( empty($matchSourceFromTag) || ! (isset($matchSourceFromTag[0]) && ! empty($matchSourceFromTag[0])) ) {
+						$fallbackToRegex = true;
+						break;
+					}
+
+					$matchesSourcesFromTags[] = $matchSourceFromTag[0];
+				}
+			}
+
+			/*
+			  * Option 2: Regular Expression (Fallback)
+			 */
+			if ($fallbackToRegex || ! Misc::isDOMDocumentOn()) {
+				preg_match_all( '#<link[^>]*(as(\s+|)=(\s+|)(|"|\')'.$params['as'].'(|"|\'))[^>]*>#Umi', $htmlSource, $matchesSourcesFromTags, PREG_SET_ORDER );
+			}
+
+			// Are there any preloaded / prefetched scripts that are inside the unloaded list?
+			// Strip the preloading tag as it's not relevant, since the script was unloaded
+			// These can be generated via plugins such as "Pre* Party Resource Hints" where users can manually insert scripts to preload
+			if ( ! empty( $matchesSourcesFromTags ) ) {
+				foreach ( $matchesSourcesFromTags as $matchedLink ) {
+					$matchedLinkTag = isset( $matchedLink[0] ) ? $matchedLink[0] : '';
+
+					if ( ! ( $matchedLinkTag && strpos( $matchedLinkTag, ' href' ) !== false ) ) {
+						continue;
+					}
+
+					foreach ( $params['unloaded_assets_rel_sources'] as $unloadedAssetRelSource ) {
+						if ( strpos( $matchedLinkTag, $unloadedAssetRelSource ) !== false ) {
+							$htmlSource = str_replace( $matchedLinkTag, '', $htmlSource );
+						}
+					}
+				}
+			}
+		}
+
+		return $htmlSource;
 	}
 
 	/**
@@ -515,21 +615,35 @@ class OptimizeCommon
 			$hrefRelPath = substr($hrefRelPath, 1);
 		}
 
-		$localAssetPath = Misc::getWpRootDirPath() . $hrefRelPath;
+		$localAssetPossiblePaths = array(Misc::getWpRootDirPath() . $hrefRelPath);
 
-		if (strpos($localAssetPath, '?ver') !== false) {
-			list($localAssetPathAlt,) = explode('?ver', $localAssetPath);
-			$localAssetPath = $localAssetPathAlt;
+		// Perhaps the URL starts with / (not //) and site_url() was not used
+		$parseSiteUrlPath = parse_url(site_url(), PHP_URL_PATH);
+
+		// This is in case we have something like this in the source (hardcoded or generated through a plugin)
+		// /blog/wp-content/plugins/custom-plugin-slug/script.js
+		// and the site_url() is equal with https://www.mysite.com/blog
+		if ($parseSiteUrlPath !== '/' && strlen($parseSiteUrlPath) > 1 && strpos($href, $parseSiteUrlPath) === 0) {
+			$relPathFromWpRootDir = str_replace($parseSiteUrlPath, '', $href);
+			$altHrefRelPath = str_replace('//', '/', Misc::getWpRootDirPath() . $relPathFromWpRootDir);
+			$localAssetPossiblePaths[] = $altHrefRelPath;
 		}
 
-		// Not using "?ver="
-		if (strpos($localAssetPath, '.' . $assetType . '?') !== false) {
-			list($localAssetPathAlt,) = explode('.' . $assetType . '?', $localAssetPath);
-			$localAssetPath = $localAssetPathAlt . '.' . $assetType;
-		}
+		foreach ($localAssetPossiblePaths as $localAssetPath) {
+			if ( strpos( $localAssetPath, '?ver' ) !== false ) {
+				list( $localAssetPathAlt, ) = explode( '?ver', $localAssetPath );
+				$localAssetPath = $localAssetPathAlt;
+			}
 
-		if (strrchr($localAssetPath, '.') === '.' . $assetType && is_file($localAssetPath)) {
-			return $localAssetPath;
+			// Not using "?ver="
+			if ( strpos( $localAssetPath, '.' . $assetType . '?' ) !== false ) {
+				list( $localAssetPathAlt, ) = explode( '.' . $assetType . '?', $localAssetPath );
+				$localAssetPath = $localAssetPathAlt . '.' . $assetType;
+			}
+
+			if ( strrchr( $localAssetPath, '.' ) === '.' . $assetType && is_file( $localAssetPath ) ) {
+				return $localAssetPath;
+			}
 		}
 
 		return false;
@@ -582,8 +696,6 @@ class OptimizeCommon
 			return false;
 		}
 
-		$isRelPath = false;
-
 		// Check if it starts without "/" or a protocol; e.g. "wp-content/theme/style.css", "wp-content/theme/script.js"
 		if (strpos($sourceFromTag, '/')   !== 0 &&
 		    strpos($sourceFromTag, '//')  !== 0 &&
@@ -594,7 +706,24 @@ class OptimizeCommon
 		}
 
 		// Perhaps the URL starts with / (not //) and site_url() was not used
-		if (strpos($sourceFromTag, '/') === 0 && strpos($sourceFromTag, '//') !== 0 && is_file(Misc::getWpRootDirPath() . $sourceFromTag)) {
+		$altFilePathForRelSource = $isRelPath = false;
+		$parseSiteUrlPath = parse_url(site_url(), PHP_URL_PATH);
+
+		// This is in case we have something like this in the HTML source (hardcoded or generated through a plugin)
+		// <link href="/blog/wp-content/plugins/custom-plugin-slug/script.js" rel="preload" as="script" type="text/javascript">
+		// and the site_url() is equal with https://www.mysite.com/blog
+		if ($parseSiteUrlPath !== '/' && strlen($parseSiteUrlPath) > 1 && strpos($sourceFromTag, $parseSiteUrlPath) !== false) {
+			$relPathFromRootDir = str_replace($parseSiteUrlPath, '', $sourceFromTag);
+			$altFilePathForRelSource = str_replace('//', '/', Misc::getWpRootDirPath() . $relPathFromRootDir);
+		} elseif (strpos($sourceFromTag, '/') === 0 && strpos($sourceFromTag, '//') !== 0) {
+			$altFilePathForRelSource = str_replace('//', '/', Misc::getWpRootDirPath() . $sourceFromTag);
+		}
+
+		if ($altFilePathForRelSource && (strpos($altFilePathForRelSource, '.css?') !== false || strpos($altFilePathForRelSource, '.js?') !== false)) {
+			list($altFilePathForRelSource) = explode('?', $altFilePathForRelSource);
+		}
+
+		if ( $altFilePathForRelSource && (is_file(Misc::getWpRootDirPath() . $sourceFromTag) || is_file($altFilePathForRelSource)) ) {
 			$isRelPath = true;
 		}
 
@@ -837,7 +966,7 @@ class OptimizeCommon
 			return array();
 		}
 
-		$optionValue = FileSystem::file_get_contents($assetsFile);
+		$optionValue = FileSystem::fileGetContents($assetsFile);
 
 		if ($optionValue) {
 			$optionValueArray = @json_decode($optionValue, ARRAY_A);
@@ -941,7 +1070,7 @@ class OptimizeCommon
 			$assetsValue = $list;
 		}
 
-		FileSystem::file_put_contents($assetsFile, $assetsValue);
+		FileSystem::filePutContents($assetsFile, $assetsValue);
 	}
 
 	/**
@@ -1597,7 +1726,7 @@ SQL;
 			$assetsFile = $dirToFilename . $transient.'.json';
 
 			if (is_file($assetsFile)) {
-				$contents = trim(FileSystem::file_get_contents($assetsFile));
+				$contents = trim(FileSystem::fileGetContents($assetsFile));
 
 				if (! $contents) {
 					// The file is empty or the contents could not be retrieved
@@ -1677,7 +1806,7 @@ SQL;
 
 			if ( isset( $valueDecoded['optimize_uri'] ) && $valueDecoded['optimize_uri'] && (strrchr( $valueDecoded['optimize_uri'], '.' ) === '.'.$assetType) ) {
 				$handleDbStr = str_replace( 'wpacu_' . $assetType . '_optimize_', '', $transient );
-				FileSystem::file_put_contents(
+				FileSystem::filePutContents(
 					$recentItemStorageDir . 'file-handle-' . $assetType . '-'. md5( $handleDbStr ) . '.txt',
 					$valueDecoded['optimize_uri']
 				);
@@ -1699,7 +1828,7 @@ SQL;
 		$mostRecentCachedAssetsInfoList = glob($patternToUse);
 		if ( ! empty($mostRecentCachedAssetsInfoList) ) {
 			foreach ( $mostRecentCachedAssetsInfoList as $fileFullPath ) {
-				$mostRecentCachedAssets[] = trim(FileSystem::file_get_contents($fileFullPath));
+				$mostRecentCachedAssets[] = trim(FileSystem::fileGetContents($fileFullPath));
 			}
 		}
 

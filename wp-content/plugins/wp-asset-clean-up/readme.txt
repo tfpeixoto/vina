@@ -3,8 +3,8 @@ Contributors: gabelivan
 Tags: minify css, minify javascript, defer css javascript, page speed, dequeue, performance
 Donate link: https://www.gabelivan.com/items/wp-asset-cleanup-pro/?utm_source=wp_org_lite&utm_medium=donate
 Requires at least: 4.6
-Tested up to: 6.0.2
-Stable tag: 1.3.8.7
+Tested up to: 6.1
+Stable tag: 1.3.8.8
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -191,6 +191,16 @@ With the recently released "Test Mode" feature, you can safely unload assets on 
 4. Homepage CSS & JS Management (List sorted by location)
 
 == Changelog ==
+= 1.3.8.8 =
+* "CSS/JS Manager": If a handle has inline code associated with it, mention the size (e.g. bytes, KB) of that inlined LINK or SCRIPT (just like it's mentioned for the LINK tags with the "href" attribute and SCRIPT tags with the "src" attribute)
+* Higher accuracy in detecting (for optimization) the LINK tags that are loading CSS/JS files
+* Improvement: If an asset is an unloaded through the CSS/JS manager and a preload (via LINK tag) was already set through another plugin (e.g. "Pre* Party Resource Hints") or within the theme, for instance in functions.php, make sure to strip the preloading as it's useless if the actual asset is not loaded in the first place
+* Improvement: In case a WordPress installation has a subdirectory (e.g. www.mysite.com/blog), make sure any assets that have relative URIs (e.g. /blog/wp-content/style.css) are all optimized properly even if they were manually added from a 3rd party plugin or through the theme (e.g. within functions.php)
+* If "SCRIPT_DEBUG" is set to "true", load the non-minified versions of the plugin's assets / read more: https://wordpress.org/support/article/debugging-in-wordpress/#script_debug
+* Fix: Make sure none of the plugin's assets are included within any combined CSS/JS files (if the options are enabled in "Settings")
+* Fix: Make sure to offer fallback to "wp_json_file_decode" in case the WordPress version is below 5.9.0 (as compatibility with older WP versions is promised)
+* Added "wpacu_go_pro_affiliate_link" filter for altering the "Go Pro" link (e.g. for adding an extra query string with a specific reference)
+
 = 1.3.8.7 =
 * By default, the front-end optimization is not triggered for URIs with query strings (as they are usually not cacheable); Make more exceptions and trigger the optimization when there are common query strings (the page is cacheable) in the URI such as the ones starting with "utm_", "mtm_", "fb_", etc.
 * Higher accuracy in detecting WordPress core files (some of the undetected WP core files used to be shown in the "External 3rd Party" area)

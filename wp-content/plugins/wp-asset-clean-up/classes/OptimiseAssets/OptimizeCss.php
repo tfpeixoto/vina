@@ -334,7 +334,7 @@ class OptimizeCss
 			 */
 			$pathToAssetDir = OptimizeCommon::getPathToAssetDir($src);
 
-			$cssContent = FileSystem::file_get_contents($localAssetPath, 'combine_css_imports');
+			$cssContent = FileSystem::fileGetContents($localAssetPath, 'combine_css_imports');
 
 			$sourceBeforeOptimization = str_replace(Misc::getWpRootDirPath(), '/', $localAssetPath);
 		}
@@ -431,7 +431,7 @@ class OptimizeCss
 			$cssContent = '/*!' . $sourceBeforeOptimization . '*/' . $cssContent;
 		}
 
-		$saveFile = FileSystem::file_put_contents($newLocalPath, $cssContent);
+		$saveFile = FileSystem::filePutContents($newLocalPath, $cssContent);
 
 		if (! $saveFile && ! $cssContent) {
 			// Fallback to the original CSS if the optimized version can't be created or updated
@@ -476,6 +476,8 @@ class OptimizeCss
 			$htmlSource = self::ignoreDependencyRuleAndKeepChildrenLoaded($htmlSource);
 			/* [wpacu_timing] */ Misc::scriptExecTimer($wpacuTimingName, 'end'); /* [/wpacu_timing] */
 		}
+
+		$htmlSource = self::stripAnyReferencesForUnloadedStyles($htmlSource);
 
 		if (self::isWorthCheckingForOptimization()) {
 			/* [wpacu_timing] */ $wpacuTimingName = 'alter_html_source_original_to_optimized_css'; Misc::scriptExecTimer($wpacuTimingName); /* [/wpacu_timing] */
@@ -614,7 +616,7 @@ class OptimizeCss
 			// Avoid Background URLs starting with "#", "data", "http" or "https" as they do not need to have a path updated
 			preg_match_all('/url\((?![\'"]?(?:#|data|http|https):)[\'"]?([^\'")]*)[\'"]?\)/i', $cssContent, $matches);
 
-			// If it start with forward slash (/), it doesn't need fix, just skip it
+			// If it starts with forward slash (/), it doesn't need fix, just skip it
 			// Also skip ../ types as they were already processed
 			$toSkipList = array("url('/", 'url("/', 'url(/');
 
@@ -669,13 +671,31 @@ class OptimizeCss
 	 */
 	public static function updateHtmlSourceOriginalToOptimizedCss($htmlSource)
 	{
+		$parseSiteUrlPath = parse_url(site_url(), PHP_URL_PATH);
+		$siteUrlNoProtocol = str_replace(array('http://', 'https://'), '//', site_url());
+
 		$cssOptimizeList = ObjectCache::wpacu_cache_get('wpacu_css_optimize_list') ?: array();
+		$allEnqueuedCleanSources = ObjectCache::wpacu_cache_get('wpacu_css_enqueued_hrefs') ?: array();
 
-		if (empty($cssOptimizeList)) {
-			return $htmlSource;
+		$allEnqueuedCleanSourcesIncludingTheirRelPaths = array();
+
+		foreach ($allEnqueuedCleanSources as $allEnqueuedCleanSource) {
+			$allEnqueuedCleanSourcesIncludingTheirRelPaths[] = $allEnqueuedCleanSource;
+
+			if (strpos($allEnqueuedCleanSource, 'http://') === 0 || strpos($allEnqueuedCleanSource, 'https://') === 0) {
+				$allEnqueuedCleanSourcesIncludingTheirRelPaths[] = str_replace(array('http://', 'https://'), '//', $allEnqueuedCleanSource);
+
+				// e.g. www.mysite.com/blog/
+				if ($parseSiteUrlPath !== '/' && strlen($parseSiteUrlPath) > 1) {
+					$allEnqueuedCleanSourcesIncludingTheirRelPaths[] = $parseSiteUrlPath . str_replace(site_url(), '', $allEnqueuedCleanSource);
+				}
+
+				// e.g. www.mysite.com/
+				if ($parseSiteUrlPath === '/' || ! $parseSiteUrlPath) {
+					$allEnqueuedCleanSourcesIncludingTheirRelPaths[] = str_replace(site_url(), '', $allEnqueuedCleanSource);
+				}
+			}
 		}
-
-		$allEnqueuedCleanLinkHrefs = ObjectCache::wpacu_cache_get('wpacu_css_enqueued_hrefs') ?: array();
 
 		$cdnUrls = OptimizeCommon::getAnyCdnUrls();
 		$cdnUrlForCss = isset($cdnUrls['css']) ? $cdnUrls['css'] : false;
@@ -687,7 +707,7 @@ class OptimizeCss
 			return $htmlSource;
 		}
 
-		$linkTagsToUpdate = array();
+		$cssOptimizeListHardcoded = $linkTagsToUpdate = array();
 
 		foreach ($matchesSourcesFromTags as $matches) {
 			$linkSourceTag = $matches[0];
@@ -713,7 +733,9 @@ class OptimizeCss
 			$cleanLinkHrefFromTag = $cleanLinkHrefFromTagArray['source'];
 			$afterQuestionMark = $cleanLinkHrefFromTagArray['after_question_mark'];
 
-			if (! in_array($cleanLinkHrefFromTag, $allEnqueuedCleanLinkHrefs)) {
+			$isHardcodedDetected = false;
+
+			if (! in_array($cleanLinkHrefFromTag, $allEnqueuedCleanSourcesIncludingTheirRelPaths)) {
 				// Not in the final enqueued list? Most likely hardcoded (not added via wp_enqueue_scripts())
 				// Emulate the object value (as the enqueued styles)
 				$generatedHandle = md5($cleanLinkHrefFromTag);
@@ -728,16 +750,33 @@ class OptimizeCss
 				ObjectCache::wpacu_cache_set('wpacu_maybe_optimize_it_css_'.$generatedHandle, $optimizeValues);
 
 				if (! empty($optimizeValues)) {
-					$cssOptimizeList[] = $optimizeValues;
+					$isHardcodedDetected = true;
+					$cssOptimizeListHardcoded[] = $optimizeValues;
 				}
 			}
 
-			foreach ($cssOptimizeList as $cssItemIndex => $listValues) {
+			if ( ! $isHardcodedDetected ) {
+				$listToParse = $cssOptimizeList;
+			} else {
+				$listToParse = $cssOptimizeListHardcoded;
+			}
+
+			if (empty($listToParse)) {
+				continue;
+			}
+
+			foreach ($listToParse as $listValues) {
 				// Index 0: Source URL (relative)
 				// Index 1: New Optimized URL (relative)
 				// Index 2: Source URL (as it is)
 
-				// The contents of the CSS file has been changed and thus, we will replace the source path from LINK with the cached (e.g. minified) one
+				// if the relative path from the WP root does not match the value of the source from the tag, do not continue
+				// e.g. '/wp-content/plugins/my-plugin/script.js' has to be inside '<script src="/wp-content/plugins/my-plugin/script.js?ver=1.1"></script>'
+				if (strpos($cleanLinkHrefFromTag, $listValues[0]) === false) {
+					continue;
+				}
+
+				// The contents of the CSS file has been changed and thus, we will replace the source path from the original tag with the cached (e.g. minified) one
 
 				// If the minified files are deleted (e.g. /wp-content/cache/ is cleared)
 				// do not replace the CSS file path to avoid breaking the website
@@ -747,15 +786,24 @@ class OptimizeCss
 					continue;
 				}
 
-				// Make sure the source URL gets updated even if it starts with // (some plugins/theme strip the protocol when enqueuing CSS files)
-				$siteUrlNoProtocol = str_replace(array('http://', 'https://'), '//', site_url());
-
+				// Make sure the source URL gets updated even if it starts with // (some plugins/theme strip the protocol when enqueuing assets)
 				// If the first value fails to be replaced, the next one will be attempted for replacement
 				// the order of the elements in the array is very important
 				$sourceUrlList = array(
 					site_url() . $listValues[0], // with protocol
-					$siteUrlNoProtocol . $listValues[0] // without protocol
+					$siteUrlNoProtocol . $listValues[0], // without protocol
 				);
+
+				if (strpos($listValues[0], $parseSiteUrlPath) === 0 || strpos($cleanLinkHrefFromTag, $parseSiteUrlPath) === 0) {
+					$sourceUrlList[] = $cleanLinkHrefFromTag;
+				}
+
+				if (strpos($cleanLinkHrefFromTag, $parseSiteUrlPath) === 0 && strpos($cleanLinkHrefFromTag, $listValues[0]) !== false) {
+					$sourceUrlList[] = str_replace('//', '/', $parseSiteUrlPath.'/'.$listValues[0]);
+				}
+				elseif ( $cleanLinkHrefFromTag === $listValues[0] ) {
+					$sourceUrlList[] = $listValues[0];
+				}
 
 				if ($cdnUrlForCss) {
 					// Does it have a CDN?
@@ -770,6 +818,11 @@ class OptimizeCss
 					    stripos($listValues[2], 'http://') !== 0 &&
 					    stripos($listValues[2], 'https://') !== 0) ) {
 					$sourceUrlList[] = $listValues[2];
+
+					}
+
+				if ( $cleanLinkHrefFromTag === $listValues[0] ) {
+					$sourceUrlList[] = $cleanLinkHrefFromTag;
 				}
 
 				// If no CDN is set, it will return site_url() as a prefix
@@ -792,7 +845,6 @@ class OptimizeCss
 						$linkTagsToUpdate[$linkSourceTag] = $newLinkSourceTag;
 						}
 
-					unset($cssOptimizeList[$cssItemIndex]); // item from the array is not needed anymore
 					break; // there was a match, stop here
 				}
 			}
@@ -810,7 +862,17 @@ class OptimizeCss
 	 */
 	public static function updateOriginalToOptimizedTag($linkSourceTag, $sourceUrlList, $optimizeUrl)
 	{
-		$newLinkSourceTag = str_replace($sourceUrlList, $optimizeUrl, $linkSourceTag);
+		if (is_array($sourceUrlList) && ! empty($sourceUrlList)) {
+			foreach ($sourceUrlList as $sourceUrl) {
+				$newLinkSourceTag = str_replace($sourceUrl, $optimizeUrl, $linkSourceTag);
+
+				if ($newLinkSourceTag !== $linkSourceTag) {
+					break;
+				}
+			}
+		} else {
+			$newLinkSourceTag = str_replace( $sourceUrlList, $optimizeUrl, $linkSourceTag );
+		}
 
 		// Needed in case it's added to the Combine CSS exceptions list
 		if (CombineCss::proceedWithCssCombine()) {
@@ -840,9 +902,7 @@ class OptimizeCss
 		$newLinkSourceTag = str_replace('.css&#038;ver='.$wp_version, '.css', $newLinkSourceTag);
 		$newLinkSourceTag = str_replace('.css&#038;ver=', '.css', $newLinkSourceTag);
 
-		$newLinkSourceTag = preg_replace('!\s+!', ' ', $newLinkSourceTag); // replace multiple spaces with only one space
-
-		return $newLinkSourceTag;
+		return preg_replace('!\s+!', ' ', $newLinkSourceTag); // replace multiple spaces with only one space
 	}
 
 	/**
@@ -959,7 +1019,7 @@ class OptimizeCss
 				$appendBeforeAnyRelPath = $cdnUrlForCss ? OptimizeCommon::cdnToUrlFormat($cdnUrlForCss, 'raw') : '';
 
 				$cssContent = self::maybeFixCssContent(
-					FileSystem::file_get_contents($localAssetPath, 'combine_css_imports'), // CSS content
+					FileSystem::fileGetContents($localAssetPath, 'combine_css_imports'), // CSS content
 					$appendBeforeAnyRelPath . OptimizeCommon::getPathToAssetDir($linkHrefOriginal) . '/'
 				);
 
@@ -1063,7 +1123,7 @@ class OptimizeCss
 					@unlink( $pathToInlineCssOptimizedItem );
 				} else {
 					// Not expired / Return its content from the cache in a faster way
-					$inlineCssStorageItemJsonContent = trim( FileSystem::file_get_contents( $pathToInlineCssOptimizedItem ) );
+					$inlineCssStorageItemJsonContent = trim( FileSystem::fileGetContents( $pathToInlineCssOptimizedItem ) );
 
 					if ( $inlineCssStorageItemJsonContent !== '' ) {
 						return $inlineCssStorageItemJsonContent;
@@ -1091,7 +1151,7 @@ class OptimizeCss
 
 		if ($useCacheForInlineStyle && isset($pathToInlineCssOptimizedItem)) {
 			// Store the optimized content to the cached CSS file which would be read quicker
-			FileSystem::file_put_contents( $pathToInlineCssOptimizedItem, $cssContent );
+			FileSystem::filePutContents( $pathToInlineCssOptimizedItem, $cssContent );
 		}
 
 		return $cssContent;
@@ -1132,6 +1192,34 @@ class OptimizeCss
 		}
 
 		return $content;
+	}
+
+	/**
+	 * e.g. if a style is unloaded, strip any LINK tag that preloads that style (e.g. added by other plugins)
+	 *
+	 * @param $htmlSource
+	 *
+	 * @return array|mixed|string|string[]
+	 */
+	public static function stripAnyReferencesForUnloadedStyles($htmlSource)
+	{
+		// Gather all HREFs of the unloaded styles (if any)
+		$unloadedStyleRelHrefs = array();
+
+		if ( isset( Main::instance()->allUnloadedAssets['styles'] ) && ! empty( Main::instance()->allUnloadedAssets['styles'] ) ) {
+			foreach ( array_unique( Main::instance()->allUnloadedAssets['styles'] ) as $styleHandle ) {
+				if ( ! (isset(Main::instance()->wpAllStyles['registered'][ $styleHandle ]->src) && Main::instance()->wpAllStyles['registered'][ $styleHandle ]->src) ) {
+					continue; // does not have a "src" (e.g. inline CSS)
+				}
+				$unloadedStyleRelHrefs[] = OptimizeCommon::getSourceRelPath( Main::instance()->wpAllStyles['registered'][ $styleHandle ]->src );
+			}
+		}
+
+		if ( ! empty($unloadedStyleRelHrefs) ) {
+			$htmlSource = OptimizeCommon::matchAndReplaceLinkTags($htmlSource, array('as' => 'style', 'unloaded_assets_rel_sources' => $unloadedStyleRelHrefs));
+		}
+
+		return $htmlSource;
 	}
 
 	/**

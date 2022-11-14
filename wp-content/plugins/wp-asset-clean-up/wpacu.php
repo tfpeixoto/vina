@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Asset CleanUp: Page Speed Booster
  * Plugin URI: https://wordpress.org/plugins/wp-asset-clean-up/
- * Version: 1.3.8.7
+ * Version: 1.3.8.8
  * Requires at least: 4.5
  * Requires PHP: 5.6
  * Description: Unload Chosen Scripts & Styles from Posts/Pages to reduce HTTP Requests, Combine/Minify CSS/JS files
@@ -29,7 +29,7 @@ if ( (defined('WPACU_PRO_NO_LITE_NEEDED') && WPACU_PRO_NO_LITE_NEEDED !== false 
 
 // Is the Pro version triggered before the Lite one and are both plugins active?
 if (! defined('WPACU_PLUGIN_VERSION')) {
-	define('WPACU_PLUGIN_VERSION', '1.3.8.7');
+	define('WPACU_PLUGIN_VERSION', '1.3.8.8');
 }
 
 // Exit if accessed directly
@@ -39,6 +39,10 @@ if (! defined('ABSPATH')) {
 
 if (! defined('WPACU_PLUGIN_ID')) {
 	define( 'WPACU_PLUGIN_ID', 'wpassetcleanup' ); // unique prefix (same plugin ID name for 'lite' and 'pro')
+}
+
+if (! defined('WPACU_PLUGIN_SLUG')) {
+	define( 'WPACU_PLUGIN_SLUG', 'wp-asset-clean-up' ); // useful to detect which functions to trigger (e.g. JS files)
 }
 
 if ( ! defined('WPACU_PLUGIN_TITLE') ) {
@@ -96,7 +100,7 @@ define('WPACU_PLUGIN_CLASSES_PATH', WPACU_PLUGIN_DIR.'/classes/');
 define('WPACU_PLUGIN_URL',          plugins_url('', WPACU_PLUGIN_FILE));
 
 // Upgrade to Pro Sales Page
-define('WPACU_PLUGIN_GO_PRO_URL',   'https://www.gabelivan.com/items/wp-asset-cleanup-pro/');
+define('WPACU_PLUGIN_GO_PRO_URL',   'https://www.gabelivan.com/items/wp-asset-cleanup-pro/'); // no query strings to be added
 
 // Global Values
 define('WPACU_LOAD_ASSETS_REQ_KEY',  WPACU_PLUGIN_ID . '_load');

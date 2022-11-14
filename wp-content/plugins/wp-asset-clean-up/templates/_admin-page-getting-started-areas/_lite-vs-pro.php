@@ -156,9 +156,9 @@ $svgNa = '<img draggable="false" class="wpacu-emoji" alt="" src="'.WPACU_PLUGIN_
 		<tr>
 			<td colspan="3" style="text-align: center; padding: 10px;">
 				<h3 style="margin: 0;"><?php echo wp_kses($svgTick, array('svg' => array('xmlns' => array(), 'viewbox' => array()), 'path' => array('fill' => array(), 'd' => array()))); ?>&nbsp; <em>30 Day Money Back Guarantee</em></h3>
-				<p style="margin-top: 8px;">If you’re not satisfied with your purchase for any reason, you can request a refund within 30 days and you will get the payment refunded.</p>
+				<p style="margin-top: 8px;">If you’re not satisfied with your purchase for any reason, you can request a refund within 30 days, and you will get the payment refunded.</p>
 				<hr />
-				<a class="button button-primary button-hero" href="<?php echo WPACU_PLUGIN_GO_PRO_URL; ?>?utm_source=plugin_getting_started&utm_medium=lite_vs_pro">
+				<a class="button button-primary button-hero" href="<?php echo apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL . '?utm_source=plugin_getting_started&utm_medium=lite_vs_pro'); ?>">
 					<span class="dashicons dashicons-star-filled" style="line-height: 50px;"></span> &nbsp;<?php _e('Upgrade to Pro to unlock all benefits', 'wp-asset-clean-up'); ?></a>
 				&nbsp;
 				<a class="button button-default button-hero" href="https://www.gabelivan.com/contact/">
