@@ -73,7 +73,7 @@ class FileSystem
 	 * @param $localPathToFile
 	 * @param $contents
 	 *
-	 * @return string
+	 * @return bool
 	 */
 	public static function filePutContents($localPathToFile, $contents)
 	{

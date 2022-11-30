@@ -16,10 +16,11 @@ class MinifyCss
 	/**
 	 * @param $cssContent
 	 * @param bool $forInlineStyle
-	 *
+		 *
 	 * @return string
 	 */
-	public static function applyMinification($cssContent, $forInlineStyle = false)
+	public static function applyMinification($cssContent, $forInlineStyle = false
+		)
 	{
 		if (class_exists('\MatthiasMullie\Minify\CSS')) {
 				$sha1OriginalContent = sha1($cssContent);
@@ -150,12 +151,12 @@ class MinifyCss
 			'#/wp-includes/css/(.*?).min.css#',
 
 			// Files within /wp-content/uploads/ or /wp-content/cache/
-			// Could belong to plugins such as "Elementor, "Oxygen" etc.
+			// Could belong to plugins such as "Elementor", "Oxygen" etc.
 			'#/wp-content/uploads/elementor/(.*?).css#',
 			'#/wp-content/uploads/oxygen/css/(.*?)-(.*?).css#',
 			'#/wp-content/cache/(.*?).css#',
 
-			// Already minified and it also has a random name making the cache folder make bigger
+			// Already minified, and it also has a random name making the cache folder make bigger
 			'#/wp-content/bs-booster-cache/#',
 
 			);

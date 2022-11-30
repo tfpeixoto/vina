@@ -235,7 +235,7 @@ class MetaBoxes
 				$metaPageOptionsJson = get_post_meta( $postId, '_' . WPACU_PLUGIN_ID . '_page_options', true );
 				return @json_decode( $metaPageOptionsJson, ARRAY_A );
 			}
-		} elseif ($type === 'front_page') { // e.g. latest posts, not a chosen page ID (that's when $type as 'post' is used)
+		} elseif ($type === 'front_page') { // e.g. the latest posts, not a chosen page ID (that's when $type as 'post' is used)
 			$globalPageOptions = get_option(WPACU_PLUGIN_ID . '_global_data');
 
 			if ($globalPageOptions) {

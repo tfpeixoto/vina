@@ -680,17 +680,12 @@ class OptimizeCommon
 
 	/**
 	 * @param $sourceTag
-	 * @param string $forAttr
 	 *
 	 * @return array|bool
 	 */
-	public static function getLocalCleanSourceFromTag($sourceTag, $forAttr)
+	public static function getLocalCleanSourceFromTag($sourceTag)
 	{
-		preg_match_all('#'.$forAttr.'=(["\'])' . '(.*)' . '(["\'])#Usmi', $sourceTag, $outputMatchesSource);
-
-		$sourceFromTag = (isset($outputMatchesSource[2][0]) && $outputMatchesSource[2][0])
-			? trim($outputMatchesSource[2][0], '"\'')
-			: false;
+		$sourceFromTag = Misc::getValueFromTag($sourceTag);
 
 		if (! $sourceFromTag) {
 			return false;
@@ -1187,7 +1182,7 @@ class OptimizeCommon
 				$storageDir.'/item/',
 				$assetCleanUpCacheDir.'css/',
 				$assetCleanUpCacheDir.'js/',
-				// Possible common directories with less files
+				// Possible common directories with fewer files
 				$relPathToPossibleDir.'/category/',
 				$relPathToPossibleDir.'/author/',
 				$relPathToPossibleDir.'/tag/'
@@ -1258,7 +1253,7 @@ class OptimizeCommon
 			// Clear all JSON files separately from the storage directory as it will be rebuilt
 			self::rmNonEmptyJsonStorageDir($storageDir);
 
-			// Now go through the JSONs and collect the latest assets so they would be kept
+			// Now go through the JSONs and collect the latest assets, so they would be kept
 			// Finally, collect the rest of $allAssetsToKeep from the database transients (if any)
 			// Do not check if they are expired or not as their assets could still be referenced
 			// until those pages will be accessed in a non-cached way
@@ -1555,7 +1550,7 @@ SQL;
 		$parseContentUrl = parse_url($wpContentUrl);
 		$parseBaseUrl = parse_url(site_url());
 
-		// Perhaps WPML plugin is used and the content URL is different then the current domain which might be for a different language
+		// Perhaps WPML plugin is used and the content URL is different from the current domain which might be for a different language
 		if ( ($parseContentUrl['host'] !== $parseBaseUrl['host']) &&
 		     (isset($_SERVER['HTTP_HOST'], $parseContentUrl['path']) && $_SERVER['HTTP_HOST'] !== $parseContentUrl['host']) &&
 			 is_dir(rtrim(ABSPATH, '/') . $parseContentUrl['path']) ) {
@@ -1864,7 +1859,7 @@ SQL;
 	 * @param $cdnUrl
 	 * @param $getType
 	 *
-	 * @return string|void
+	 * @return string
 	 */
 	public static function cdnToUrlFormat($cdnUrl, $getType)
 	{

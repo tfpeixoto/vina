@@ -3,8 +3,8 @@ Contributors: gabelivan
 Tags: minify css, minify javascript, defer css javascript, page speed, dequeue, performance
 Donate link: https://www.gabelivan.com/items/wp-asset-cleanup-pro/?utm_source=wp_org_lite&utm_medium=donate
 Requires at least: 4.6
-Tested up to: 6.1
-Stable tag: 1.3.8.8
+Tested up to: 6.1.1
+Stable tag: 1.3.8.9
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -191,6 +191,12 @@ With the recently released "Test Mode" feature, you can safely unload assets on 
 4. Homepage CSS & JS Management (List sorted by location)
 
 == Changelog ==
+= 1.3.8.9 =
+* Improvement: Better detection of the tags when the source of a tag (e.g. "src" or "href") is not wrapped around quotes or even has spaces added after or before the equal sign / e.g. <script src=/path/to/file.js></script> OR <link rel=stylesheet href = /path/to/file.css>
+* Whenever XML-RPC is completely disabled in 'Settings' -- 'Disable XML-RPC', make sure the following option is automatically turned ON: 'Settings" --- 'HTML Source CleanUp' -- 'Remove "Really Simple Discovery (RSD)" link tag?'
+* Fix: The size of an asset loaded locally was not shown when the path to the file was relative and starting with the URI of the WordPress site URL / Example: The WordPress site URL was "https://yoursite.com/blog" and the tag was "<script src='/blog/wp-content/path/to/file.js'></script>"
+* Fix: Exclude from optimisation JS files that contain "/*@cc_on" and "@*/" as they are meant to be loaded by Internet Explorer and not stripped if they only contain commented code
+
 = 1.3.8.8 =
 * "CSS/JS Manager": If a handle has inline code associated with it, mention the size (e.g. bytes, KB) of that inlined LINK or SCRIPT (just like it's mentioned for the LINK tags with the "href" attribute and SCRIPT tags with the "src" attribute)
 * Higher accuracy in detecting (for optimization) the LINK tags that are loading CSS/JS files

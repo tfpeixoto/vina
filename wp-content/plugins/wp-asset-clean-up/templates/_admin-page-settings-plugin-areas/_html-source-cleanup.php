@@ -20,14 +20,24 @@ $styleTabContent = ($selectedTabArea === $tabIdArea) ? 'style="display: table-ce
                 <label for="wpacu_remove_rsd_link">Remove "Really Simple Discovery (RSD)" link tag?</label>
             </th>
             <td>
-                <label class="wpacu_switch">
+	            <?php
+	            $opacityStyle = '';
+
+                if ($data['disable_xmlrpc'] === 'disable_all') {
+                    $opacityStyle = 'opacity: 0.4;';
+                }
+                ?>
+                <label class="wpacu_switch" style="<?php echo $opacityStyle; ?>">
                     <input id="wpacu_remove_rsd_link" type="checkbox"
 						<?php echo (($data['remove_rsd_link'] == 1) ? 'checked="checked"' : ''); ?>
                            name="<?php echo WPACU_PLUGIN_ID . '_settings'; ?>[remove_rsd_link]"
                            value="1" /> <span class="wpacu_slider wpacu_round"></span> </label>
                 &nbsp;
-                <code>&lt;link rel=&quot;EditURI&quot; type=&quot;application/rsd xml&quot; title=&quot;RSD&quot; href=&quot;http://yourwebsite.com/xmlrpc.php?rsd&quot; /&gt;</code>
-                <p style="margin-top: 10px;">XML-RPC clients use this discover method. If you do not know what this is and don't use service integrations such as <a href="http://www.flickr.com/services/api/request.xmlrpc.html">Flickr</a> on your WordPress website, you can remove it.</p>
+                <code style="<?php echo $opacityStyle; ?>">&lt;link rel=&quot;EditURI&quot; type=&quot;application/rsd xml&quot; title=&quot;RSD&quot; href=&quot;http://yourwebsite.com/xmlrpc.php?rsd&quot; /&gt;</code>
+                <p style="margin-top: 10px; <?php echo $opacityStyle; ?>">XML-RPC clients use this discovery method. If you do not know what this is and don't use service integrations such as <a href="http://www.flickr.com/services/api/request.xmlrpc.html">Flickr</a> on your WordPress website, you can remove it.</p>
+                <?php if ($data['disable_xmlrpc'] === 'disable_all') { ?>
+                    <p style="margin-top: 10px; color: #cc0000;"><strong>Note:</strong> As you already chosen to completely disable "<a data-wpacu-vertical-link-target="wpacu-setting-disable-xml-rpc" href="#wpacu-setting-disable-xml-rpc">Disable XML-RPC</a>", the "Really Simple Discovery (RSD)" link tag is already removed.</p>
+                <?php } ?>
             </td>
         </tr>
 

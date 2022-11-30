@@ -139,7 +139,7 @@ class OptimizeCss
 						continue;
 					}
 
-					$cleanLinkHrefFromTagArray = OptimizeCommon::getLocalCleanSourceFromTag( $linkSourceTag, 'href' );
+					$cleanLinkHrefFromTagArray = OptimizeCommon::getLocalCleanSourceFromTag( $linkSourceTag );
 
 					if ( isset( $cleanLinkHrefFromTagArray['source'] ) && $cleanLinkHrefFromTagArray['source'] ) {
 						$allEnqueuedCleanLinkHrefs[] = $cleanLinkHrefFromTagArray['source'];
@@ -539,7 +539,7 @@ class OptimizeCss
 		$htmlSource = FontsGoogle::alterHtmlSource($htmlSource);
 		/* [wpacu_timing] */ Misc::scriptExecTimer($wpacuTimingName, 'end'); /* [/wpacu_timing] */
 
-		// NOSCRIPT fallback: Applies for Google Fonts (async) (Lite and Pro) /  Preloads (Async in Pro version) / Critical CSS (as as LINK "stylesheet" tags will be async preloaded)
+		// NOSCRIPT fallback: Applies for Google Fonts (async) (Lite and Pro) /  Preloads (Async in Pro version) / Critical CSS (as LINK "stylesheet" tags will be async preloaded)
 		/* [wpacu_timing] */ $wpacuTimingName = 'alter_html_source_for_add_async_preloads_noscript'; Misc::scriptExecTimer($wpacuTimingName); /* [/wpacu_timing] */
 		$htmlSource = apply_filters('wpacu_add_noscript_certain_link_tags', $htmlSource);
 		/* [wpacu_timing] */ Misc::scriptExecTimer($wpacuTimingName, 'end'); /* [/wpacu_timing] */
@@ -672,6 +672,11 @@ class OptimizeCss
 	public static function updateHtmlSourceOriginalToOptimizedCss($htmlSource)
 	{
 		$parseSiteUrlPath = parse_url(site_url(), PHP_URL_PATH);
+
+		if ($parseSiteUrlPath === null) {
+			$parseSiteUrlPath = '';
+		}
+
 		$siteUrlNoProtocol = str_replace(array('http://', 'https://'), '//', site_url());
 
 		$cssOptimizeList = ObjectCache::wpacu_cache_get('wpacu_css_optimize_list') ?: array();
@@ -722,7 +727,7 @@ class OptimizeCss
 				continue;
 			}
 
-			$cleanLinkHrefFromTagArray = OptimizeCommon::getLocalCleanSourceFromTag($linkSourceTag, 'href');
+			$cleanLinkHrefFromTagArray = OptimizeCommon::getLocalCleanSourceFromTag($linkSourceTag);
 
 			// Skip external links, no point in carrying on
 			if (! $cleanLinkHrefFromTagArray || ! is_array($cleanLinkHrefFromTagArray)) {
@@ -794,11 +799,11 @@ class OptimizeCss
 					$siteUrlNoProtocol . $listValues[0], // without protocol
 				);
 
-				if (strpos($listValues[0], $parseSiteUrlPath) === 0 || strpos($cleanLinkHrefFromTag, $parseSiteUrlPath) === 0) {
+				if ($parseSiteUrlPath && (strpos($listValues[0], $parseSiteUrlPath) === 0 || strpos($cleanLinkHrefFromTag, $parseSiteUrlPath) === 0)) {
 					$sourceUrlList[] = $cleanLinkHrefFromTag;
 				}
 
-				if (strpos($cleanLinkHrefFromTag, $parseSiteUrlPath) === 0 && strpos($cleanLinkHrefFromTag, $listValues[0]) !== false) {
+				if ($parseSiteUrlPath && (strpos($cleanLinkHrefFromTag, $parseSiteUrlPath) === 0 && strpos($cleanLinkHrefFromTag, $listValues[0]) !== false)) {
 					$sourceUrlList[] = str_replace('//', '/', $parseSiteUrlPath.'/'.$listValues[0]);
 				}
 				elseif ( $cleanLinkHrefFromTag === $listValues[0] ) {
@@ -880,25 +885,26 @@ class OptimizeCss
 			$newLinkSourceTag = str_ireplace('<link ', '<link data-wpacu-link-rel-href-before="'.$sourceUrlRel.'" ', $newLinkSourceTag);
 		}
 
-		preg_match_all( '#\shref=(["\'])(.*?)(["\'])#', $newLinkSourceTag, $outputMatchesSrc );
+		$hrefValue = Misc::getValueFromTag($newLinkSourceTag);
 
 		// No space from the matching and ? should be there
-		if (isset( $outputMatchesSrc[2][0] ) && ( strpos( $outputMatchesSrc[2][0], ' ' ) === false )) {
-			if ( strpos( $outputMatchesSrc[2][0], '?' ) !== false ) {
+		if ($hrefValue && ( strpos( $hrefValue, ' ' ) === false )) {
+			if ( strpos( $hrefValue, '?' ) !== false ) {
 				// Strip things like ?ver=
-				list( , $toStrip ) = explode( '?', $outputMatchesSrc[2][0] );
+				list( , $toStrip ) = explode( '?', $hrefValue );
 				$toStrip            = '?' . trim( $toStrip );
 				$newLinkSourceTag = str_replace( $toStrip, '', $newLinkSourceTag );
 			}
 
-			if ( strpos( $outputMatchesSrc[2][0], '&#038;ver' ) !== false ) {
+			if ( strpos( $hrefValue, '&#038;ver' ) !== false ) {
 				// Replace any .js&#038;ver with .js
-				$toStrip = strrchr($outputMatchesSrc[2][0], '&#038;ver');
+				$toStrip = strrchr($hrefValue, '&#038;ver');
 				$newLinkSourceTag = str_replace( $toStrip, '', $newLinkSourceTag );
 			}
 		}
 
 		global $wp_version;
+
 		$newLinkSourceTag = str_replace('.css&#038;ver='.$wp_version, '.css', $newLinkSourceTag);
 		$newLinkSourceTag = str_replace('.css&#038;ver=', '.css', $newLinkSourceTag);
 
@@ -939,7 +945,7 @@ class OptimizeCss
 
 		// Skip any LINK tags within conditional comments (e.g. Internet Explorer ones)
 		preg_match_all(
-			'#<link[^>]*rel=([\'"])stylesheet([\'"])[^>]*\shref.*>#Usmi',
+			'#<link[^>]*stylesheet[^>]*>#Umsi',
 			OptimizeCommon::cleanerHtmlSource( $htmlSource, array( 'strip_content_between_conditional_comments', 'for_fetching_link_tags' ) ),
 			$matchesSourcesFromTags,
 			PREG_SET_ORDER
@@ -958,6 +964,10 @@ class OptimizeCss
 
 			foreach ($matchesSourcesFromTags as $matchList) {
 				$matchedTag = $matchList[0];
+
+				if ( stripos( $matchedTag, '<link' ) !== 0 ) {
+					continue;
+				}
 
 				// Do not inline the admin bar SCRIPT file, saving resources as it's shown for the logged-in user only
 				if (strpos($matchedTag, '/wp-includes/css/admin-bar') !== false) {
@@ -993,8 +1003,7 @@ class OptimizeCss
 					continue;
 				}
 
-				preg_match_all('#href=(["\'])' . '(.*)' . '(["\'])#Usmi', $matchedTag, $outputMatchesHref);
-				$linkHrefOriginal = trim($outputMatchesHref[2][0], '"\'');
+				$linkHrefOriginal = Misc::getValueFromTag($matchedTag);
 				$localAssetPath = OptimizeCommon::getLocalAssetPath($linkHrefOriginal, 'css');
 
 				if (! $localAssetPath) {
@@ -1012,8 +1021,8 @@ class OptimizeCss
 				}
 
 				// Is there a media attribute? Make sure to add it to the STYLE tag
-				preg_match_all('#media=(["\'])' . '(.*)' . '(["\'])#Usmi', $matchedTag, $outputMatchesMedia);
-				$mediaAttrValue = isset($outputMatchesMedia[2][0]) ? trim($outputMatchesMedia[2][0], '"\'') : '';
+				$mediaAttrValue = Misc::getValueFromTag($matchedTag, 'media');
+
 				$mediaAttr = ($mediaAttrValue && $mediaAttrValue !== 'all') ? 'media=\''.$mediaAttrValue.'\'' : '';
 
 				$appendBeforeAnyRelPath = $cdnUrlForCss ? OptimizeCommon::cdnToUrlFormat($cdnUrlForCss, 'raw') : '';
@@ -1523,11 +1532,8 @@ class OptimizeCss
 			foreach ($matchesSourcesFromTags as $matchedValues) {
 				$matchedTag = $matchedValues[0];
 
-				preg_match_all('#media=(["\'])' . '(.*)' . '(["\'])#Usmi', $matchedTag, $outputMatchesMedia);
-				$mediaAttrValue = isset($outputMatchesMedia[2][0]) ? trim($outputMatchesMedia[2][0], '"\'') : '';
-
-				preg_match_all('#href=(["\'])' . '(.*)' . '(["\'])#Usmi', $matchedTag, $outputMatchesMedia);
-				$hrefAttrValue = isset($outputMatchesMedia[2][0]) ? trim($outputMatchesMedia[2][0], '"\'') : '';
+				$mediaAttrValue = Misc::getValueFromTag($matchedTag, 'media');
+				$hrefAttrValue  = Misc::getValueFromTag($matchedTag);
 
 				$noScripts .= '<noscript><link rel="stylesheet" href="'.$hrefAttrValue.'" media="'.$mediaAttrValue.'" /></noscript>'."\n";
 			}

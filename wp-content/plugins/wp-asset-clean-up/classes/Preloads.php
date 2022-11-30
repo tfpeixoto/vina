@@ -293,28 +293,11 @@ class Preloads
 			return $htmlSource;
 		}
 
-		// Use the RegEx as it's much faster and very accurate in this situation
-		// If there are issues, fallback to DOMDocument
-		$strContainsFormat = preg_quote('data-wpacu-to-be-preloaded-basic', '/');
-		preg_match_all('#<link[^>]*'.$strContainsFormat.'[^>]*' . '\shref=(\'|"|)(.*)(\\1?\s)' . '.*(>)#Usmi', $htmlSource, $matchesSourcesFromLinkTags, PREG_SET_ORDER);
-
-		$stickToRegEx = true; // default
-
-		foreach ($matchesSourcesFromLinkTags as $linkTagArray) {
-			$linkTag = $linkTagArray[0];
-
-			preg_match_all('#id=([\'"])(.*?)(\\1)#', $linkTag, $matchId);
-			$matchedCssId = isset($matchId[2][0]) ? $matchId[2][0] : '';
-			$matchedCssHandle = substr($matchedCssId, 0, -4);
-
-			if (! in_array($matchedCssHandle, $preloadedHandles)) {
-				$stickToRegEx = false;
-				break;
-			}
-		}
+        $allHrefs = array();
+		$stickToRegEx = false; // default
 
 		// Something might not be right with the RegEx; Fallback to DOMDocument, more accurate, but slower
-		if ( ! $stickToRegEx && Misc::isDOMDocumentOn() ) {
+		if ( Misc::isDOMDocumentOn() ) {
 			$documentForCSS = Misc::initDOMDocument();
 
 			$htmlSourceAlt = preg_replace( '@<(noscript|style|script)[^>]*?>.*?</\\1>@si', '', $htmlSource );
@@ -322,12 +305,17 @@ class Preloads
 
             $linkTags = $documentForCSS->getElementsByTagName( 'link' );
 
-            if ( count($linkTags) > 0 ) {
+			if ( count($linkTags) > 0 ) {
 	            $matchesSourcesFromLinkTags = array(); // reset its value; new fetch method was used
 
 	            foreach ( $linkTags as $tagObject ) {
 		            if ( empty( $tagObject->attributes ) ) {
 			            continue;
+		            }
+
+                    if (strpos($htmlSourceAlt, $tagObject->nodeValue) === false) {
+                        $stickToRegEx = true; // the value is not the same as in the HTML source (e.g. altered by the DOM) / fallback to RegEx
+                        break;
 		            }
 
 		            $linkAttributes = array();
@@ -336,25 +324,38 @@ class Preloads
 			            $linkAttributes[ $attrObj->nodeName ] = trim( $attrObj->nodeValue );
 		            }
 
-		            if ( isset( $linkAttributes['data-wpacu-to-be-preloaded-basic'], $linkAttributes['href'] ) ) {
-			            $matchesSourcesFromLinkTags[][2] = $linkAttributes['href'];
-		            }
+		            if ( ! isset( $linkAttributes['data-wpacu-to-be-preloaded-basic'], $linkAttributes['href'] ) ) {
+                        continue;
+                    }
+
+                    $allHrefs[] = $linkAttributes['href'];
 	            }
             }
 
 			libxml_clear_errors();
         }
 
-		if ( ! empty($matchesSourcesFromLinkTags) ) {
-	        foreach ( $matchesSourcesFromLinkTags as $linkTagArray ) {
-		        $linkHref = isset( $linkTagArray[2] ) ? $linkTagArray[2] : false;
+        if ($stickToRegEx) {
+	        // Use the RegEx as it's much faster and very accurate in this situation
+	        $strContainsFormat = preg_quote('data-wpacu-to-be-preloaded-basic', '/');
+	        preg_match_all('#<link[^>]*'.$strContainsFormat.'[^>]*' . '\shref(\s+|)=(\s+|)(\'|"|)(.*)(\\3)' . '.*(>)#Usmi', $htmlSource, $matchesSourcesFromLinkTags, PREG_SET_ORDER);
 
-		        if ( ! $linkHref ) {
-			        continue;
+	        if ( ! empty($matchesSourcesFromLinkTags) ) {
+		        foreach ( $matchesSourcesFromLinkTags as $linkTagArray ) {
+			        $linkHref = isset( $linkTagArray[0] ) ? Misc::getValueFromTag( $linkTagArray[0] ) : false;
+
+                    if ($linkHref) {
+                        $allHrefs[] = $linkHref;
+                    }
 		        }
+	        }
+        }
 
+		$allHrefs = array_unique($allHrefs);
+
+		if ( ! empty($allHrefs) ) {
+	        foreach ( $allHrefs as $linkHref ) {
 		        $linkPreload = self::linkPreloadCssFormat( $linkHref );
-
 		        $htmlSource = str_replace( self::DEL_STYLES_PRELOADS, $linkPreload . self::DEL_STYLES_PRELOADS, $htmlSource );
 	        }
         }
@@ -393,18 +394,20 @@ class Preloads
 
 		$strContainsFormat = preg_quote('data-wpacu-to-be-preloaded-basic=\'1\'', '/');
 
-		preg_match_all('#<script[^>]*'.$strContainsFormat.'[^>]*' . 'src=([\'"])(.*)([\'"])' . '.*(>)#Usmi', $htmlSource, $matchesSourcesFromScriptTags, PREG_SET_ORDER);
+		preg_match_all('#<script[^>]*'.$strContainsFormat.'[^>]*' . 'src(\s+|)=(\s+|)(\'|"|)(.*)(\\3)' . '.*(>)#Usmi', $htmlSource, $matchesSourcesFromScriptTags, PREG_SET_ORDER);
 
 		if (empty($matchesSourcesFromScriptTags)) {
 			return $htmlSource;
 		}
 
 		foreach ($matchesSourcesFromScriptTags as $scriptTagArray) {
-			$scriptSrc = isset($scriptTagArray[2]) ? $scriptTagArray[2] : false;
+            $scripTag = isset($scriptTagArray[0]) ? $scriptTagArray[0] : false;
 
-			if (! $scriptSrc) {
+			if (! $scripTag) {
 				continue;
 			}
+
+            $scriptSrc = Misc::getValueFromTag($scripTag);
 
 			$linkPreload = '<link rel=\'preload\' as=\'script\' href=\''.esc_attr($scriptSrc).'\' data-wpacu-preload-js=\'1\'>'."\n";
 

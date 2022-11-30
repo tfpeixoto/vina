@@ -210,7 +210,7 @@ class Tools
 		    $return .= strip_tags($browser)."\n";
         }
 
-	    // WordPress configuration.
+	    // WordPress' configuration.
 	    // Get theme info.
 	    $theme_data = wp_get_theme();
 	    $theme      = $theme_data->Name . ' ' . $theme_data->Version;

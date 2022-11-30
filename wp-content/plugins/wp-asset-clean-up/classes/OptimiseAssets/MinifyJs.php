@@ -38,7 +38,7 @@ class MinifyJs
 				$minifiedContent = trim($minifier->minify());
 
 				if (trim($minifiedContent) === trim(trim($jsContent, ';'))) {
-					$minifiedContent = $jsContent; // consider them the same if only the ; at the end was stripped (it doesn't worth the resources that would be used)
+					$minifiedContent = $jsContent; // consider them the same if only the ';' at the end was stripped (it doesn't worth the resources that would be used)
 					$alreadyMinified = true;
 				}
 
@@ -175,8 +175,8 @@ class MinifyJs
 					}
 
 					// Only 'text/javascript' type is allowed for minification
-					preg_match_all('#type=(["\'])' . '(.*)' . '(["\'])#Usmi', $originalTag, $outputMatches);
-					$scriptType = isset($outputMatches[2][0]) ? trim($outputMatches[2][0], '"\'') : 'text/javascript'; // default
+					$scriptType = Misc::getValueFromTag($originalTag, 'type') ?: 'text/javascript'; // default
+
 					if ($scriptType !== 'text/javascript') {
 						continue;
 					}

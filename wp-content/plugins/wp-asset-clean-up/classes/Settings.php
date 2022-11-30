@@ -94,7 +94,7 @@ class Settings
         'combine_loaded_js',
 		'combine_loaded_js_exceptions',
         'combine_loaded_js_for_admin_only',
-        'combine_loaded_js_defer_body', // Applies defer="defer" to the combined file(s) within BODY tag
+        'combine_loaded_js_defer_body', // Applies 'defer="defer"' to the combined file(s) within BODY tag
         'combine_loaded_js_try_catch', // try {} catch (e) {} for each individual file within a combined file
 
 		// Minify each loaded CSS (remaining ones after unloading the useless ones)
@@ -568,7 +568,7 @@ class Settings
         }
 
 		// Oxygen Builder is triggered and some users might want to trigger unload rules there to make the editor faster, especially plugin unload rules
-        // We will prevent minify/combine and other functions that will requires caching any files to avoid any errors
+        // We will prevent minify/combine and other functions that will require caching any files to avoid any errors
 		if (defined('WPACU_ALLOW_ONLY_UNLOAD_RULES') && WPACU_ALLOW_ONLY_UNLOAD_RULES) {
 		    $settings['minify_loaded_css']
                 = $settings['minify_loaded_js']
@@ -600,7 +600,7 @@ class Settings
 		}
 
 		// /?wpacu_manage_front -> "Manage in the Front-end" via query string request
-        // Useful when working for a client and you prefer him to view the pages (while logged-in) without the CSS/JS list at the bottom
+        // Useful when working for a client, and you prefer him to view the pages (while logged-in) without the CSS/JS list at the bottom
 		if (isset($_GET['wpacu_manage_front'])) {
 			$settings['frontend_show'] = true;
 		}
@@ -720,7 +720,7 @@ class Settings
             }
 
 	        // Apply 'Ignore dependency rule and keep the "children" loaded' for "dashicons" handle if Ninja Forms is active
-	        // because "nf-display" handle depends on the Dashicons and it could break the forms' styling
+	        // because "nf-display" handle depends on the Dashicons, and it could break the forms' styling
 	        if ($disableDashiconsForGuests && Misc::isPluginActive('ninja-forms/ninja-forms.php')) {
 		        $mainVarToUse = array();
 		        $mainVarToUse['wpacu_ignore_child']['styles']['dashicons'] = 1;

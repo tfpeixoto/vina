@@ -290,7 +290,7 @@ HTACCESS;
 			@mkdir( $storageDir . OptimizeCommon::$optimizedSingleFilesDir, 0755, true );
 		}
 
-		// Storage directory for the most recent items (these ones are never deleted from the cache)
+		// Storage directory for the most recent items (these are never deleted from the cache)
 		$storageDirRecentItems = WP_CONTENT_DIR . OptimiseAssets\OptimizeCommon::getRelPathPluginCacheDir() . '_storage/_recent_items/';
 
 		if ( ! is_dir($storageDirRecentItems) ) {
@@ -381,7 +381,7 @@ HTACCESS;
 		// Is it an AMP endpoint?
 		if ( ($isAmpInRequestUri && Misc::isPluginActive('accelerated-mobile-pages/accelerated-mobile-pages.php')) // "AMP for WP – Accelerated Mobile Pages"
 		     || ($isAmpInRequestUri && Misc::isPluginActive('amp/amp.php')) // "AMP – WordPress plugin"
-		     || (function_exists('is_wp_amp') && Misc::isPluginActive('wp-amp/wp-amp.php') && is_wp_amp()) // "WP AMP — Accelerated Mobile Pages for WordPress and WooCommerce" (Premium plugin)
+		     || ((function_exists('is_wp_amp') && Misc::isPluginActive('wp-amp/wp-amp.php') && is_wp_amp())) // "WP AMP — Accelerated Mobile Pages for WordPress and WooCommerce" (Premium plugin)
 		) {
 			return true; // do not print anything on an AMP page
 		}

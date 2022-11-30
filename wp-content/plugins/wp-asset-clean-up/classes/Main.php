@@ -3,6 +3,7 @@ namespace WpAssetCleanUp;
 
 use WpAssetCleanUp\OptimiseAssets\CombineJs;
 use WpAssetCleanUp\OptimiseAssets\DynamicLoadedAssets;
+use WpAssetCleanUp\OptimiseAssets\OptimizeCommon;
 
 /**
  * Class Main
@@ -259,7 +260,7 @@ class Main
 			$noRocketInit = true;
 
 			if (strpos($currentTheme, 'uncode') !== false) {
-				$noRocketInit = false; // make exception for the "Uncode" Theme as it doesn't check if get_rocket_option() function exists
+				$noRocketInit = false; // make exception for the "Uncode" Theme as it doesn't check if the get_rocket_option() function exists
 			}
 
 			if ($noRocketInit) {
@@ -882,10 +883,8 @@ SQL;
             // These are LITE rules
 			$list = ( ! empty($list) ) ? $this->filterAssetsUnloadList($list, 'styles','load_exception') : $list;
 
-			// [wpacu_pro]
-            // These are PRO rules or rules added via custom coding
+			// These are PRO rules or rules added via custom coding
             $list = ( ! empty($list) ) ? apply_filters('wpacu_filter_styles_list_load_exception', $list) : $list;
-            // [/wpacu_pro]
 			/*
 			 * [END] Load Exception Check
 			 * */
@@ -1234,7 +1233,7 @@ SQL;
 		            wp_dequeue_script($handle);
 	            }
 
-	            continue;
+				continue;
             }
 
 	        if (isset($ignoreChildParentList['scripts'], $this->wpAllScripts['registered'][$handle]->src) && is_array($ignoreChildParentList['scripts']) && array_key_exists($handle, $ignoreChildParentList['scripts'])) {
@@ -1445,7 +1444,7 @@ SQL;
      *
 	 * @param $postType
 	 *
-	 * @return \array[][]|mixed
+	 * @return \array[][]
 	 */
 	public function getLoadExceptionsPostType($postType)
     {
@@ -2308,7 +2307,7 @@ SQL;
             // EITHER the enqueued or hardcoded list of assets HAS TO BE RETRIEVED
 	        // Print out the 'error' response to make the user aware about it
             if ( ! ($wpacuListE || $wpacuListH) ) {
-                // 'body' is set and it's not an array
+                // 'body' is set, and it's not an array
 	            if ( is_wp_error($wpRemotePost) ) {
 		            $wpRemotePost['response']['message'] = $wpRemotePost->get_error_message();
 	            } elseif ( isset( $wpRemotePost['body']) ) {
@@ -2946,7 +2945,7 @@ SQL;
 			}
 
 			// External file? Use a different approach
-			// Return a HTML code that will be parsed via AJAX through JavaScript
+			// Return an HTML code that will be parsed via AJAX through JavaScript
 			$isExternalFile = (! $isRelInternalPath &&
 			                   (! (isset($obj->wp) && $obj->wp === 1))
 			                   && strpos($src, $siteUrl) !== 0);
@@ -2961,32 +2960,46 @@ SQL;
 				       '<span style="display: none;"><img style="width: 20px; height: 20px;" alt="" align="top" width="20" height="20" src="'.includes_url('images/spinner-2x.gif').'"></span>';
 			}
 
-			// Local file? Core or from a plugin / theme?
-			if (strpos($obj->src, $siteUrl) !== false) {
-				// Local Plugin / Theme File
-				// Could be a Staging site that is having the Live URL in the General Settings
-				$src = ltrim(str_replace($siteUrl, '', $obj->src), '/');
-			} elseif ((isset($obj->wp) && $obj->wp === 1) || $isRelInternalPath) {
-				// Local WordPress Core File
-				$src = ltrim($obj->src, '/');
-			}
+			$forAssetType = $pathToFile = false;
 
-			$srcAlt = $src;
+            if ( stripos( $src, '.css' ) !== false ) {
+                $forAssetType = 'css';
+            } elseif ( stripos( $src, '.js' ) !== false ) {
+                $forAssetType = 'js';
+            }
 
-			if (strpos($src, '../') === 0) {
-				$srcAlt = str_replace('../', '', $srcAlt);
-			}
+            if ($forAssetType) {
+	            $pathToFile = OptimizeCommon::getLocalAssetPath( $src, $forAssetType );
+            }
 
-			$pathToFile = Misc::getWpRootDirPath() . $srcAlt;
+			if ( ! is_file($pathToFile) ) { // Fallback, old code...
+				// Local file? Core or from a plugin / theme?
+				if ( strpos( $obj->src, $siteUrl ) !== false ) {
+					// Local Plugin / Theme File
+					// Could be a Staging site that is having the Live URL in the General Settings
+					$src = ltrim( str_replace( $siteUrl, '', $obj->src ), '/' );
+				} elseif ( ( isset( $obj->wp ) && $obj->wp === 1 ) || $isRelInternalPath ) {
+					// Local WordPress Core File
+					$src = ltrim( $obj->src, '/' );
+				}
 
-			if (strpos($pathToFile, '?ver') !== false) {
-				list($pathToFile) = explode('?ver', $pathToFile);
-			}
+				$srcAlt = $src;
 
-			// It can happen that the CSS/JS has extra parameters (rare cases)
-			foreach (array('.css?', '.js?') as $needlePart) {
-				if (strpos($pathToFile, $needlePart) !== false) {
-					list($pathToFile) = explode('?', $pathToFile);
+				if ( strpos( $src, '../' ) === 0 ) {
+					$srcAlt = str_replace( '../', '', $srcAlt );
+				}
+
+				$pathToFile = Misc::getWpRootDirPath() . $srcAlt;
+
+				if ( strpos( $pathToFile, '?ver' ) !== false ) {
+					list( $pathToFile ) = explode( '?ver', $pathToFile );
+				}
+
+				// It can happen that the CSS/JS has extra parameters (rare cases)
+				foreach ( array( '.css?', '.js?' ) as $needlePart ) {
+					if ( strpos( $pathToFile, $needlePart ) !== false ) {
+						list( $pathToFile ) = explode( '?', $pathToFile );
+					}
 				}
 			}
 

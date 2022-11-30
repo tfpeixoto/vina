@@ -158,7 +158,7 @@ HTML;
         self::updateAssetListLayoutSettings();
 
         // Form submitted from the homepage
-	    // e.g. from a page such as latest blog posts, not a static page that was selected as home page)
+	    // e.g. from a page such as latest blog posts, not a static page that was selected as home page
         if (Misc::isHomePage() && Misc::getShowOnFront() !== 'page') {
 	        $wpacuNoLoadAssets = Misc::getVar('post', WPACU_PLUGIN_ID, array());
 
@@ -1244,7 +1244,7 @@ HTML;
 				// Strip other unused information including the 'handle' (no need to have it twice as it's already in one of the array's keys)
 				unset( $assetArray['handle'], $assetArray['textdomain'], $assetArray['translations_path'] );
 
-				// Some handles don't have an "src" value such as "woocommerce-inline"
+				// Some handles don't have a "src" value such as "woocommerce-inline"
 				if (isset($assetArray['src']) && $assetArray['src']) {
 					$assetArray['src'] = Misc::assetFromHrefToRelativeUri( $assetArray['src'], $assetKey );
 				}

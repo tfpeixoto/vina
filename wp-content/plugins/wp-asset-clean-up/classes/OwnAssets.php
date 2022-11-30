@@ -766,6 +766,10 @@ HTML;
 			add_action('admin_head', static function() {
 			?>
 				<style <?php echo Misc::getStyleTypeAttribute(); ?> data-wpacu-own-inline-style="true">
+                body[class*='asset-cleanup'] .swal2-container {
+                    z-index: 1000000;
+                }
+
                 .wpacu-swal2-popup {
                     width: 36em !important;
                 }
