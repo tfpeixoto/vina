@@ -342,7 +342,7 @@ class CombineJs
 						}
 					}
 
-					// Apply defer="defer" to combined JS files from the BODY tag (if enabled), except the combined jQuery & jQuery Migrate Group
+					// Apply 'defer="defer"' to combined JS files from the BODY tag (if enabled), except the combined jQuery & jQuery Migrate Group
 					if ($docLocationScript === 'body' && ! $jQueryIsIncludedInGroup && Main::instance()->settings['combine_loaded_js_defer_body']) {
 						if ($isDeferAppliedOnBodyCombineGroupNo === false) {
 							// Only record the first one
@@ -434,7 +434,7 @@ class CombineJs
 			}
 		}
 
-		// Only relevant if "Defer loading JavaScript combined files from <body>"" in "Settings" - "Combine CSS & JS Files" - "Combine loaded JS (JavaScript) into fewer files"
+		// Only relevant if "Defer loading JavaScript combined files from <body>" in "Settings" - "Combine CSS & JS Files" - "Combine loaded JS (JavaScript) into fewer files"
 		// and there is at least one combined deferred tag
 
 		if (isset($finalCacheList['body']) && (! empty($finalCacheList['body'])) && Main::instance()->settings['combine_loaded_js_defer_body']) {

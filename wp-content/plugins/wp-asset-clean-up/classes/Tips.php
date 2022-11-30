@@ -34,11 +34,11 @@ This CSS file is related to "Contact Form 7" and if you don't load any form on t
 HTML;
 
 		$this->list['css']['duplicate-post'] = <<<HTML
-This CSS file is meant to style the "Duplicate Post" plugin's menu within the top admin bar and it's loading when the user (with the right privileges) is logged-in. It's NOT meant to load for the guests (non logged-in visitors). You can leave it loaded.
+This CSS file is meant to style the "Duplicate Post" plugin's menu within the top admin bar, and it's loading when the user (with the right privileges) is logged-in. It's NOT meant to load for the guests (non-logged-in visitors). You can leave it loaded.
 HTML;
 
 		$this->list['css']['dashicons'] = <<<HTML
-To avoid breaking admin bar's styling which relies on the Wordpress Dashicons, any unload rule set for this handle will be ignored IF the user is logged-in and the admin bar is showing up.
+To avoid breaking admin bar's styling which relies on the WordPress Dashicons, any unload rule set for this handle will be ignored IF the user is logged-in and the admin bar is showing up.
 HTML;
 		// JavaScript list
 		$this->list['js']['wp-embed'] = <<<HTML

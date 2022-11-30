@@ -25,7 +25,7 @@ if ($anyUnloadRuleSet || $data['row']['is_load_exception_per_page']) {
 $loadExceptionOptionsAreaCss = '';
 
 if ($data['row']['global_unloaded']) {
-    // Move it to the right side or extend it to avoid so much empty space and a DIV larger in height
+    // Move it to the right side or extend it to avoid so much empty space and a higher DIV
 	$loadExceptionOptionsAreaCss = 'display: contents;';
 }
 ?>
@@ -45,7 +45,6 @@ if ($data['row']['global_unloaded']) {
                                   value="<?php echo htmlentities(esc_attr($data['row']['obj']->handle), ENT_QUOTES); ?>" />
                         <span>On this page</span></label>
                 </li>
-
                 <?php
                 if ($data['bulk_unloaded_type'] === 'post_type') {
                     // Only show it on edit post/page/custom post type
@@ -72,13 +71,13 @@ if ($data['row']['global_unloaded']) {
                     </li>
                     <?php
                     if (isset($data['post_type']) && $data['post_type'] !== 'attachment' && ! empty($data['post_type_has_tax_assoc'])) {
-                        include dirname( __DIR__ ) . '/_common/_asset-single-row-load-exceptions-taxonomy.php';
+                        include '_asset-single-row-load-exceptions-taxonomy.php';
                     }
                 }
                 ?>
                 <li>
-                    <label for="wpacu_load_it_regex_option_<?php echo $assetTypeS; ?>_<?php echo $data['row']['obj']->handle; ?>"><input
-                                data-handle="<?php echo $data['row']['obj']->handle; ?>"
+                    <label for="wpacu_load_it_regex_option_<?php echo $assetTypeS; ?>_<?php echo htmlentities(esc_attr($data['row']['obj']->handle), ENT_QUOTES); ?>">
+                        <input data-handle="<?php echo htmlentities(esc_attr($data['row']['obj']->handle), ENT_QUOTES); ?>"
                                 id="wpacu_load_it_regex_option_<?php echo $assetTypeS; ?>_<?php echo $data['row']['obj']->handle; ?>"
                                 class="wpacu_load_it_option_two wpacu_<?php echo $assetTypeS; ?> wpacu_load_exception wpacu_lite_locked"
                                 type="checkbox"
@@ -95,18 +94,19 @@ if ($data['row']['global_unloaded']) {
                                 href="https://assetcleanup.com/docs/?p=21#wpacu-method-2"><span
                                     class="dashicons dashicons-editor-help"></span></a></label>
                 </li>
-			    <?php
-			    $isLoadItLoggedIn = in_array($data['row']['obj']->handle, $data['handle_load_logged_in']['scripts']);
-			    ?>
-                <li id="wpacu_load_it_user_logged_in_option_<?php echo $assetTypeS; ?>_<?php echo $data['row']['obj']->handle; ?>">
-                    <label><input data-handle="<?php echo $data['row']['obj']->handle; ?>"
-                                  id="wpacu_load_it_user_logged_in_option_<?php echo $assetTypeS; ?>_<?php echo $data['row']['obj']->handle; ?>"
+                <?php
+                $isLoadItLoggedIn = in_array($data['row']['obj']->handle, $data['handle_load_logged_in'][$assetType]);
+                if ($isLoadItLoggedIn) { $data['row']['at_least_one_rule_set'] = true; }
+                ?>
+                <li id="wpacu_load_it_user_logged_in_option_<?php echo $assetTypeS; ?>_<?php echo htmlentities(esc_attr($data['row']['obj']->handle), ENT_QUOTES); ?>">
+                    <label><input data-handle="<?php echo htmlentities(esc_attr($data['row']['obj']->handle), ENT_QUOTES); ?>"
+                                  id="wpacu_load_it_user_logged_in_option_<?php echo $assetTypeS; ?>_<?php echo htmlentities(esc_attr($data['row']['obj']->handle), ENT_QUOTES); ?>"
                                   class="wpacu_load_it_option_three wpacu_<?php echo $assetTypeS; ?> wpacu_load_exception"
                                   type="checkbox"
-						    <?php if ($isLoadItLoggedIn) { ?> checked="checked" <?php } ?>
-                                  name="wpacu_load_it_logged_in[<?php echo $assetType; ?>][<?php echo $data['row']['obj']->handle; ?>]"
+                            <?php if ($isLoadItLoggedIn) { ?> checked="checked" <?php } ?>
+                                  name="wpacu_load_it_logged_in[<?php echo $assetType; ?>][<?php echo htmlentities(esc_attr($data['row']['obj']->handle), ENT_QUOTES); ?>]"
                                   value="1"/>
-                        <span>If the user is logged-in</span></label>
+                        <span><?php esc_html_e('If the user is logged-in', 'wp-asset-clean-up'); ?></span></label>
                 </li>
 		    </ul>
             <div class="wpacu-clearfix"></div>

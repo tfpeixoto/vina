@@ -72,7 +72,7 @@ class OptimizeJs
 						continue;
 					}
 
-					$cleanScriptSrcFromTagArray = OptimizeCommon::getLocalCleanSourceFromTag( $scriptSourceTag, 'src' );
+					$cleanScriptSrcFromTagArray = OptimizeCommon::getLocalCleanSourceFromTag( $scriptSourceTag );
 
 					if ( isset( $cleanScriptSrcFromTagArray['source'] ) && $cleanScriptSrcFromTagArray['source'] ) {
 						$allEnqueuedCleanScriptSrcs[] = $cleanScriptSrcFromTagArray['source'];
@@ -293,6 +293,10 @@ class OptimizeJs
 		 * [END] JS Content Optimization
 		*/
 
+		if (isset($jsContentBeforeMin) && $jsContent === '/**/' && strpos($jsContentBeforeMin, '/*@cc_on') !== false && strpos($jsContentBeforeMin, '@*/') !== false) {
+			return array(); // Internet Explorer things, leave the file as it is
+		}
+
 		// Relative path to the new file
 		// Save it to /wp-content/cache/js/{OptimizeCommon::$optimizedSingleFilesDir}/
 		$fileVer = sha1($jsContent);
@@ -458,6 +462,11 @@ class OptimizeJs
 	public static function updateHtmlSourceOriginalToOptimizedJs($htmlSource)
 	{
 		$parseSiteUrlPath = parse_url(site_url(), PHP_URL_PATH);
+
+		if ($parseSiteUrlPath === null) {
+			$parseSiteUrlPath = '';
+		}
+
 		$siteUrlNoProtocol = str_replace(array('http://', 'https://'), '//', site_url());
 
 		$jsOptimizeList = ObjectCache::wpacu_cache_get('wpacu_js_optimize_list') ?: array();
@@ -503,19 +512,19 @@ class OptimizeJs
 				continue;
 			}
 
+			$cleanScriptSrcFromTagArray = OptimizeCommon::getLocalCleanSourceFromTag($scriptSourceTag);
+
+			// Skip external links, no point in carrying on
+			if (! $cleanScriptSrcFromTagArray || ! is_array($cleanScriptSrcFromTagArray)) {
+				continue;
+			}
+
 			$forAttr = 'src';
 
 			// Any preloads for the optimized script?
 			// e.g. <link rel='preload' as='script' href='...' />
 			if (strpos($scriptSourceTag, '<link') !== false) {
 				$forAttr = 'href';
-			}
-
-			$cleanScriptSrcFromTagArray = OptimizeCommon::getLocalCleanSourceFromTag($scriptSourceTag, $forAttr);
-
-			// Skip external links, no point in carrying on
-			if (! $cleanScriptSrcFromTagArray || ! is_array($cleanScriptSrcFromTagArray)) {
-				continue;
 			}
 
 			// Is it a local JS? Check if it's hardcoded (not enqueued the WordPress way)
@@ -583,7 +592,11 @@ class OptimizeJs
 					$siteUrlNoProtocol . $listValues[0], // without protocol
 				);
 
-				if (strpos($cleanScriptSrcFromTag, $parseSiteUrlPath) === 0 && strpos($cleanScriptSrcFromTag, $listValues[0]) !== false) {
+				if ($parseSiteUrlPath && (strpos($listValues[0], $parseSiteUrlPath) === 0 || strpos($cleanScriptSrcFromTag, $parseSiteUrlPath) === 0)) {
+					$sourceUrlList[] = $cleanScriptSrcFromTag;
+				}
+
+				if ($parseSiteUrlPath && strpos($cleanScriptSrcFromTag, $parseSiteUrlPath) === 0 && strpos($cleanScriptSrcFromTag, $listValues[0]) !== false) {
 					$sourceUrlList[] = str_replace('//', '/', $parseSiteUrlPath.'/'.$listValues[0]);
 				}
 				elseif ( $cleanScriptSrcFromTag === $listValues[0] ) {
@@ -662,20 +675,20 @@ class OptimizeJs
 		$sourceUrlRel = is_array($sourceUrlList) ? OptimizeCommon::getSourceRelPath($sourceUrlList[0]) : OptimizeCommon::getSourceRelPath($sourceUrlList);
 		$newScriptSourceTag = str_ireplace('<'.$tagToCheck.' ', '<'.$tagToCheck.' data-wpacu-script-rel-src-before="'.$sourceUrlRel.'" ', $newScriptSourceTag);
 
-		preg_match_all( '#\s'.$forAttr.'=(["\'])(.*?)(["\'])#', $scriptSourceTag, $outputMatchesSrc );
+		$sourceValue = Misc::getValueFromTag($scriptSourceTag);
 
 		// No space from the matching and ? should be there
-		if (isset( $outputMatchesSrc[2][0] ) && ( strpos( $outputMatchesSrc[2][0], ' ' ) === false )) {
-			if ( strpos( $outputMatchesSrc[2][0], '?' ) !== false ) {
+		if ($sourceValue && ( strpos( $sourceValue, ' ' ) === false )) {
+			if ( strpos( $sourceValue, '?' ) !== false ) {
 				// Strip things like ?ver=
-				list( , $toStrip ) = explode( '?', $outputMatchesSrc[2][0] );
+				list( , $toStrip ) = explode( '?', $sourceValue );
 				$toStrip            = '?' . trim( $toStrip );
 				$newScriptSourceTag = str_replace( $toStrip, '', $newScriptSourceTag );
 			}
 
-			if ( strpos( $outputMatchesSrc[2][0], '&#038;ver' ) !== false ) {
+			if ( strpos( $sourceValue, '&#038;ver' ) !== false ) {
 				// Replace any .js&#038;ver with .js
-				$toStrip = strrchr($outputMatchesSrc[2][0], '&#038;ver');
+				$toStrip = strrchr($sourceValue, '&#038;ver');
 				$newScriptSourceTag = str_replace( $toStrip, '', $newScriptSourceTag );
 			}
 		}

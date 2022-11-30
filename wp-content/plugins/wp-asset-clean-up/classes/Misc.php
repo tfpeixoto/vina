@@ -192,7 +192,7 @@ class Misc
 	/**
 	 * @param $postId
 	 *
-	 * @return array|false|string|string[]|\WP_Error
+	 * @return string
 	 */
 	public static function getPageUri($postId)
     {
@@ -517,7 +517,7 @@ class Misc
 	 */
 	public static function assetFromHrefToRelativeUri($src, $assetKey)
     {
-	    // Make the "src" relative in case the information will be imported from Staging to Live, it won't show the handle's link referencing to the staging URL in the "Overview" page and other similar pages as it's confusing
+	    // Make the "src" relative in case the information will be imported from Staging to Live, it won't show the handle's link referencing to the staging URL in the "Overview" page and other similar pages, as it's confusing
 	    $localAssetPath = OptimizeCommon::getLocalAssetPath($src, (($assetKey === 'styles') ? 'css' : 'js'));
 
 	    $relSrc = $src;
@@ -536,6 +536,136 @@ class Misc
 
 	    return $relSrc;
     }
+
+	/**
+	 * @param $tagOutput ('script', 'link')
+	 * @param $attribute
+	 *
+	 * @return false|string
+	 */
+	public static function getValueFromTag($tagOutput, $attribute = '', $method = 'regex')
+	{
+		$tagOutput = trim($tagOutput);
+
+		if ( strpos( $tagOutput, '<script' ) === 0 ) {
+			$tagNameToCheck = 'script';
+
+			if ($attribute === '') {
+				$attribute = 'src';
+			}
+		} elseif ( strpos( $tagOutput, '<link' ) === 0 ) {
+			$tagNameToCheck = 'link';
+
+			if ($attribute === '') {
+				$attribute = 'href';
+			}
+		} elseif ( strpos( $tagOutput, '<style' ) === 0 ) {
+			$tagNameToCheck = 'style';
+
+			if ($attribute === '') {
+				$attribute = 'type';
+			}
+		} else {
+			return false; // the tag it neither 'script' nor 'link'
+		}
+
+		if ($method === 'dom_with_fallback') {
+			if (self::isDOMDocumentOn()) {
+				$domForTag = self::initDOMDocument();
+
+				$domForTag->loadHTML( $tagOutput );
+
+				$scriptTagObj = $domForTag->getElementsByTagName( $tagNameToCheck )->item( 0 );
+
+				if ( $scriptTagObj === null ) {
+					return false;
+				}
+
+				if ( $scriptTagObj->hasAttributes() ) {
+					foreach ( $scriptTagObj->attributes as $attrObj ) {
+						if ( $attrObj->nodeName === $attribute ) {
+							return trim( $attrObj->nodeValue );
+						}
+					}
+				}
+			}
+
+			return self::getValueFromTagViaRegEx($tagOutput, $attribute);
+		}
+
+		if ($method === 'regex') {
+			return self::getValueFromTagViaRegEx($tagOutput, $attribute);
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param $tagOutput
+	 * @param $attribute
+	 *
+	 * @return false|string
+	 */
+	public static function getValueFromTagViaRegEx($tagOutput, $attribute = '')
+	{
+		$tagOutput = trim( $tagOutput );
+
+		if ( strpos($tagOutput, '<script') === 0 ) {
+			if ( $attribute === '' ) {
+				$attribute = 'src';
+			}
+
+			preg_match_all( '#<script.*?'.$attribute.'\s*=\s*(.*?)#Usmi', $tagOutput, $outputMatches );
+		}
+
+		if ( strpos($tagOutput, '<link') === 0 ) {
+			if ( $attribute === '' ) {
+				$attribute = 'href';
+			}
+
+			preg_match_all( '#<link.*?'.$attribute.'\s*=\s*(.*?)#Usmi', $tagOutput, $outputMatches );
+		}
+
+		if ( strpos($tagOutput, '<style') === 0 ) {
+			if ( $attribute === '' ) {
+				$attribute = 'type';
+			}
+
+			preg_match_all( '#<style.*?'.$attribute.'\s*=\s*(.*?)#Usmi', $tagOutput, $outputMatches );
+		}
+
+		if ( isset($outputMatches[1][0]) && $outputMatches[1][0] ) {
+			$scriptPart = trim($outputMatches[1][0]);
+
+			foreach ( array('"', "'") as $quoteType ) {
+				if ( $scriptPart[0] === $quoteType ) {
+					$scriptPartTwo = ltrim( $scriptPart, $quoteType );
+
+					$posEndingQuote = strpos( $scriptPartTwo, $quoteType );
+
+					if ( $posEndingQuote === false ) {
+						return false;
+					}
+
+					return substr( $scriptPartTwo, 0, $posEndingQuote );
+				}
+			}
+
+			if ( ! in_array($scriptPart[0], array('"', "'") ) ) { // no quotes, just space or no wrapper
+				$scriptPartTwo = ltrim( $scriptPart );
+
+				$posFirstSpace = strpos( $scriptPartTwo, ' ' );
+
+				if ($posFirstSpace === false ) {
+					return false;
+				}
+
+				return substr( $scriptPartTwo, 0, $posFirstSpace );
+			}
+		}
+
+		return false;
+	}
 
 	/**
 	 * @return bool
@@ -1427,7 +1557,7 @@ SQL;
     }
 
 	/**
-	 * @return array|bool|mixed|object
+	 * @return array
 	 */
 	public static function getAllActivePluginsIcons()
     {

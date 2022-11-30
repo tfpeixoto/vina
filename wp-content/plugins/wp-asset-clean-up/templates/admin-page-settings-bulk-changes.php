@@ -107,19 +107,19 @@ $wpacuTabCurrent = isset($_REQUEST['wpacu_bulk_menu_tab']) && array_key_exists( 
 			if ($preloadedStatus === 'async') { echo '&nbsp;(<strong><em>'.$preloadedStatus.'</em></strong>)'; }
 			// [/wpacu_pro]
 
-			if ( $src ) {
-				$appendAfterSrc = strpos($src, '?') === false ? '?'.$verToAppend : '&'.$verToAppend;
-				?>
+            if ( $src ) {
+			    $appendAfterSrc = strpos($src, '?') === false ? '?'.$verToAppend : '&'.$verToAppend;
+			    ?>
                 <div><a <?php if ($isExternalSrc) { ?> data-wpacu-external-source="<?php echo esc_attr($src . $appendAfterSrc); ?>" <?php } ?> href="<?php echo esc_html($src . $appendAfterSrc); ?>" target="_blank"><small><?php echo str_replace( site_url(), '', $src ); ?></small></a> <?php if ($isExternalSrc) { ?><span data-wpacu-external-source-status></span><?php } ?></div>
-				<?php
-				$maybeInactiveAsset = \WpAssetCleanUp\Misc::maybeIsInactiveAsset($src);
+                <?php
+			    $maybeInactiveAsset = \WpAssetCleanUp\Misc::maybeIsInactiveAsset($src);
 
-				if (is_array($maybeInactiveAsset) && ! empty($maybeInactiveAsset)) {
-					if ($maybeInactiveAsset['from'] === 'plugin') { ?>
+			    if (is_array($maybeInactiveAsset) && ! empty($maybeInactiveAsset)) {
+			        if ($maybeInactiveAsset['from'] === 'plugin') { ?>
                         <small><strong>Note:</strong> <span style="color: darkred;">The plugin `<strong><?php echo esc_html($maybeInactiveAsset['name']); ?></strong>` seems to be inactive, thus any rules set are also inactive &amp; irrelevant, unless you re-activate the plugin.</span></small>
-					<?php } elseif ($maybeInactiveAsset['from'] === 'theme') { ?>
+				    <?php } elseif ($maybeInactiveAsset['from'] === 'theme') { ?>
                         <small><strong>Note:</strong> <span style="color: darkred;">The theme `<strong><?php echo esc_html($maybeInactiveAsset['name']); ?></strong>` seems to be inactive, thus any rules set are also inactive &amp; irrelevant, unless you re-activate the theme.</span></small>
-					<?php }
+				    <?php }
 				}
 			}
 		}

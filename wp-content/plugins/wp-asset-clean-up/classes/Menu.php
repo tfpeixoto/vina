@@ -254,7 +254,7 @@ class Menu
 			), $url
 		);
 
-		// Only show it to the user that has "administrator" access and it's in the following list (if a certain list of admins is provided)
+		// Only show it to the user that has "administrator" access, and it's in the following list (if a certain list of admins is provided)
 		// "Settings" -> "Plugin Usage Preferences" -> "Allow managing assets to:"
 		if (self::userCanManageAssets() && Main::currentUserCanViewAssetsList()) {
 			/*

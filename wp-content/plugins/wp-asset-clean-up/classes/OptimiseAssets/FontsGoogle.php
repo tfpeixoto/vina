@@ -203,8 +203,7 @@ class FontsGoogle
 							continue;
 						}
 
-						preg_match_all( '#href=(["\'])' . '(.*)' . '(["\'])#Usmi', $linkTag, $outputMatches );
-						$linkHrefOriginal = $finalLinkHref = trim( $outputMatches[2][0], '"\'' );
+						$linkHrefOriginal = Misc::getValueFromTag($linkTag);
 
 						// [START] Remove invalid requests with no font family
 						$urlParse = parse_url( str_replace( '&amp;', '&', $linkHrefOriginal ), PHP_URL_QUERY );
@@ -250,7 +249,7 @@ class FontsGoogle
 					$finalCombinableLinks = array_values( $finalCombinableLinks );
 
 					// Only proceed with the optimization/combine if there's obviously at least 2 combinable URL requests to Google Fonts
-					// OR the loading type is different than render-blocking
+					// OR the loading type is different from render-blocking
 					if ( Main::instance()->settings['google_fonts_combine_type'] || count( $finalCombinableLinks ) > 1 ) {
 						$htmlSource = self::combineGoogleFontLinks( $finalCombinableLinks, $htmlSource );
 					}
@@ -274,8 +273,7 @@ class FontsGoogle
 							continue;
 						}
 
-						preg_match_all( '#href=(["\'])' . '(.*)' . '(["\'])#Usmi', $linkTag, $outputMatches );
-						$linkHrefOriginal = trim( $outputMatches[2][0], '"\'' );
+						$linkHrefOriginal = Misc::getValueFromTag($linkTag);
 
 						// [START] Remove invalid requests with no font family
 						$urlParse = parse_url( str_replace( '&amp;', '&', $linkHrefOriginal ), PHP_URL_QUERY );
@@ -331,7 +329,7 @@ class FontsGoogle
 			$conditionOne = stripos($linkHrefOriginal, self::$containsStr) === false;
 		}
 
-		// Do not continue if it doesn't contain the right string or it contains 'display=' or it does not contain 'family=' or there is no value set for "font-display"
+		// Do not continue if it doesn't contain the right string, or it contains 'display=' or it does not contain 'family=' or there is no value set for "font-display"
 		if ($conditionOne ||
 		    stripos($linkHrefOriginal, 'display=') !== false ||
 		    stripos($linkHrefOriginal, 'family=') === false ||
@@ -349,7 +347,7 @@ class FontsGoogle
 		$urlQuery = parse_url($altLinkHref, PHP_URL_QUERY);
 		parse_str($urlQuery, $outputStr);
 
-		// Is there no "display" or there is but it has an empty value? Append the one we have in the "Settings" - "Google Fonts"
+		// Is there no "display" or there is, but it has an empty value? Append the one we have in the "Settings" - "Google Fonts"
 		if ( ! isset($outputStr['display']) || (isset($outputStr['display']) && $outputStr['display'] === '') ) {
 			$outputStr['display'] = Main::instance()->settings['google_fonts_display'];
 

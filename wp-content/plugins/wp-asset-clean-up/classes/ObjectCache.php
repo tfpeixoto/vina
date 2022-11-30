@@ -665,7 +665,7 @@ class ObjectCache {
 		/**
 		 * Saves the data to the cache.
 		 *
-		 * Differs from ObjectCache::wpacu_cache_add) and wp_cache_replace() in that it will always write data.
+		 * Differs from ObjectCache::wpacu_cache_add() and wp_cache_replace() in that it will always write data.
 		 *
 		 * @since 2.0.0
 		 *

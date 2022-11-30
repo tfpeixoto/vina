@@ -36,7 +36,7 @@ class CleanUp
 		$settings = Main::instance()->settings;
 
 		// Remove "Really Simple Discovery (RSD)" link?
-		if ($settings['remove_rsd_link'] == 1) {
+		if ($settings['remove_rsd_link'] == 1 || $settings['disable_xmlrpc'] === 'disable_all') {
 			// <link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://yourwebsite.com/xmlrpc.php?rsd" />
 			remove_action('wp_head', 'rsd_link');
 		}
