@@ -22,4 +22,6 @@ jobs:
           exclude: | 
             **/wp-content/uploads/**
             **/wp-content/updraft/**
+            **/wp-content/webp-express/**
+            **/wp-content/cache/**
             .htaccess
