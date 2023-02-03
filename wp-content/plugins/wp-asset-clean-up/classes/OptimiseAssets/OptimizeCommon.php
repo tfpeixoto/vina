@@ -618,7 +618,7 @@ class OptimizeCommon
 		$localAssetPossiblePaths = array(Misc::getWpRootDirPath() . $hrefRelPath);
 
 		// Perhaps the URL starts with / (not //) and site_url() was not used
-		$parseSiteUrlPath = parse_url(site_url(), PHP_URL_PATH);
+		$parseSiteUrlPath = (string)parse_url(site_url(), PHP_URL_PATH);
 
 		// This is in case we have something like this in the source (hardcoded or generated through a plugin)
 		// /blog/wp-content/plugins/custom-plugin-slug/script.js
@@ -702,7 +702,7 @@ class OptimizeCommon
 
 		// Perhaps the URL starts with / (not //) and site_url() was not used
 		$altFilePathForRelSource = $isRelPath = false;
-		$parseSiteUrlPath = parse_url(site_url(), PHP_URL_PATH);
+		$parseSiteUrlPath = (string)parse_url(site_url(), PHP_URL_PATH);
 
 		// This is in case we have something like this in the HTML source (hardcoded or generated through a plugin)
 		// <link href="/blog/wp-content/plugins/custom-plugin-slug/script.js" rel="preload" as="script" type="text/javascript">
@@ -1173,8 +1173,8 @@ class OptimizeCommon
 
 			$mostRecentCachedAssets = self::getMostRecentCachedAssets();
 
-			$siteHost = parse_url(site_url(), PHP_URL_HOST);
-			$siteUri = parse_url(site_url(), PHP_URL_PATH);
+			$siteHost = (string)parse_url(site_url(), PHP_URL_HOST);
+			$siteUri = (string)parse_url(site_url(), PHP_URL_PATH);
 
 			$relPathToPossibleDir = $storageDir.'/'.$siteHost . $siteUri;
 
@@ -1891,7 +1891,7 @@ SQL;
 	public static function clearJsonStorageForPost($postId, $checkTiming = false)
 	{
 		$postPermalink  = get_permalink($postId);
-		$requestUriPath = parse_url($postPermalink, PHP_URL_PATH);
+		$requestUriPath = (string)parse_url($postPermalink, PHP_URL_PATH);
 
 		$dirToFilename = WP_CONTENT_DIR . self::getRelPathPluginCacheDir() . '/_storage/'
 		                 . parse_url(site_url(), PHP_URL_HOST) . '/'. $requestUriPath;

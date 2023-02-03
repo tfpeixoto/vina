@@ -409,9 +409,9 @@ HTML;
 	    self::updateAssetListLayoutSettings();
 
         $jsonNoAssetsLoadList = wp_json_encode( $wpacuNoLoadAssets );
-        Misc::addUpdateOption( WPACU_PLUGIN_ID . '_front_page_no_load', $jsonNoAssetsLoadList );
+	    Misc::addUpdateOption( WPACU_PLUGIN_ID . '_front_page_no_load', $jsonNoAssetsLoadList );
 
-        // If globally disabled, make an exception to load for submitted assets
+	    // If globally disabled, make an exception to load for submitted assets
         $this->saveLoadExceptions('front_page');
 
         // Add / Remove Site-wide Unloads

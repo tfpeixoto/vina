@@ -100,7 +100,7 @@ class Preloads
 	    $this->preloads = $this->getPreloads();
 
 	    if (isset($this->preloads['styles']) && ! empty($this->preloads['styles'])) {
-		    $htmlSource = self::appendPreloadsForStylesToHead($htmlSource, array_keys($this->preloads['styles']));
+		    $htmlSource = self::appendPreloadsForStylesToHead($htmlSource);
 	    }
 
 	    return $htmlSource;
@@ -278,11 +278,10 @@ class Preloads
 
 	/**
 	 * @param $htmlSource
-	 * @param $preloadedHandles
 	 *
 	 * @return mixed
 	 */
-	public static function appendPreloadsForStylesToHead($htmlSource, $preloadedHandles)
+	public static function appendPreloadsForStylesToHead($htmlSource)
 	{
 	    if (self::preventPreload()) {
 	        return $htmlSource;
@@ -294,7 +293,7 @@ class Preloads
 		}
 
         $allHrefs = array();
-		$stickToRegEx = false; // default
+		$stickToRegEx = true; // default
 
 		// Something might not be right with the RegEx; Fallback to DOMDocument, more accurate, but slower
 		if ( Misc::isDOMDocumentOn() ) {
@@ -313,11 +312,6 @@ class Preloads
 			            continue;
 		            }
 
-                    if (strpos($htmlSourceAlt, $tagObject->nodeValue) === false) {
-                        $stickToRegEx = true; // the value is not the same as in the HTML source (e.g. altered by the DOM) / fallback to RegEx
-                        break;
-		            }
-
 		            $linkAttributes = array();
 
 		            foreach ( $tagObject->attributes as $attrObj ) {
@@ -328,7 +322,14 @@ class Preloads
                         continue;
                     }
 
-                    $allHrefs[] = $linkAttributes['href'];
+		            if (strpos($htmlSourceAlt, $linkAttributes['href']) === false) {
+			            $stickToRegEx = true; // the source value is not the same as in the HTML source (e.g. altered by the DOM) / fallback to RegEx
+			            break;
+		            }
+
+                    $linkTag = Misc::getOuterHTML( $tagObject );
+
+                    $allHrefs[$linkTag] = $linkAttributes['href'];
 	            }
             }
 
@@ -342,10 +343,14 @@ class Preloads
 
 	        if ( ! empty($matchesSourcesFromLinkTags) ) {
 		        foreach ( $matchesSourcesFromLinkTags as $linkTagArray ) {
-			        $linkHref = isset( $linkTagArray[0] ) ? Misc::getValueFromTag( $linkTagArray[0] ) : false;
+                    $linkTag = isset( $linkTagArray[0] ) ? $linkTagArray[0] : false;
 
-                    if ($linkHref) {
-                        $allHrefs[] = $linkHref;
+                    if ($linkTag) {
+	                    $linkHref = isset( $linkTagArray[0] ) ? Misc::getValueFromTag( $linkTag ) : false;
+
+	                    if ( $linkHref ) {
+		                    $allHrefs[$linkTag] = $linkHref;
+	                    }
                     }
 		        }
 	        }
@@ -354,9 +359,32 @@ class Preloads
 		$allHrefs = array_unique($allHrefs);
 
 		if ( ! empty($allHrefs) ) {
-	        foreach ( $allHrefs as $linkHref ) {
-		        $linkPreload = self::linkPreloadCssFormat( $linkHref );
-		        $htmlSource = str_replace( self::DEL_STYLES_PRELOADS, $linkPreload . self::DEL_STYLES_PRELOADS, $htmlSource );
+	        foreach ( $allHrefs as $linkTag => $linkHref ) {
+                $condBefore = $condAfter = '';
+
+		        // Any IE comments around the tag?
+		        $scriptIdAttr = Misc::getValueFromTag($linkTag, 'id');
+
+		        if ($scriptIdAttr && substr( $scriptIdAttr, -4 ) === '-css') {
+                    $linkHandle = substr( $scriptIdAttr, 0, -4 );
+
+                    $linkObj = isset(Main::instance()->wpAllStyles['registered'][$linkHandle]) ? Main::instance()->wpAllStyles['registered'][$linkHandle] : false;
+
+                    if ($linkObj) {
+	                    $conditional = isset($linkObj->extra['conditional']) ? $linkObj->extra['conditional'] : '';
+
+	                    if ($conditional) {
+		                    $condBefore = "<!--[if {$conditional}]>\n";
+		                    $condAfter  = "<![endif]-->\n";
+	                    }
+                    }
+		        }
+
+                $linkPreload  = $condBefore;
+                $linkPreload .= self::linkPreloadCssFormat( $linkHref );
+                $linkPreload .= $condAfter;
+
+                $htmlSource = str_replace( self::DEL_STYLES_PRELOADS, $linkPreload . self::DEL_STYLES_PRELOADS, $htmlSource );
 	        }
         }
 
@@ -401,15 +429,39 @@ class Preloads
 		}
 
 		foreach ($matchesSourcesFromScriptTags as $scriptTagArray) {
-            $scripTag = isset($scriptTagArray[0]) ? $scriptTagArray[0] : false;
+            $scriptTag = isset($scriptTagArray[0]) ? $scriptTagArray[0] : false;
 
-			if (! $scripTag) {
+			if (! $scriptTag) {
 				continue;
 			}
 
-            $scriptSrc = Misc::getValueFromTag($scripTag);
+            $scriptSrc = Misc::getValueFromTag($scriptTag);
 
-			$linkPreload = '<link rel=\'preload\' as=\'script\' href=\''.esc_attr($scriptSrc).'\' data-wpacu-preload-js=\'1\'>'."\n";
+            $condBefore = $condAfter = '';
+
+            // Any IE comments around the tag?
+            $scriptIdAttr = Misc::getValueFromTag($scriptTag, 'id');
+
+            if ($scriptIdAttr && strpos($scriptTag, '-js') !== false) {
+	            $scriptHandle = rtrim($scriptIdAttr, '-js');
+
+                if ($scriptHandle) {
+                    $scriptObj = isset(Main::instance()->wpAllScripts['registered'][$scriptHandle]) ? Main::instance()->wpAllScripts['registered'][$scriptHandle] : false;
+
+                    if ($scriptObj) {
+	                    $conditional = isset($scriptObj->extra['conditional']) ? $scriptObj->extra['conditional'] : '';
+
+	                    if ($conditional) {
+		                    $condBefore = "<!--[if {$conditional}]>\n";
+		                    $condAfter  = "<![endif]-->\n";
+	                    }
+                    }
+                }
+            }
+
+            $linkPreload  = $condBefore;
+			$linkPreload .= '<link rel=\'preload\' as=\'script\' href=\''.esc_attr($scriptSrc).'\' data-wpacu-preload-js=\'1\'>'."\n";
+			$linkPreload .= $condAfter;
 
 			$htmlSource = str_replace(self::DEL_SCRIPTS_PRELOADS, $linkPreload . self::DEL_SCRIPTS_PRELOADS, $htmlSource);
 		}

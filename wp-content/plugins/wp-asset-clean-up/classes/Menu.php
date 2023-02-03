@@ -239,7 +239,7 @@ class Menu
 		}
 
 		// Do not show the management link to specific post types that are marked as "public", but not relevant such as "ct_template" from Oxygen Builder
-		if (in_array($post->post_type, array('ct_template', 'oxy_user_library'))) {
+		if (in_array($post->post_type, MetaBoxes::$noMetaBoxesForPostTypes)) {
 			return $actions;
 		}
 

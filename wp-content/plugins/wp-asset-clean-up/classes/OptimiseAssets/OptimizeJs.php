@@ -461,11 +461,7 @@ class OptimizeJs
 	 */
 	public static function updateHtmlSourceOriginalToOptimizedJs($htmlSource)
 	{
-		$parseSiteUrlPath = parse_url(site_url(), PHP_URL_PATH);
-
-		if ($parseSiteUrlPath === null) {
-			$parseSiteUrlPath = '';
-		}
+		$parseSiteUrlPath = (string)parse_url(site_url(), PHP_URL_PATH);
 
 		$siteUrlNoProtocol = str_replace(array('http://', 'https://'), '//', site_url());
 
@@ -969,7 +965,7 @@ class OptimizeJs
 		foreach ($scriptTagsObj as $scriptTagObj) {
 			$tagContents = $scriptTagObj->nodeValue;
 
-			if (strpos(CleanUp::getOuterHTML($scriptTagObj), $collectUntil) !== false) {
+			if ( strpos( Misc::getOuterHTML( $scriptTagObj ), $collectUntil) !== false) {
 				break;
 			}
 

@@ -102,28 +102,28 @@ class HardcodedAssets
 		$collectScripts    = true; // default
 
 		$hardCodedAssets = array(
-			'link_and_style_tags'        => array(), // LINK (rel="stylesheet") & STYLE (inline)
-			'script_src_and_inline_tags' => array(), // SCRIPT (with "src" attribute) & SCRIPT (inline)
+			'link_and_style_tags'          => array(), // LINK (rel="stylesheet") & STYLE (inline)
+			'script_nosrc_and_inline_tags' => array(), // SCRIPT (with "src" attribute) & SCRIPT (inline)
 		);
 
 		$matchesSourcesFromTags = array();
 
-		$fallbackToRegex = true;
+		$stickToRegEx = true;
 
 		if ( $collectLinkStyles ) {
-			if ( ! $fallbackToRegex && Misc::isDOMDocumentOn() ) {
+			if ( ! $stickToRegEx && Misc::isDOMDocumentOn() ) {
 				$domDoc = Misc::initDOMDocument();
 				$domDoc->loadHTML($htmlSourceAlt);
 
 				$selector = new \DOMXPath($domDoc);
 
-				$domTagQuery = $selector->query('//link[@rel="stylesheet"]|//style|//script');
+				$domTagQuery = $selector->query('//link[@rel="stylesheet"]|//style|//script|//noscript');
 
 				if (count($domTagQuery) > 1) {
 					foreach($domTagQuery as $tagFound) {
 						$tagType = in_array($tagFound->nodeName, array('link', 'style')) ? 'css' : 'js';
 
-						if (self::skipTagIfNotRelevant(CleanUp::getOuterHTML($tagFound), 'whole_tag', $tagType)) {
+						if (self::skipTagIfNotRelevant( Misc::getOuterHTML( $tagFound ), 'whole_tag', $tagType)) {
 							continue; // no point in wasting more resources as the tag will never be shown, since it's irrelevant
 						}
 
@@ -170,7 +170,7 @@ class HardcodedAssets
 							// It always has to be a match from the DOM generated tag
 							// Otherwise, default it to RegEx
 							if ( empty($matchSourceFromTag) || ! (isset($matchSourceFromTag[0][0]) && ! empty($matchSourceFromTag[0][0])) ) {
-								$fallbackToRegex = true;
+								$stickToRegEx = true;
 								break;
 							}
 
@@ -178,15 +178,15 @@ class HardcodedAssets
 						}
 					}
 
-					if (! $fallbackToRegex) {
+					if (! $stickToRegEx) {
 						$shaOneToOriginal = array();
 
 						$htmlSourceAltEncoded = $htmlSourceAlt;
 
 						foreach($domTagQuery as $tagFound) {
-							if ( $tagFound->nodeValue && in_array( $tagFound->nodeName, array( 'style', 'script' ) ) ) {
+							if ( $tagFound->nodeValue && in_array( $tagFound->nodeName, array( 'style', 'script', 'noscript' ) ) ) {
 								if (strpos($htmlSourceAlt, $tagFound->nodeValue) === false) {
-									$fallbackToRegex = true;
+									$stickToRegEx = true;
 									break;
 								}
 
@@ -206,7 +206,7 @@ class HardcodedAssets
 
 						$selectorTwo = new \DOMXPath($domDocForTwo);
 
-						$domTagQueryTwo = $selectorTwo->query('//style|//script');
+						$domTagQueryTwo = $selectorTwo->query('//style|//script|//noscript');
 
 						foreach($domTagQueryTwo as $tagFoundTwo) {
 							$tagType = in_array($tagFoundTwo->nodeName, array('link', 'style')) ? 'css' : 'js';
@@ -255,7 +255,7 @@ class HardcodedAssets
 							// It always has to be a match from the DOM generated tag
 							// Otherwise, default it to RegEx
 							if ( empty($matchSourceFromTagTwo) || ! (isset($matchSourceFromTagTwo[0][0]) && ! empty($matchSourceFromTagTwo[0][0])) ) {
-								$fallbackToRegex = true;
+								$stickToRegEx = true;
 								break;
 							}
 
@@ -263,7 +263,7 @@ class HardcodedAssets
 
 							$matchedTag = str_replace('/*[wpacu]*/'.$encodedNodeValue.'/*[/wpacu]*/', $shaOneToOriginal[$encodedNodeValue], $matchSourceFromTagTwo[0][0]);
 
-							$tagTypeForReference = ($tagFoundTwo->nodeName === 'style') ? 'style_tag' : 'script_tag';
+							$tagTypeForReference = ($tagFoundTwo->nodeName === 'style') ? 'style_tag' : 'script_noscript_tag';
 
 							$matchesSourcesFromTags[] = array($tagTypeForReference => $matchedTag);
 						}
@@ -274,7 +274,7 @@ class HardcodedAssets
 			/*
 			* [START] Collect Hardcoded LINK (stylesheet) & STYLE tags
 			*/
-			if ($fallbackToRegex || ! Misc::isDOMDocumentOn()) {
+			if ($stickToRegEx || ! Misc::isDOMDocumentOn()) {
 				preg_match_all(
 					'#(?=(?P<link_tag><link[^>]*stylesheet[^>]*(>)))|(?=(?P<style_tag><style[^>]*?>.*</style>))#Umsi',
 					$htmlSourceAlt,
@@ -358,15 +358,15 @@ class HardcodedAssets
 			/*
 			* [START] Collect Hardcoded SCRIPT (src/inline)
 			*/
-			if ($fallbackToRegex || ! Misc::isDOMDocumentOn()) {
-				preg_match_all( '@<script[^>]*?>.*?</script>@si', $htmlSourceAlt, $matchesScriptTags, PREG_SET_ORDER );
+			if ($stickToRegEx || ! Misc::isDOMDocumentOn()) {
+				preg_match_all( '@<script[^>]*?>.*?</script>|<noscript[^>]*?>.*?</noscript>@si', $htmlSourceAlt, $matchesScriptTags, PREG_SET_ORDER );
 			} else {
 				$matchesScriptTags = array();
 
 				if (! empty($matchesSourcesFromTags)) {
 					foreach ($matchesSourcesFromTags as $matchedTag) {
-						if (isset($matchedTag['script_tag']) && $matchedTag['script_tag']) {
-							$matchesScriptTags[][0] = $matchedTag['script_tag'];
+						if (isset($matchedTag['script_noscript_tag']) && $matchedTag['script_noscript_tag']) {
+							$matchesScriptTags[][0] = $matchedTag['script_noscript_tag'];
 						}
 					}
 				}
@@ -424,7 +424,8 @@ class HardcodedAssets
 				);
 
 				foreach ( $matchesScriptTags as $matchedTag ) {
-					if ( isset( $matchedTag[0] ) && $matchedTag[0] && strpos( $matchedTag[0], '<script' ) === 0 ) {
+					if ( isset( $matchedTag[0] ) && $matchedTag[0]
+					     && (stripos( $matchedTag[0], '<script' ) === 0 || stripos( $matchedTag[0], '<noscript' ) === 0) ) {
 						$matchedTagOutput = trim( $matchedTag[0] );
 
 						// Own plugin assets and enqueued ones since they aren't hardcoded
@@ -445,7 +446,7 @@ class HardcodedAssets
 							}
 						}
 
-						$hardCodedAssets['script_src_and_inline_tags'][] = trim( $matchedTag[0] );
+						$hardCodedAssets['script_src_or_inline_and_noscript_inline_tags'][] = trim( $matchedTag[0] );
 					}
 				}
 			}
@@ -454,7 +455,7 @@ class HardcodedAssets
 			*/
 		}
 
-		if ($fallbackToRegex && ! empty($hardCodedAssets['link_and_style_tags']) && ! empty($hardCodedAssets['script_src_and_inline_tags'])) {
+		if ($stickToRegEx && ! empty($hardCodedAssets['link_and_style_tags']) && ! empty($hardCodedAssets['script_src_or_inline_and_noscript_inline_tags'])) {
 			$hardCodedAssets = self::removeAnyLinkTagsThatMightBeDetectedWithinScriptTags( $hardCodedAssets );
 		}
 
@@ -602,7 +603,7 @@ class HardcodedAssets
 	{
 		foreach ($hardcodedAssets['link_and_style_tags'] as $cssTagIndex => $cssTag) {
 			if ($cssTag) {
-				foreach ($hardcodedAssets['script_src_and_inline_tags'] as $scriptTag) {
+				foreach ($hardcodedAssets['script_src_or_inline_and_noscript_inline_tags'] as $scriptTag) {
 					if (strpos($scriptTag, $cssTag) !== false) {
 						// e.g. could be '<script>var linkToCss="<link href='[path_to_custom_css_file_here]'>";</script>'
 						unset($hardcodedAssets['link_and_style_tags'][$cssTagIndex]);
@@ -699,7 +700,8 @@ class HardcodedAssets
 		// Only hash the actual path to the file
 		// In case the tag changes (e.g. an attribute will be added), the tag will be considered the same for the plugin rules
 		// To avoid the rules from not working  / e.g. the file could have a dynamic "?ver=" at the end
-		if ( ! (stripos($tagOutput, '<link') !== false || stripos($tagOutput, '<style') !== false || stripos($tagOutput, '<script') !== false) ) {
+		if ( ! (stripos($tagOutput, '<link') !== false || stripos($tagOutput, '<style') !== false
+		        || stripos($tagOutput, '<script') !== false || stripos($tagOutput, '<noscript') !== false) ) {
 			return sha1( $tagOutput ); // default
 		}
 
@@ -710,7 +712,7 @@ class HardcodedAssets
 			return self::determineHardcodedAssetSha1ForAssetsWithSource($tagOutput);
 		}
 
-		if (stripos($tagOutput, '<style') !== false || stripos($tagOutput, '<script') !== false) {
+		if (stripos($tagOutput, '<style') !== false || stripos($tagOutput, '<script') !== false || stripos($tagOutput, '<noscript') !== false) {
 			return self::determineHardcodedAssetSha1ForAssetsWithoutSource($tagOutput);
 		}
 
@@ -732,15 +734,19 @@ class HardcodedAssets
 			preg_match_all('@(<style[^>]*?>)(.*?)</style>@si', $tagOutput, $matches);
 
 			if (isset($matches[0][0], $matches[2][0]) && strlen($tagOutput) === strlen($matches[0][0])) {
-				return sha1( trim($matches[2][0]) ); // the hashed content of the tag
+				return sha1( trim($matches[2][0]) ); // the hashed content of the STYLE tag
 			}
-		}
-
-		if (stripos($tagOutput, '<script') !== false) {
+		} elseif (stripos($tagOutput, '<script') !== false) {
 			preg_match_all('@(<script[^>]*?>)(.*?)</script>@si', $tagOutput, $matches);
 
 			if (isset($matches[0][0], $matches[2][0]) && strlen($tagOutput) === strlen($matches[0][0])) {
-				return sha1( trim($matches[2][0]) ); // the hashed content of the tag
+				return sha1( trim($matches[2][0]) ); // the hashed content of the SCRIPT tag
+			}
+		} elseif (stripos($tagOutput, '<noscript') !== false) {
+			preg_match_all('@(<noscript[^>]*?>)(.*?)</noscript>@si', $tagOutput, $matches);
+
+			if (isset($matches[0][0], $matches[2][0]) && strlen($tagOutput) === strlen($matches[0][0])) {
+				return sha1( trim($matches[2][0]) ); // the hashed content of the NOSCRIPT tag
 			}
 		}
 
@@ -770,81 +776,43 @@ class HardcodedAssets
 	 */
 	public static function getRelSourceFromTagOutputForReference($tagOutput)
 	{
-		$sourceValue = false;
-
-		if ( Misc::isDOMDocumentOn() ) {
-			$domDoc = Misc::initDOMDocument();
-			$domDoc->loadHTML( $tagOutput );
-
-			$selector = new \DOMXPath( $domDoc );
-
-			$domTagQuery = $selector->query( '//link[@rel="stylesheet"]|//script[@src]' );
-			$tagFound    = isset( $domTagQuery[0] ) ? $domTagQuery[0] : false;
-
-			if ( ! $tagFound ) {
-				return false; // default
-			}
-
-			if ( ! in_array( $tagFound->nodeName, array( 'link', 'script' ) ) ) {
-				return false; // default
-			}
-
-			$attrToCheck = $tagFound->nodeName === 'link' ? 'href' : 'src';
-			$extToCheck  = $tagFound->nodeName === 'link' ? 'css' : 'js';
-
-			foreach ( $tagFound->attributes as $attr ) {
-				if ( $attr->nodeName === $attrToCheck ) {
-					$sourceValue = trim( $attr->nodeValue );
-					break; // "href" or "src" was found, stop here
-				}
-			}
+		if (stripos($tagOutput, 'href') !== false && stripos($tagOutput, 'stylesheet') !== false && stripos(trim($tagOutput), '<link') === 0) {
+			$attrToGet  = 'href';
+			$extToCheck = 'css';
 		} else {
-			// RegEx Fallback
-			preg_match_all(
-				'#(?=(?P<link_tag><link[^>]*stylesheet[^>]*(>)))|(?=(?P<script_tag><script[^>]*?>.*</script>))#Umsi',
-				$tagOutput,
-				$matchedTag,
-				PREG_SET_ORDER
-			);
-
-			if ( ! ( isset( $matchedTag[0]['link_tag'] ) || isset( $matchedTag[0]['script_tag'] ) ) ) {
-				return false; // default
-			}
-
-			$attrToCheck = ( isset( $matchedTag[0]['link_tag'] ) && $matchedTag[0]['link_tag'] ) ? 'href' : 'src';
-			$extToCheck  = ( isset( $matchedTag[0]['link_tag'] ) && $matchedTag[0]['link_tag'] ) ? 'css' : 'js';
-
-			$sourceValue = Misc::getValueFromTag($tagOutput, $attrToCheck);
-
-			}
-
-		if ( $sourceValue ) {
-			if ( stripos( $sourceValue, '.' . $extToCheck . '?' ) !== false ) {
-				list( $cleanSource ) = explode( '.' . $extToCheck . '?', $sourceValue );
-				$finalCleanSource = $cleanSource . '.' . $extToCheck;
-			} else {
-				$finalCleanSource = $sourceValue;
-			}
-
-			if ( $finalCleanSource ) {
-				$localAssetPath = OptimizeCommon::getLocalAssetPath( $finalCleanSource, $extToCheck );
-
-				if ( $localAssetPath ) {
-					$sourceRelPath = OptimizeCommon::getSourceRelPath( $finalCleanSource );
-
-					if ( $sourceRelPath ) {
-						return $finalCleanSource;
-					}
-				} else {
-					$finalCleanSource = str_ireplace( array( 'http://', 'https://' ), '', $finalCleanSource );
-					$finalCleanSource = ( strpos( $finalCleanSource, '//' ) === 0 ) ? substr( $finalCleanSource, 2 ) : $finalCleanSource; // if the string starts with '//', remove it
-				}
-			}
-
-			return $finalCleanSource;
+			$attrToGet  = 'src';
+			$extToCheck = 'js';
 		}
 
-		return false;
+		$sourceValue = Misc::getValueFromTag($tagOutput, $attrToGet);
+
+		if (! $sourceValue) {
+			return false;
+		}
+
+		if ( stripos( $sourceValue, '.' . $extToCheck . '?' ) !== false ) {
+			list( $cleanSource ) = explode( '.' . $extToCheck . '?', $sourceValue );
+			$finalCleanSource = $cleanSource . '.' . $extToCheck;
+		} else {
+			$finalCleanSource = $sourceValue;
+		}
+
+		if ( $finalCleanSource ) {
+			$localAssetPath = OptimizeCommon::getLocalAssetPath( $finalCleanSource, $extToCheck );
+
+			if ( $localAssetPath ) {
+				$sourceRelPath = OptimizeCommon::getSourceRelPath( $finalCleanSource );
+
+				if ( $sourceRelPath ) {
+					return $finalCleanSource;
+				}
+			} else {
+				$finalCleanSource = str_ireplace( array( 'http://', 'https://' ), '', $finalCleanSource );
+				$finalCleanSource = ( strpos( $finalCleanSource, '//' ) === 0 ) ? substr( $finalCleanSource, 2 ) : $finalCleanSource; // if the string starts with '//', remove it
+			}
+		}
+
+		return $finalCleanSource;
 	}
 
 	/**

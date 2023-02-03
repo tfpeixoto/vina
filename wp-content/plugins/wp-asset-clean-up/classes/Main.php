@@ -39,11 +39,6 @@ class Main
 	public static $domGetType = 'direct';
 
 	/**
-	 * @var string
-	 */
-	public $assetsRemoved = '';
-
-	/**
 	 * Record them for debugging purposes when using /?wpacu_debug
 	 *
 	 * @var array
@@ -1201,12 +1196,12 @@ SQL;
 	        // Ignore auto generated handles for the hardcoded CSS as they were added for reference purposes
 	        // They will get stripped later on via OptimizeCommon.php
 	        // The handle is used just for reference for later stripping via altering the DOM
-	        if (strpos($handle, 'wpacu_hardcoded_script_inline_') !== false) {
+	        if (strpos($handle, 'wpacu_hardcoded_script_inline_') !== false || strpos($handle, 'wpacu_hardcoded_noscript_inline_') !== false) {
 		        // [wpacu_pro]
-		        $saveMarkedHandles = ObjectCache::wpacu_cache_get('wpacu_hardcoded_scripts_inline') ?: array();
+		        $saveMarkedHandles = ObjectCache::wpacu_cache_get('wpacu_hardcoded_scripts_noscripts_inline') ?: array();
 		        $saveMarkedHandles[] = $handle;
 		        $this->allUnloadedAssets['scripts'][] = $handle; // for "wpacu_no_load" on hardcoded list
-		        ObjectCache::wpacu_cache_set( 'wpacu_hardcoded_scripts_inline', $saveMarkedHandles );
+		        ObjectCache::wpacu_cache_set( 'wpacu_hardcoded_scripts_noscripts_inline', $saveMarkedHandles );
 		        // [/wpacu_pro]
 		        continue;
 	        }
@@ -2516,6 +2511,10 @@ SQL;
 		    $data['all']['hardcoded']  = (array)json_decode($jsonH, ARRAY_A);
 		    $totalHardcodedTags = 0; // default
 
+			if (isset($data['all']['hardcoded']['within_conditional_comments']) && ! empty($data['all']['hardcoded']['within_conditional_comments'])) {
+				ObjectCache::wpacu_cache_set( 'wpacu_hardcoded_content_within_conditional_comments', $data['all']['hardcoded']['within_conditional_comments'] );
+			}
+
 		    ob_start();
 		    // $totalHardcodedTags is set here
 		    include_once WPACU_PLUGIN_DIR.'/templates/meta-box-loaded-assets/_assets-hardcoded-list.php'; // generate $hardcodedTagsOutput
@@ -2769,12 +2768,14 @@ SQL;
      * Including 404, date and search pages (they are considered as ONE page with the same rules for any URL variation)
      *
      * @param int $postId
-     * @param bool $jsonDecoded
+     * @param bool $returnAsArray
      *
-     * @return string (The returned value must be a JSON one)
+     * @return string|array (The returned value must be a JSON one)
      */
-    public function getAssetsUnloadedPageLevel($postId = 0, $jsonDecoded = false)
+    public function getAssetsUnloadedPageLevel($postId = 0, $returnAsArray = false)
     {
+        $defaultEmptyArrayValue = array( 'styles' => array(), 'scripts' => array() );
+
         // Post Type (Overwrites 'front' - home page - if we are in a singular post)
         if ($postId == 0) {
             $postId = (int)$this->getCurrentPostId();
@@ -2782,77 +2783,81 @@ SQL;
 
         $isInAdminPageViaAjax = (is_admin() && defined('DOING_AJAX') && DOING_AJAX);
 
-        if ( empty($this->assetsRemoved) ) {
-            $this->assetsRemoved = wp_json_encode( array( 'styles' => array(), 'scripts' => array() ) );
-	        // For Home Page (latest blog posts)
-	        if ( $postId < 1 && ( $isInAdminPageViaAjax || Misc::isHomePage() ) ) {
-		        $this->assetsRemoved = get_option( WPACU_PLUGIN_ID . '_front_page_no_load' );
-	        } elseif ( $postId > 0 ) { // Singular Page
-		        $this->assetsRemoved = get_post_meta( $postId, '_' . WPACU_PLUGIN_ID . '_no_load', true );
-	        }
+	    $assetsRemovedPageLevel = wp_json_encode( $defaultEmptyArrayValue );
 
-	        @json_decode( $this->assetsRemoved );
-
-	        if ( ! ( Misc::jsonLastError() === JSON_ERROR_NONE ) || empty( $this->assetsRemoved ) || $this->assetsRemoved === '[]' ) {
-		        // Reset value to a JSON formatted one
-		        $this->assetsRemoved = wp_json_encode( array( 'styles' => array(), 'scripts' => array() ) );
-	        }
-
-	        $assetsRemovedDecoded = json_decode( $this->assetsRemoved, ARRAY_A );
-
-	        if (! isset($assetsRemovedDecoded['styles'])) {
-		        $assetsRemovedDecoded['styles'] = array();
-	        }
-
-	        if (! isset($assetsRemovedDecoded['scripts'])) {
-		        $assetsRemovedDecoded['scripts'] = array();
-	        }
-
-            /* [START] Unload CSS/JS on page request for debugging purposes */
-            $assetsUnloadedOnTheFly = array( 'styles' => array(), 'scripts' => array() );
-
-            if ( Misc::getVar( 'get', 'wpacu_unload_css' ) ) {
-                $cssOnTheFlyList = $this->unloadAssetOnTheFly( 'css' );
-
-                if ( ! empty( $cssOnTheFlyList ) ) {
-                    foreach ( $cssOnTheFlyList as $cssHandle ) {
-                        if ( ! in_array( $cssHandle, $assetsRemovedDecoded['styles'] ) ) {
-                            $assetsRemovedDecoded['styles'][] = $assetsUnloadedOnTheFly['styles'][] = $cssHandle;
-                        }
-                    }
-                }
-            }
-
-            if ( Misc::getVar( 'get', 'wpacu_unload_js' ) ) {
-                $jsOnTheFlyList = $this->unloadAssetOnTheFly( 'js' );
-
-                if ( ! empty( $jsOnTheFlyList ) ) {
-                    foreach ( $jsOnTheFlyList as $jsHandle ) {
-                        if ( ! in_array( $jsHandle, $assetsRemovedDecoded['scripts'] ) ) {
-                            $assetsRemovedDecoded['scripts'][] = $assetsUnloadedOnTheFly['scripts'][] = $jsHandle;
-                        }
-                    }
-                }
-            }
-
-            ObjectCache::wpacu_cache_add( 'wpacu_assets_unloaded_list_page_request', $assetsUnloadedOnTheFly );
-            /* [END] Unload CSS/JS on page request for debugging purposes */
-
-	        $this->assetsRemoved = wp_json_encode( $assetsRemovedDecoded );
+        // For Home Page (latest blog posts)
+        if ( $postId < 1 && ( $isInAdminPageViaAjax || Misc::isHomePage() ) ) {
+            $assetsRemovedPageLevel = get_option( WPACU_PLUGIN_ID . '_front_page_no_load' );
+        } elseif ( $postId > 0 ) { // Singular Page
+            $assetsRemovedPageLevel = get_post_meta( $postId, '_' . WPACU_PLUGIN_ID . '_no_load', true );
         }
 
-        if ($jsonDecoded) {
-	        $this->assetsRemoved = (array)@json_decode($this->assetsRemoved);
+        @json_decode( $assetsRemovedPageLevel );
+
+        if ( ! ( Misc::jsonLastError() === JSON_ERROR_NONE ) || empty( $assetsRemovedPageLevel ) || $assetsRemovedPageLevel === '[]' ) {
+            // Reset value to a JSON formatted one
+	        $assetsRemovedPageLevel = wp_json_encode( $defaultEmptyArrayValue );
+        }
+
+        $assetsRemovedDecoded = json_decode( $assetsRemovedPageLevel, ARRAY_A );
+
+        if (! isset($assetsRemovedDecoded['styles'])) {
+            $assetsRemovedDecoded['styles'] = array();
+        }
+
+        if (! isset($assetsRemovedDecoded['scripts'])) {
+            $assetsRemovedDecoded['scripts'] = array();
+        }
+
+        /* [START] Unload CSS/JS on page request for debugging purposes */
+        $assetsUnloadedOnTheFly = $defaultEmptyArrayValue;
+
+        if ( Misc::getVar( 'get', 'wpacu_unload_css' ) ) {
+            $cssOnTheFlyList = $this->unloadAssetOnTheFly( 'css' );
+
+            if ( ! empty( $cssOnTheFlyList ) ) {
+                foreach ( $cssOnTheFlyList as $cssHandle ) {
+                    if ( ! in_array( $cssHandle, $assetsRemovedDecoded['styles'] ) ) {
+                        $assetsRemovedDecoded['styles'][] = $assetsUnloadedOnTheFly['styles'][] = $cssHandle;
+                    }
+                }
+            }
+        }
+
+        if ( Misc::getVar( 'get', 'wpacu_unload_js' ) ) {
+            $jsOnTheFlyList = $this->unloadAssetOnTheFly( 'js' );
+
+            if ( ! empty( $jsOnTheFlyList ) ) {
+                foreach ( $jsOnTheFlyList as $jsHandle ) {
+                    if ( ! in_array( $jsHandle, $assetsRemovedDecoded['scripts'] ) ) {
+                        $assetsRemovedDecoded['scripts'][] = $assetsUnloadedOnTheFly['scripts'][] = $jsHandle;
+                    }
+                }
+            }
+        }
+
+        ObjectCache::wpacu_cache_add( 'wpacu_assets_unloaded_list_page_request', $assetsUnloadedOnTheFly );
+        /* [END] Unload CSS/JS on page request for debugging purposes */
+
+	    $assetsRemovedPageLevel = wp_json_encode( $assetsRemovedDecoded );
+
+        if ($returnAsArray) {
+	        $assetsRemovedPageLevel = (array)@json_decode($assetsRemovedPageLevel);
 
 	        // Make sure there are no objects in the array to avoid any PHP errors later on in PHP 8+
 	        foreach ( array( 'styles', 'scripts' ) as $assetType ) {
-		        if ( isset( $this->assetsRemoved[ $assetType ] ) ) {
-			        $this->assetsRemoved[ $assetType ] = (array) $this->assetsRemoved[ $assetType ];
+		        if ( isset( $assetsRemovedPageLevel[ $assetType ] ) ) {
+			        $assetsRemovedPageLevel[ $assetType ] = (array)$assetsRemovedPageLevel[ $assetType ];
 		        }
 	        }
         }
 
-	    return $this->assetsRemoved;
+        // Hmm, perhaps one of the filters was incorrectly used and returned an array instead of a JSON format; autocorrect this to avoid PHP errors
+        if (! $returnAsArray && is_array($assetsRemovedPageLevel)) {
+            return wp_json_encode( $defaultEmptyArrayValue );
+        }
+
+	    return $assetsRemovedPageLevel;
     }
 
 	/**

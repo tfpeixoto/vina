@@ -32,7 +32,7 @@ if ( ! isset($data, $isCoreFile, $hideCoreFiles, $jqueryIconHtmlHandle, $childHa
 
 	// Any conditions set such as "IE" or "lt IE 8"?
     $dataRowExtra = (array)$data['row']['obj']->extra;
-	// Notify the user the assets load only on Internet Explorer
+    // Notify the user the assets load only on Internet Explorer
 	if ( isset( $dataRowExtra['conditional'] ) && $dataRowExtra['conditional'] && strpos( $dataRowExtra['conditional'], 'IE' ) !== false ) {
         echo '&nbsp;&nbsp;<span><img style="vertical-align: middle;" width="25" height="25" src="'.WPACU_PLUGIN_URL.'/assets/icons/icon-ie.svg" alt="" title="Microsoft / Public domain" />&nbsp;<span style="font-weight: 400; color: #1C87CF;">Loads only in Internet Explorer based on the following condition:</span> <em> if '.$dataRowExtra['conditional'].'</em></span>';
     }

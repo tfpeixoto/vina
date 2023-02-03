@@ -409,7 +409,7 @@ class Misc
 	{
 		$siteUrl = get_bloginfo('url');
 
-		$urlPath = parse_url($siteUrl, PHP_URL_PATH);
+		$urlPath = (string)parse_url($siteUrl, PHP_URL_PATH);
 
 		$requestURI = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
 
@@ -613,6 +613,16 @@ class Misc
 		if ( strpos($tagOutput, '<script') === 0 ) {
 			if ( $attribute === '' ) {
 				$attribute = 'src';
+			}
+
+			// Perhaps the strung "src" is inside an inline JS tag which would make the source value irrelevant
+			// We only need the "src" attribute from a SCRIPT tag that loads a .js file (without any inline JS code)
+			$tagOutputNoTags = trim(strip_tags($tagOutput));
+
+			if ($tagOutputNoTags !== '' && stripos($tagOutputNoTags, 'src') !== false) {
+				// This is an inline tag such as the following:
+				// <script>j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;</script>
+				return false;
 			}
 
 			preg_match_all( '#<script.*?'.$attribute.'\s*=\s*(.*?)#Usmi', $tagOutput, $outputMatches );
@@ -891,6 +901,20 @@ class Misc
 	}
 
 	/**
+	 * @param $e
+	 *
+	 * @return string
+	 */
+	public static function getOuterHTML( $e )
+	{
+		$doc = Misc::initDOMDocument();
+
+		$doc->appendChild( $doc->importNode( $e, true ) );
+
+		return trim( $doc->saveHTML() );
+	}
+
+	/**
 	 * @return array|string
 	 */
 	public static function getW3tcMasterConfig()
@@ -1045,17 +1069,22 @@ HTML;
 	 */
 	public static function addUpdateOption($optionName, $optionValue, $autoload = 'no')
     {
-    	// Nothing in the database | Add it
-    	if (! get_option($optionName)) {
+		$optionValue = is_string($optionValue) ? trim($optionValue) : $optionValue;
+
+	    // Empty array encoded into JSON; No point in keeping the option in the database if it's already there
+	    if ($optionValue === '[]') {
+		    delete_option($optionName);
+		    return;
+	    }
+
+    	// Nothing in the database? Since option does not exist, add it
+    	if (get_option($optionName) === false) {
 		    add_option($optionName, $optionValue, '', $autoload);
 		    return;
 	    }
 
-    	// Empty array encoded into JSON; No point in keeping the option in the database
-    	if ($optionValue === '[]') {
-    		delete_option($optionName);
-    		return;
-	    }
+		// get_option($optionName) didn't return false, thus the option is either an empty string or it has a value
+	    // either way, it exists in the database and the update will be triggered
 
     	// Value is in the database already | Update it
     	update_option($optionName, $optionValue, $autoload);

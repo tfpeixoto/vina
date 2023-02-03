@@ -27,7 +27,10 @@ class MetaBoxes
 		'popupbuilder',
 
 		// "Datafeedr Product Sets" plugin
-		'datafeedr-productset'
+		'datafeedr-productset',
+
+		// Elementor
+		'elementor_library'
 	);
 
 	/**
