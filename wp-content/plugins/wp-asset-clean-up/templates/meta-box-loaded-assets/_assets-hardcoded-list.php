@@ -8,8 +8,9 @@ $hardcodedTags = $data['all']['hardcoded'];
 
 $contentWithinConditionalComments = \WpAssetCleanUp\ObjectCache::wpacu_cache_get('wpacu_hardcoded_content_within_conditional_comments');
 
-$totalFoundHardcodedTags  = isset($hardcodedTags['link_and_style_tags'])        ? count($hardcodedTags['link_and_style_tags'])        : 0;
-$totalFoundHardcodedTags += isset($hardcodedTags['script_src_and_inline_tags']) ? count($hardcodedTags['script_src_and_inline_tags']) : 0;
+$totalFoundHardcodedTags  = isset($hardcodedTags['link_and_style_tags']) ? count($hardcodedTags['link_and_style_tags']) : 0;
+$totalFoundHardcodedTags += isset($hardcodedTags['script_src_or_inline_and_noscript_inline_tags'])
+                            ? count($hardcodedTags['script_src_or_inline_and_noscript_inline_tags']) : 0;
 
 if ($totalFoundHardcodedTags === 0) {
 	return; // Don't print anything if there are no hardcoded tags available
@@ -41,7 +42,7 @@ if ($totalFoundHardcodedTags === 0) {
 			<?php
             $handlesInfo = \WpAssetCleanUp\Main::getHandlesInfo();
 
-			foreach (array('link_and_style_tags', 'script_src_and_inline_tags') as $targetKey) {
+			foreach (array('link_and_style_tags', 'script_src_or_inline_and_noscript_inline_tags') as $targetKey) {
 				$hardcodedTags[ $targetKey ] = array_unique( $hardcodedTags[ $targetKey ] );
 
 				if ( ! empty( $hardcodedTags[ $targetKey ] ) ) {
@@ -51,7 +52,7 @@ if ($totalFoundHardcodedTags === 0) {
 						<div class="wpacu-content-title">
 							<h3>
 								<?php if ($targetKey === 'link_and_style_tags') { ?>Hardcoded LINK (stylesheet) &amp; STYLE tags<?php } ?>
-								<?php if ($targetKey === 'script_src_and_inline_tags') { ?>Hardcoded SCRIPT (with "src" attribute &amp; inline) tags<?php } ?>
+								<?php if ($targetKey === 'script_src_or_inline_and_noscript_inline_tags') { ?>Hardcoded SCRIPT (with "src" attribute &amp; inline) and NOSCRIPT inline tags<?php } ?>
 							</h3>
 						</div>
 						<table class="wpacu_list_table wpacu_striped">
@@ -134,30 +135,36 @@ if ($totalFoundHardcodedTags === 0) {
 									}
 
 									$totalHardcodedTags++;
-								} elseif ($targetKey === 'script_src_and_inline_tags') {
+								} elseif ($targetKey === 'script_src_or_inline_and_noscript_inline_tags') {
 								/*
-								 * 2) Hardcoded SCRIPT (with "src" attribute & inline) tags
+								 * 2) Hardcoded SCRIPT (with "src" attribute & inline) or Hardcoded NOSCRIPT inline tags
 								*/
-									$generatedHandle = $srcHrefOriginal = $isScriptInline = false;
+									$generatedHandle = $srcHrefOriginal = false;
 
-									if ( preg_match('#src(\s+|)=(\s+|)#Umi', $tagOutput) ) {
-										$srcHrefOriginal = \WpAssetCleanUp\Misc::getValueFromTag($tagOutput);
-									}
-
-									if ($srcHrefOriginal) {
-									    // No room for any mistakes, do not print the cached files
-										if (strpos($srcHrefOriginal, \WpAssetCleanUp\OptimiseAssets\OptimizeCommon::getRelPathPluginCacheDir()) !== false) {
-											continue;
+									if ( stripos( $tagOutput, '<script' ) === 0 ) {
+										if ( preg_match( '#src(\s+|)=(\s+|)#Umi', $tagOutput ) ) {
+											$srcHrefOriginal = \WpAssetCleanUp\Misc::getValueFromTag( $tagOutput );
 										}
-										$handlePrefix    = 'wpacu_hardcoded_script_src_';
-										$generatedHandle = $handlePrefix . $contentUniqueStr;
-									}
 
-									// Is it a SCRIPT without "src" attribute? Then it's an inline one
-									if (! $generatedHandle) {
-                                        $handlePrefix    = 'wpacu_hardcoded_script_inline_';
+										if ( $srcHrefOriginal ) {
+											// No room for any mistakes, do not print the cached files
+											if ( strpos( $srcHrefOriginal,
+													\WpAssetCleanUp\OptimiseAssets\OptimizeCommon::getRelPathPluginCacheDir() ) !== false ) {
+												continue;
+											}
+											$handlePrefix    = 'wpacu_hardcoded_script_src_';
+											$generatedHandle = $handlePrefix . $contentUniqueStr;
+										}
+
+										// Is it a SCRIPT without "src" attribute? Then it's an inline one
+										if ( ! $generatedHandle ) {
+											$handlePrefix    = 'wpacu_hardcoded_script_inline_';
+											$generatedHandle = $handlePrefix . $contentUniqueStr;
+										}
+									} elseif ( stripos( $tagOutput, '<noscript' ) === 0 ) {
+										$handlePrefix    = 'wpacu_hardcoded_noscript_inline_';
 										$generatedHandle = $handlePrefix . $contentUniqueStr;
-									}
+                                    }
 
 									$dataRowObj = (object)array(
 										'handle'        => $generatedHandle,

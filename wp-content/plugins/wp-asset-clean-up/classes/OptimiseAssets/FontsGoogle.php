@@ -203,7 +203,7 @@ class FontsGoogle
 							continue;
 						}
 
-						$linkHrefOriginal = Misc::getValueFromTag($linkTag);
+						$finalLinkHref = $linkHrefOriginal = Misc::getValueFromTag($linkTag);
 
 						// [START] Remove invalid requests with no font family
 						$urlParse = parse_url( str_replace( '&amp;', '&', $linkHrefOriginal ), PHP_URL_QUERY );
@@ -217,10 +217,10 @@ class FontsGoogle
 
 						// If anything is set apart from '[none set]', proceed
 						if ( Main::instance()->settings['google_fonts_display'] ) {
-							$newLinkHref = $finalLinkHref = self::alterGoogleFontLink( $linkHrefOriginal );
+							$finalLinkHref = self::alterGoogleFontLink( $linkHrefOriginal );
 
-							if ( $newLinkHref !== $linkHrefOriginal ) {
-								$finalLinkTag = str_replace( $linkHrefOriginal, $newLinkHref, $linkTag );
+							if ( $finalLinkHref !== $linkHrefOriginal ) {
+								$finalLinkTag = str_replace( $linkHrefOriginal, $finalLinkHref, $linkTag );
 
 								// Finally, alter the HTML source
 								$htmlSource = str_replace( $linkTag, $finalLinkTag, $htmlSource );

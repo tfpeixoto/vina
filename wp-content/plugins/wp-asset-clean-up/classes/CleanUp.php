@@ -167,7 +167,7 @@ class CleanUp
 				$nameAttrValue = $tagObject->getAttribute( 'name' );
 
 				if ( $nameAttrValue === 'generator' ) {
-					$outerTag = $outerTagRegExp = trim( self::getOuterHTML( $tagObject ) );
+					$outerTag = $outerTagRegExp = trim( Misc::getOuterHTML( $tagObject ) );
 
 					// As DOMDocument doesn't retrieve the exact string, some alterations to the RegEx have to be made
 					// Leave no room for errors as all sort of characters can be within the "content" attribute
@@ -308,20 +308,6 @@ class CleanUp
 		}
 
 		return $htmlSource;
-	}
-
-	/**
-	 * @param $e
-	 *
-	 * @return string
-	 */
-	public static function getOuterHTML($e)
-	{
-		$doc = Misc::initDOMDocument();
-
-		$doc->appendChild($doc->importNode($e, true));
-
-		return trim($doc->saveHTML());
 	}
 
 	/**
@@ -470,9 +456,11 @@ class CleanUp
 
 			// Remove all embeds rewrite rules.
 			add_filter('rewrite_rules_array', static function ($rules) {
-				foreach($rules as $rule => $rewrite) {
-					if (false !== strpos($rewrite, 'embed=true')) {
-						unset($rules[$rule]);
+				if ( ! empty($rules) ) {
+					foreach ( $rules as $rule => $rewrite ) {
+						if ( is_string($rewrite) && false !== strpos( $rewrite, 'embed=true' ) ) {
+							unset( $rules[ $rule ] );
+						}
 					}
 				}
 				return $rules;

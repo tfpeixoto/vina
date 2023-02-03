@@ -1,7 +1,6 @@
 <?php
 namespace WpAssetCleanUp\OptimiseAssets;
 
-use WpAssetCleanUp\CleanUp;
 use WpAssetCleanUp\Main;
 use WpAssetCleanUp\Menu;
 use WpAssetCleanUp\MetaBoxes;

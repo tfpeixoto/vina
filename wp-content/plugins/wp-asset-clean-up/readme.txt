@@ -4,7 +4,7 @@ Tags: minify css, minify javascript, defer css javascript, page speed, dequeue, 
 Donate link: https://www.gabelivan.com/items/wp-asset-cleanup-pro/?utm_source=wp_org_lite&utm_medium=donate
 Requires at least: 4.6
 Tested up to: 6.1.1
-Stable tag: 1.3.8.9
+Stable tag: 1.3.9.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -191,6 +191,16 @@ With the recently released "Test Mode" feature, you can safely unload assets on 
 4. Homepage CSS & JS Management (List sorted by location)
 
 == Changelog ==
+= 1.3.9.0 =
+* When managing the assets via "Manage in the front-end view", make sure to notify the user when scripts are wrapped by Internet Explorer conditional comments
+* Hide "Manage CSS/JS" link on post types that aren't relevant such as "Elementor" templates
+* Manage CSS/JS: Show the NOSCRIPT tags on the hardcoded list
+* Fix - If a tag (LINK/SCRIPT) is wrapped by IE comments, make sure the wrapping is preserved when the asset is preloaded, otherwise, the asset would load on all browsers when its meant to be loaded only by Internet Explorer
+* Fix - In rare cases when an option value remained empty in the database (e.g. edited directly through phpMyAdmin), add_option() was used instead of update_option()
+* Fix - Warning: strpos() expects parameter 1 to be string, array given in /classes/CleanUp.php (within the "doDisableOembed" method)
+* Fix - PHP Warning: strpos(): Empty needle in /classes/Preloads.php (line: 316)
+* Fix - Fatal error: Uncaught Error: json_decode(): Argument #1 ($json) must be of type string, array given in /classes/Main.php (line: 791)
+
 = 1.3.8.9 =
 * Improvement: Better detection of the tags when the source of a tag (e.g. "src" or "href") is not wrapped around quotes or even has spaces added after or before the equal sign / e.g. <script src=/path/to/file.js></script> OR <link rel=stylesheet href = /path/to/file.css>
 * Whenever XML-RPC is completely disabled in 'Settings' -- 'Disable XML-RPC', make sure the following option is automatically turned ON: 'Settings" --- 'HTML Source CleanUp' -- 'Remove "Really Simple Discovery (RSD)" link tag?'

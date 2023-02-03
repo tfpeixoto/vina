@@ -671,11 +671,7 @@ class OptimizeCss
 	 */
 	public static function updateHtmlSourceOriginalToOptimizedCss($htmlSource)
 	{
-		$parseSiteUrlPath = parse_url(site_url(), PHP_URL_PATH);
-
-		if ($parseSiteUrlPath === null) {
-			$parseSiteUrlPath = '';
-		}
+		$parseSiteUrlPath = (string)parse_url(site_url(), PHP_URL_PATH);
 
 		$siteUrlNoProtocol = str_replace(array('http://', 'https://'), '//', site_url());
 

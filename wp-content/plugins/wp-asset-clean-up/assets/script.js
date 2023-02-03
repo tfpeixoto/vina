@@ -3,11 +3,11 @@
 //
 (function($) {
     $.fn.wpAssetCleanUp = function() {
-        var metaBoxContent = '#wpacu_meta_box_content';
+        let metaBoxContent = '#wpacu_meta_box_content';
 
         return {
             cssJsManagerActions: function () {
-                var cbSelector = '.input-unload-on-this-page',
+                let cbSelector = '.input-unload-on-this-page',
                     cbSelectorNotLocked = '.input-unload-on-this-page.wpacu-not-locked',
                     cbSelectorMakeExceptionOnPage = '.wpacu_load_it_option_one.wpacu_load_exception',
                     handle, handleFor, $targetedAssetRow;
@@ -42,7 +42,7 @@
                 $('.wpacu-plugin-check-all').on('click', function (e) {
                     e.preventDefault();
 
-                    var wpacuPluginTarget = $(this).attr('data-wpacu-plugin');
+                    let wpacuPluginTarget = $(this).attr('data-wpacu-plugin');
                     //console.log(wpacuPluginTarget);
 
                     $('table.wpacu_list_by_location[data-wpacu-plugin="' + wpacuPluginTarget + '"]')
@@ -54,7 +54,7 @@
                 $('.wpacu-plugin-uncheck-all').on('click', function (e) {
                     e.preventDefault();
 
-                    var wpacuPluginTarget = $(this).attr('data-wpacu-plugin');
+                    let wpacuPluginTarget = $(this).attr('data-wpacu-plugin');
 
                     $('table.wpacu_list_by_location[data-wpacu-plugin="' + wpacuPluginTarget + '"]')
                         .find(cbSelectorNotLocked)
@@ -71,8 +71,8 @@
                 $('.wpacu-plugin-check-load-all').on('click change', function (e) {
                     e.preventDefault();
 
-                    var wpacuPluginTarget = $(this).attr('data-wpacu-plugin');
-                    var $wpacuPluginList = $('table.wpacu_list_by_location[data-wpacu-plugin="' + wpacuPluginTarget + '"]');
+                    let wpacuPluginTarget = $(this).attr('data-wpacu-plugin');
+                    let $wpacuPluginList = $('table.wpacu_list_by_location[data-wpacu-plugin="' + wpacuPluginTarget + '"]');
 
                     $wpacuPluginList
                         .find(cbSelectorMakeExceptionOnPage)
@@ -85,8 +85,8 @@
                 $('.wpacu-plugin-uncheck-load-all').on('click change', function (e) {
                     e.preventDefault();
 
-                    var wpacuPluginTarget = $(this).attr('data-wpacu-plugin');
-                    var $wpacuPluginList = $('table.wpacu_list_by_location[data-wpacu-plugin="' + wpacuPluginTarget + '"]');
+                    let wpacuPluginTarget = $(this).attr('data-wpacu-plugin');
+                    let $wpacuPluginList = $('table.wpacu_list_by_location[data-wpacu-plugin="' + wpacuPluginTarget + '"]');
 
                     $wpacuPluginList
                         .find(cbSelectorMakeExceptionOnPage)
@@ -112,12 +112,11 @@
 
                 // Unload on All Pages of post/page/custom post type / site-wide (everywhere) / based on taxonomy
                 $(document).on('click change', '.wpacu_bulk_unload', function (event) {
-                    var $mainThis = $(this);
                     handle = $(this).attr('data-handle');
                     handleFor = $(this).attr('data-handle-for'); // 'style' or 'script' (e.g. 'contact-form-7' has the same name for both)
                     $targetedAssetRow = $('[data-' + handleFor + '-handle-row="' + handle + '"]');
 
-                    var $parentLi = $(this).parents('li');
+                    let $parentLi = $(this).parents('li');
 
                     /**************************************************************
                      * STATE 1: The checkbox IS CHECKED (show multiple drop-down)
@@ -218,13 +217,13 @@
                     'click change', // when these actions are taken
                     cbSelectorMakeExceptionOnPage + ',' + '.wpacu_load_it_option_post_type', // on these elements
                     function () { // trigger the following function
-                        var handle = $(this).attr('data-handle');
+                        let handle = $(this).attr('data-handle');
 
                         if ($(this).prop('checked')) {
                             $(this).parent('label').addClass('wpacu_global_unload_exception');
 
                             // Uncheck "Unload on this page" as it's not relevant anymore
-                            var asset_type = '';
+                            let asset_type = '';
 
                             if ($(this).hasClass('wpacu_style')) {
                                 asset_type = 'style';
@@ -243,7 +242,7 @@
                 $(document).on('click', '.wpacu-add-handle-note', function (e) {
                     e.preventDefault();
 
-                    var wpacuHandle = $(this).attr('data-handle'), $wpacuNotesFieldArea, $wpacuNoteInput;
+                    let wpacuHandle = $(this).attr('data-handle'), $wpacuNotesFieldArea, $wpacuNoteInput;
 
                     if ($(this).hasClass('wpacu-for-script')) {
                         $wpacuNotesFieldArea = $('.wpacu-handle-notes-field[data-script-handle="' + wpacuHandle + '"]');
@@ -277,7 +276,7 @@
                 $(document).on('click', '.wpacu-external-file-size', function (e) {
                     e.preventDefault();
 
-                    var $wpacuCurrentTarget = $(this),
+                    let $wpacuCurrentTarget = $(this),
                         $wpacuFileSizeArea,
                         wpacuRemoteFile = $wpacuCurrentTarget.attr('data-src');
 
@@ -306,11 +305,11 @@
                 });
                 // [/Get external asset size]
 
-                // Note: Starting from July 24, 2021, development has started to use AJAX to save the state
+                // Note: Starting from July 24, 2021, AJAX is used to save the state
                 $(document).on('click', '.wpacu_handle_row_expand_contract', function (e) {
                     e.preventDefault();
 
-                    var wpacuAssetHandle = $(this).attr('data-wpacu-handle'),
+                    let wpacuAssetHandle = $(this).attr('data-wpacu-handle'),
                         wpacuAssetHandleFor = $(this).attr('data-wpacu-handle-for'),
                         wpacuNewAssetRowState;
 
@@ -385,8 +384,7 @@
             },
 
             showHandleLoadExceptionArea: function (handleFor, handle) {
-                //console.log('div.wpacu_exception_options_area_wrap[data-'+ handleFor +'-handle="'+ handle +'"]');
-                var $targetedLoadExceptionArea = $('div.wpacu_exception_options_area_wrap[data-' + handleFor + '-handle="' + handle + '"]');
+                let $targetedLoadExceptionArea = $('div.wpacu_exception_options_area_wrap[data-' + handleFor + '-handle="' + handle + '"]');
                 $targetedLoadExceptionArea.parent('div').removeClass('wpacu_hide');
                 // Remove "disabled" attribute to any load exceptions checkboxes
                 // Except the locked ones if the Lite version is used
@@ -398,7 +396,7 @@
                 // Then HIDE make exceptions area
                 if (!$targetedAssetRow.hasClass('wpacu_is_bulk_unloaded')) {
                     if (!$targetedAssetRow.find('.wpacu_bulk_unload').is(':checked')) {
-                        var $targetedLoadExceptionArea = $('div.wpacu_exception_options_area_wrap[data-' + handleFor + '-handle="' + handle + '"]');
+                        let $targetedLoadExceptionArea = $('div.wpacu_exception_options_area_wrap[data-' + handleFor + '-handle="' + handle + '"]');
                         $targetedLoadExceptionArea.parent('div').addClass('wpacu_hide');
                         // Set "disabled" attribute any load exceptions checkboxes as they are irrelevant in this instance
                         $targetedLoadExceptionArea.find('input[type="checkbox"]').prop('disabled', true);
@@ -407,8 +405,7 @@
             },
 
             uncheckAllOtherBulkUnloadRules: function ($targetInput, includingUnloadViaRegEx) {
-                //console.log($targetInput.closest('tr').find('.wpacu_unload_rule_input'));
-                var wpacuToFind = '.wpacu_bulk_unload';
+                let wpacuToFind = '.wpacu_bulk_unload';
 
                 if (includingUnloadViaRegEx === false) {
                     wpacuToFind = '.wpacu_bulk_unload:not(.wpacu_unload_it_regex_checkbox)';
@@ -423,18 +420,17 @@
             },
 
             limitSubmittedFields: function () {
-                var wpacuSubmitForm = false,
-                    preloadTargetInput = '[data-wpacu-input="preload"]',
+                let preloadTargetInput = '[data-wpacu-input="preload"]',
                     wpacuListToCheck = [];
 
                 // Edit post/page area (e.g. /wp-admin/post.php?post=[POST_ID_HERE]&action=edit)
                 // OR edit taxonomy area (e.g. /wp-admin/term.php?taxonomy=category&tag_ID=63&post_type=post)
                 if ($('body.wp-admin form#post').length > 0 || $('body.wp-admin form#edittag').length > 0) {
                     if ($('#wpacu_unload_assets_area_loaded').length < 1) {
-                        return true; // the CSS/JS area is not loaded on edit post/page area, thus no reason to continue
+                        return; // the CSS/JS area is not loaded on edit post/page area, thus no reason to continue
                     }
 
-                    wpacuSubmitForm = true; // leave it always to true as the edit post/page/taxonomy form needs to always submit (might be edited later on)
+                    return true; // leave it always to true as the edit post/page/taxonomy form needs to always submit (might be edited later on)
                 }
 
                 if ($(preloadTargetInput).length > 0) {
@@ -442,20 +438,19 @@
                 }
 
                 if (wpacuListToCheck.length > 0) {
-                    //console.log(wpacuListToCheck.join());
                     $(wpacuListToCheck.join()).each(function () {
-                        //console.log($(this).val());
-                        if (!$(this).val()) {
-                            $(this).prop('disabled', 'disabled');
+                        let $thisEl = $(this);
+                        if ( ! $thisEl.val() ) {
+                            $thisEl.prop('disabled', 'disabled');
+
+                            setTimeout(function () {
+                                $thisEl.prop('disabled', false);
+                            }, 2000); // restore them in case the user pressed "Preview Changes"
                         }
-                    }).promise().done(function () {
-                        wpacuSubmitForm = true;
                     });
-                } else {
-                    wpacuSubmitForm = true; // "Do not load Asset CleanUp Pro on this page (this will disable any functionality of the plugin)" could be enabled
                 }
 
-                return wpacuSubmitForm;
+                return true;
             },
 
             wpacuParseContentsForDirectCall: function (contents, statusCode) {
@@ -466,7 +461,7 @@
                 ) {
                     // Sometimes, 200 OK (success) is returned, but due to an issue with the page, the assets list is not retrieved
                     // Do further checks if any of the markers are missing (even if there are no assets to manage, they should be printed)
-                    var wpacuOutputError = wpacu_object.ajax_direct_fetch_error_with_success_response;
+                    let wpacuOutputError = wpacu_object.ajax_direct_fetch_error_with_success_response;
 
                     // Strip tags (Source: https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/)
                     wpacuOutputError = wpacuOutputError.replace(
@@ -485,7 +480,7 @@
                     return;
                 }
 
-                var wpacuListE = contents.substring(
+                let wpacuListE = contents.substring(
                     (contents.lastIndexOf(wpacu_object.start_del_e) + wpacu_object.start_del_e.length),
                     contents.lastIndexOf(wpacu_object.end_del_e)
                 );
@@ -493,12 +488,12 @@
                 /*
                  * IMPORTANT NOTE: It looks like UglifyJS jas issues preserving comments that are after consecutive "var"
                  */
-                var wpacuListH = contents.substring(
+                let wpacuListH = contents.substring(
                     (contents.lastIndexOf(wpacu_object.start_del_h) + wpacu_object.start_del_h.length),
                     contents.lastIndexOf(wpacu_object.end_del_h)
                 );
 
-                var dataGetLoadedAssets = {
+                let dataGetLoadedAssets = {
                     'action'            : wpacu_object.plugin_prefix + '_get_loaded_assets',
                     'wpacu_list_e'      : wpacuListE,
                     'wpacu_list_h'      : wpacuListH,
@@ -550,9 +545,9 @@
                 // Was "Do not load Asset CleanUp Pro on this page (this will disable any functionality of the plugin)" ticked?
                 // Do not load any list! Instead, make an AJAX call to load the restricted area mentioning that the restriction took effect
 
-                var pageOptionNoPluginLoadTarget = '#wpacu_page_options_no_wpacu_load';
+                let pageOptionNoPluginLoadTarget = '#wpacu_page_options_no_wpacu_load';
                 if ($(pageOptionNoPluginLoadTarget).length > 0 && $(pageOptionNoPluginLoadTarget).prop('checked')) {
-                    var dataLoadPageRestrictedArea = {
+                    let dataLoadPageRestrictedArea = {
                         'action'      : wpacu_object.plugin_prefix + '_load_page_restricted_area',
                         'post_id'     : wpacu_object.post_id,
                         'wpacu_nonce' : wpacu_object.wpacu_ajax_load_page_restricted_area_nonce,
@@ -573,7 +568,7 @@
                     return;
                 }
 
-                var dataDirect = {};
+                let dataDirect = {};
 
                 if (wpacu_object.dom_get_type === 'direct') {
                     dataDirect[wpacu_object.plugin_prefix + '_load']   = 1;
@@ -593,7 +588,7 @@
                                 }
 
                                 // Strip any tags (Source: https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/)
-                                var errorTextOutput = xhr.responseText.replace(/(<([^>]+)>)/ig, '');
+                                let errorTextOutput = xhr.responseText.replace(/(<([^>]+)>)/ig, '');
 
                                 // htmlEntities() PHP equivalent: https://css-tricks.com/snippets/javascript/htmlentities-for-javascript/
                                 try {
@@ -602,7 +597,7 @@
                                     console.log(e);
                                 }
 
-                                var wpacuOutputError = wpacu_object.ajax_direct_fetch_error;
+                                let wpacuOutputError = wpacu_object.ajax_direct_fetch_error;
                                     wpacuOutputError = wpacuOutputError.replace(/{wpacu_output}/, errorTextOutput);
                                     wpacuOutputError = wpacuOutputError.replace(/{wpacu_status_code_error}/, xhr.status);
 
@@ -610,9 +605,6 @@
                             }
                         }
                     }).done(function (contents, _textStatus, jqXHR) {
-                        //console.log(jqXHR);
-                        //console.log(jqXHR.getAllResponseHeaders());
-
                         // "Step 1" (Fetch the assets from the home page) is now completed
                         $('#wpacu-fetch-list-step-1-wrap').addClass('wpacu-completed');
                         $('#wpacu-fetch-list-step-1-status').html($('#wpacu-list-step-completed-status').html());
@@ -622,7 +614,7 @@
                         $.fn.wpAssetCleanUp().wpacuParseContentsForDirectCall(contents);
                     });
                 } else if (wpacu_object.dom_get_type === 'wp_remote_post') {
-                    var dataGetLoadedAssets = {
+                    let dataGetLoadedAssets = {
                         'action':             wpacu_object.plugin_prefix + '_get_loaded_assets',
                         'post_id':            wpacu_object.post_id,
                         'page_url':           wpacu_object.page_url,
@@ -661,14 +653,14 @@
                 }
 
                 // IMPORTANT NOTE: It looks like UglifyJS has issues preserving comments that are after consecutive "var"
-                var wpacuListH = contents.substring(
+                let wpacuListH = contents.substring(
                     (contents.lastIndexOf(wpacu_object.start_del_h) + wpacu_object.start_del_h.length),
                     contents.lastIndexOf(wpacu_object.end_del_h)
                 );
 
-                var wpacuSettings = $('#wpacu-assets-collapsible-wrap-hardcoded-list').attr('data-wpacu-settings-frontend');
+                let wpacuSettings = $('#wpacu-assets-collapsible-wrap-hardcoded-list').attr('data-wpacu-settings-frontend');
 
-                var dataGetLoadedHardcodedAssets = {
+                let dataGetLoadedHardcodedAssets = {
                     'action'          : wpacu_object.plugin_prefix + '_print_loaded_hardcoded_assets',
                     'wpacu_list_h'    : wpacuListH,
                     'wpacu_settings'  : wpacuSettings, // includes $data values as well (with rules) to pass to the hardcoded list
@@ -677,7 +669,7 @@
                 };
 
                 $.post(wpacu_object.ajax_url, dataGetLoadedHardcodedAssets, function (response) {
-                    var $mainJQuerySelector = '#wpacu-assets-collapsible-wrap-hardcoded-list';
+                    let $mainJQuerySelector = '#wpacu-assets-collapsible-wrap-hardcoded-list';
 
                     if (!response) {
                         return;
@@ -688,7 +680,7 @@
                         return;
                     }
 
-                    var responseJson = JSON.parse(response);
+                    let responseJson = JSON.parse(response);
 
                     $($mainJQuerySelector).find('> .wpacu-assets-collapsible-content').html(responseJson.output);
                     $($mainJQuerySelector).find('a.wpacu-assets-collapsible')
@@ -698,16 +690,16 @@
 
             wpacuCheckSourcesFor404Errors: function() {
                 // Trigger on page load (front-end view)
-                var $targetSources = $('[data-wpacu-external-source]');
+                let $targetSources = $('[data-wpacu-external-source]');
 
                 if ($targetSources.length < 1) {
                     return;
                 }
 
-                var totalExternalSources = $targetSources.length, checkUrlsToPass = '';
+                let totalExternalSources = $targetSources.length, checkUrlsToPass = '';
 
                 $targetSources.each(function(wpacuIndex) {
-                    var $targetSource = $(this), sourceUrl = $targetSource.attr('data-wpacu-external-source');
+                    let $targetSource = $(this), sourceUrl = $targetSource.attr('data-wpacu-external-source');
 
                     checkUrlsToPass += sourceUrl + '-at-wpacu-at-';
 
@@ -717,7 +709,7 @@
                             'wpacu_check_urls'  : checkUrlsToPass,
                             'wpacu_nonce'       : wpacu_object.wpacu_ajax_check_external_urls_nonce
                         }, function(response) {
-                            var urlsList = $.parseJSON(response);
+                            let urlsList = $.parseJSON(response);
 
                             $.each(urlsList, function(index, sourceToHi) {
                                 $('[data-wpacu-external-source="'+ sourceToHi +'"]')
@@ -745,14 +737,14 @@
 
             wpacuAjaxUpdateKeepTheGroupsState: function(newState, btnIdClicked) {
                 // Don't use resources and perform the AJAX call if the same "state" button is clicked
-                var dataCurrentState = $('#wpacu-assets-groups-change-state-area').attr('data-wpacu-groups-current-state');
+                let dataCurrentState = $('#wpacu-assets-groups-change-state-area').attr('data-wpacu-groups-current-state');
 
                 if (dataCurrentState == newState) {
                     $('#' + btnIdClicked).prop('disabled', false); // Don't leave the button disabled
                     return;
                 }
 
-                var dataUpdateSetting = {
+                let dataUpdateSetting = {
                     'action'                       : wpacu_object.plugin_prefix + '_update_settings',
                     'wpacu_nonce'                  : wpacu_object.wpacu_update_specific_settings_nonce,
                     'wpacu_update_keep_the_groups' : 'yes',
@@ -773,7 +765,7 @@
                 }
             },
             wpacuAjaxUpdateKeepTheAssetRowState: function(newState, handle, handleFor, $currentElement) {
-                var dataUpdateSetting = {
+                let dataUpdateSetting = {
                     'action'                       : wpacu_object.plugin_prefix + '_update_asset_row_state',
                     'wpacu_update_asset_row_state' : 'yes',
                     'wpacu_asset_row_state'        : newState, // "expanded" or "contracted"
@@ -793,7 +785,7 @@
 
             wpacuTriggerAdjustTextAreaHeightAllTextareas: function() {
                 // We use the "data-wpacu-adapt-height" attribute as a marker
-                var wpacuTextAreas = [].slice.call(document.querySelectorAll('textarea[data-wpacu-adapt-height="1"]'));
+                let wpacuTextAreas = [].slice.call(document.querySelectorAll('textarea[data-wpacu-adapt-height="1"]'));
 
                 // Iterate through all the textareas on the page
                 wpacuTextAreas.forEach(function(el) {
@@ -804,7 +796,7 @@
                     el.style.overflowY = 'hidden';
 
                     // the minimum height initiated through the "rows" attribute
-                    var minHeight = el.scrollHeight;
+                    let minHeight = el.scrollHeight;
 
                     el.addEventListener('input', function() {
                         $.fn.wpAssetCleanUp().wpacuAdjustTextareaHeight(el, minHeight);
@@ -822,8 +814,8 @@
             wpacuAdjustTextareaHeight: function(el, minHeight) {
                 /* Source: http://bdadam.com/blog/automatically-adapting-the-height-textarea.html */
                 // compute the height difference which is caused by border and outline
-                var outerHeight = parseInt(window.getComputedStyle(el).height, 10);
-                var diff = outerHeight - el.clientHeight;
+                let outerHeight = parseInt(window.getComputedStyle(el).height, 10);
+                let diff = outerHeight - el.clientHeight;
 
                 // set the height to 0 in case of it has to be shrunk
                 el.style.height = 0;
@@ -847,7 +839,6 @@ jQuery(document).ready(function($) {
                 * Settings: A link is clicked that should trigger a vertical menu link from the plugin
                  */
                 $(document).on('click', 'a[data-wpacu-vertical-link-target]', function (e) {
-                    //console.log('clicked...');
                     e.preventDefault();
                     $.fn.wpAssetCleanUpSettingsArea().tabOpenSettingsArea(e, $(this).attr('data-wpacu-vertical-link-target'));
                 });
@@ -856,7 +847,6 @@ jQuery(document).ready(function($) {
                  * A vertical tab is clicked
                  */
                 $(document).on('click', 'a[data-wpacu-settings-tab-key]', function (e) {
-                    //console.log('clicked...');
                     e.preventDefault();
                     $.fn.wpAssetCleanUpSettingsArea().tabOpenSettingsArea(e, $(this).attr('data-wpacu-settings-tab-key'));
                 });
@@ -1043,7 +1033,7 @@ jQuery(document).ready(function($) {
                 });
 
                 // Submit button (Dashboard) is clicked
-                var $settingSubmitBtn = $('#wpacu-update-button-area input[type="submit"]');
+                let $settingSubmitBtn = $('#wpacu-update-button-area input[type="submit"]');
 
                 // Show the loading spinner
                 $(document).on('submit', '#wpacu-settings-form, .wpacu-settings-form', function() {
@@ -1066,7 +1056,7 @@ jQuery(document).ready(function($) {
                 */
                 evt.preventDefault();
 
-                var i, wpacuVerticalTabContent, wpacuVerticalTabLinks;
+                let i, wpacuVerticalTabContent, wpacuVerticalTabLinks;
 
                 wpacuVerticalTabContent = document.getElementsByClassName("wpacu-settings-tab-content");
 
@@ -1102,7 +1092,7 @@ jQuery(document).ready(function($) {
                 /*
                 * "Tools" -> "Reset"
                 */
-                var wpacuResetDdSelector = '#wpacu-reset-drop-down', $wpacuOptionSelected, wpacuMsgToShow;
+                let wpacuResetDdSelector = '#wpacu-reset-drop-down', $wpacuOptionSelected, wpacuMsgToShow;
 
                 $(wpacuResetDdSelector).on('change keyup keydown mouseup mousedown click', function() {
                     if ($(this).val() === '') {
@@ -1178,7 +1168,7 @@ jQuery(document).ready(function($) {
         return {
             actions: function () {
                 // "Update" button is clicked within front-end view
-                var $updateBtnFrontEnd = $('#wpacu-update-front-settings-area .wpacu_update_btn');
+                let $updateBtnFrontEnd = $('#wpacu-update-front-settings-area .wpacu_update_btn');
 
                 // Show the loading spinner
                 $(document).on('submit', '#wpacu-frontend-form', function() {
@@ -1197,7 +1187,7 @@ jQuery(document).ready(function($) {
                 // The code below is for the pages loaded in the front-end view
                 // Fetch hardcoded assets
                 if ($('#wpacu-assets-collapsible-wrap-hardcoded-list').length > 0) {
-                    var dataFetchHardcodedList = {};
+                    let dataFetchHardcodedList = {};
                     dataFetchHardcodedList[wpacu_object.plugin_prefix + '_load']   = 1;
                     dataFetchHardcodedList[wpacu_object.plugin_prefix + '_time_r'] = new Date().getTime();
                     dataFetchHardcodedList['wpacu_just_hardcoded']                 = 1;
@@ -1208,7 +1198,6 @@ jQuery(document).ready(function($) {
                         data: dataFetchHardcodedList,
                         cache: false,
                         complete: function (xhr, textStatus) {
-                            //console.log(xhr);
                             if (xhr.statusText === 'error') {
                                 $.fn.wpAssetCleanUp().wpacuParseResultsForHarcodedAssets(xhr.responseText);
                                 }
@@ -1252,13 +1241,11 @@ jQuery(document).ready(function($) {
                 // Asset CleanUp meta box's content is refreshed to show the latest changes as if the page was refreshed
                 // This takes effect only when edit post/page is used and Gutenberg editor is used - e.g. /wp-admin/post.php?post=[post_id_here]&action=edit
                 $(document).on('click', '.wp-admin.post-php .edit-post-header__settings button.is-primary', function () {
-                    $.fn.wpAssetCleanUp().limitSubmittedFields();
-
-                    var $thisUpdateBtn = $(this);
+                    let $thisUpdateBtn = $(this);
 
                     // Wait until triggering it around half a second after the "Update" button is clicked
                     setTimeout(function() {
-                        var wpacuIntervalUpdateAction = function () {
+                        let wpacuIntervalUpdateAction = function () {
                             // If it's in the updating status, don't do anything
                             if ($thisUpdateBtn.attr('aria-disabled') === 'true' || $('#editor').hasClass('is-validating')) {
                                 return;
@@ -1273,11 +1260,11 @@ jQuery(document).ready(function($) {
                             // Updating status is over. Reload the CSS/JS manager which would show the new list
                             // (e.g. a site-wide rule could be applied, and it needs to show the removing "radio input" option)
                             if ($('.edit-post-header__settings .is-saving').length === 0) {
-                                var wpacuMetaBoxContentTarget = '#wpacu_meta_box_content';
+                                let wpacuMetaBoxContentTarget = '#wpacu_meta_box_content';
 
                                 if ($(wpacuMetaBoxContentTarget).length > 0) {
                                     $('#wpacu-assets-reloading').remove();
-                                    var wpacuAppendToPostWhileUpdating = '<span id="wpacu-assets-reloading" class="editor-post-saved-state is-wpacu-reloading">' + wpacu_object.reload_icon + wpacu_object.reload_msg + '</span>';
+                                    let wpacuAppendToPostWhileUpdating = '<span id="wpacu-assets-reloading" class="editor-post-saved-state is-wpacu-reloading">' + wpacu_object.reload_icon + wpacu_object.reload_msg + '</span>';
                                     $('.wp-admin.post-php .edit-post-header__settings').prepend(wpacuAppendToPostWhileUpdating);
 
                                     $('.wpacu_asset_row, .wpacu-page-options .wpacu-assets-collapsible-content').addClass('wpacu-loading'); // show loading spinner once "Update" is clicked
@@ -1292,9 +1279,11 @@ jQuery(document).ready(function($) {
                             }
                         };
 
-                        var wpacuUpdateIntervalId = setInterval(wpacuIntervalUpdateAction, 900);
+                        let wpacuUpdateIntervalId = setInterval(wpacuIntervalUpdateAction, 900);
                     }, 500);
                 });
+
+                return $.fn.wpAssetCleanUp().limitSubmittedFields();
             }
         }
     }
@@ -1357,7 +1346,7 @@ jQuery(document).ready(function($) {
 
             afterSubmit: function () {
                 try {
-                    var httpRefererFieldTargetName = 'input[type="hidden"][name="_wp_http_referer"]',
+                    let httpRefererFieldTargetName = 'input[type="hidden"][name="_wp_http_referer"]',
                         wpacuHttpRefererFieldVal;
 
                     if ($(httpRefererFieldTargetName).length > 0) {
@@ -1387,7 +1376,7 @@ jQuery(document).ready(function($) {
                 }
 
                 // Is the post status a "draft" one? Do not do any cache clearing and preloading as it's useless
-                var $wpacuHiddenPostStatusEl = '#hidden_post_status';
+                let $wpacuHiddenPostStatusEl = '#hidden_post_status';
                 if ($($wpacuHiddenPostStatusEl).length > 0 && $($wpacuHiddenPostStatusEl).val() === 'draft') {
                     return;
                 }
@@ -1435,7 +1424,7 @@ jQuery(document).ready(function($) {
                     return;
                 }
 
-                var wpacuAutoptimizeClickEl = '#wp-admin-bar-autoptimize-default li';
+                let wpacuAutoptimizeClickEl = '#wp-admin-bar-autoptimize-default li';
 
                 // Autoptimize elements & variables: make sure they are all initialized
                 if ($(wpacuAutoptimizeClickEl).length > 0
@@ -1468,7 +1457,7 @@ jQuery(document).ready(function($) {
                 // Items are marked for removal from the unload list
                 // from either "Everywhere" or "Post Type"
                 $(document).on('click', '.wpacu_bulk_rule_checkbox, .wpacu_remove_preload', function() {
-                    var $wpacuBulkChangeRow = $(this).parents('.wpacu_bulk_change_row');
+                    let $wpacuBulkChangeRow = $(this).parents('.wpacu_bulk_change_row');
 
                     if ($(this).prop('checked')) {
                         $wpacuBulkChangeRow.addClass('wpacu_selected');
