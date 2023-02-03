@@ -11,7 +11,7 @@ class ImportExport
 {
 	/***** BEGIN EXPORT ******/
 	/**
-	 * @return false|mixed|string|void
+	 * @return string
 	 */
 	public function jsonSettings()
 	{
@@ -27,10 +27,10 @@ class ImportExport
 		$settingsArray['disable_wp_block_library']     = in_array( 'wp-block-library', $globalUnloadList['styles'] );
 
 		// JS
-		$settingsArray['disable_jquery_migrate']       = in_array( 'jquery-migrate',   $globalUnloadList['scripts'] );
-		$settingsArray['disable_comment_reply']        = in_array( 'comment-reply',    $globalUnloadList['scripts'] );
+		$settingsArray['disable_jquery_migrate'] = in_array( 'jquery-migrate',   $globalUnloadList['scripts'] );
+		$settingsArray['disable_comment_reply']  = in_array( 'comment-reply',    $globalUnloadList['scripts'] );
 
-		return json_encode($settingsArray);
+		return wp_json_encode($settingsArray);
 	}
 
 	/**
@@ -55,7 +55,7 @@ class ImportExport
 		// Last important check
 		\check_admin_referer('wpacu_do_export', 'wpacu_do_export_nonce');
 
-		$exportComment = 'Exported [exported_text] via '.WPACU_PLUGIN_TITLE.' (v'.WPACU_PRO_PLUGIN_VERSION.') - Timestamp: '.time();
+		$exportComment = 'Exported [exported_text] via '.WPACU_PLUGIN_TITLE.' (v'.WPACU_PLUGIN_VERSION.') - Timestamp: '.time();
 
 		// "Settings" values (could be just default ones if none are found in the database)
 		if ($wpacuExportFor === 'settings') {
@@ -67,8 +67,6 @@ class ImportExport
 				'__comment' => $exportComment,
 				'settings'  => json_decode($settingsJson, ARRAY_A)
 			);
-
-			$valuesJson = json_encode($valuesArray);
 		} elseif ($wpacuExportFor === 'everything') {
 			$exportComment = str_replace('[exported_text]', 'Everything', $exportComment);
 
@@ -90,8 +88,22 @@ class ImportExport
 			$bulkUnloadListJson = get_option(WPACU_PLUGIN_ID . '_bulk_unload');
 			$bulkUnloadArray    = json_decode($bulkUnloadListJson, ARRAY_A);
 
-			$globalDataListJson = get_option(WPACU_PLUGIN_ID . '_global_data');
-			$globalDataArray    = json_decode($globalDataListJson, ARRAY_A);
+			// Post type: load exceptions
+			$postTypeLoadExceptionsJson  = get_option(WPACU_PLUGIN_ID . '_post_type_load_exceptions');
+			$postTypeLoadExceptionsArray = json_decode($postTypeLoadExceptionsJson, ARRAY_A);
+
+			$globalDataListJson  = get_option(WPACU_PLUGIN_ID . '_global_data');
+			$globalDataListArray = json_decode($globalDataListJson, ARRAY_A);
+
+			// [wpacu_pro]
+			// Load exceptions for extras: is_archive(), author, search, 404 pages
+			$extrasLoadExceptionsListJson = get_option(WPACU_PLUGIN_ID . '_extras_load_exceptions');
+			$extrasLoadExceptionsArray    = json_decode($extrasLoadExceptionsListJson, ARRAY_A);
+
+			// Load exceptions for pages that have certain taxonomies set
+			$postTypeViaTaxLoadExceptionsJson  = get_option(WPACU_PLUGIN_ID . '_post_type_via_tax_load_exceptions');
+			$postTypeViaTaxLoadExceptionsArray = json_decode($postTypeViaTaxLoadExceptionsJson, ARRAY_A);
+			// [/wpacu_pro]
 
 			global $wpdb;
 
@@ -120,12 +132,20 @@ SQL;
 				),
 
 				'global_unload' => $globalUnloadArray,
-				'bulk_unload'   => $bulkUnloadArray,
-				'global_data'   => $globalDataArray,
-				'posts_metas'   => $allMetasResults
-			);
 
-			$valuesJson = json_encode($valuesArray);
+				'bulk_unload'   => $bulkUnloadArray,
+				'post_type_exceptions'         => $postTypeLoadExceptionsArray,
+				// [wpacu_pro]
+				'post_type_via_tax_exceptions' => $postTypeViaTaxLoadExceptionsArray,
+			    // [/wpacu_pro]
+
+				'global_data'   => $globalDataListArray,
+				// [wpacu_pro]
+				'extras_exceptions' => $extrasLoadExceptionsArray,
+				// [/wpacu_pro]
+
+				'posts_metas'   => $allMetasResults,
+			);
 		} else {
 			return; // has to be "Settings" or "Everything"
 		}
@@ -139,7 +159,7 @@ SQL;
 		header('Content-Type: application/json');
 		header('Content-Disposition: attachment; filename="asset-cleanup-lite-exported-'.$wpacuExportForPartOfFileName.'-from-'.$host.'-'.$date.'.json"');
 
-		echo $valuesJson;
+		echo wp_json_encode($valuesArray);
 		exit();
 	}
 	/***** END EXPORT ******/
@@ -171,7 +191,7 @@ SQL;
 			return;
 		}
 
-		$valuesJson = FileSystem::file_get_contents($jsonTmpName);
+		$valuesJson = FileSystem::fileGetContents($jsonTmpName);
 
 		$valuesArray = json_decode($valuesJson, ARRAY_A);
 
@@ -209,42 +229,56 @@ SQL;
 				)
 			);
 
-			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_settings', json_encode($valuesArray['settings']));
+			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_settings', wp_json_encode($valuesArray['settings']));
 			$importedList[] = 'settings';
 		}
 
 		// "Homepage" Unloads
 		if (isset($valuesArray['homepage']['unloads']['scripts'])
 		    || isset($valuesArray['homepage']['unloads']['styles'])) {
-			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_front_page_no_load', json_encode($valuesArray['homepage']['unloads']));
+			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_front_page_no_load', wp_json_encode($valuesArray['homepage']['unloads']));
 			$importedList[] = 'homepage_unloads';
 		}
 
 		// "Homepage" Load Exceptions
 		if (isset($valuesArray['homepage']['load_exceptions']['scripts'])
 		    || isset($valuesArray['homepage']['load_exceptions']['styles'])) {
-			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_front_page_load_exceptions', json_encode($valuesArray['homepage']['load_exceptions']));
+			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_front_page_load_exceptions', wp_json_encode($valuesArray['homepage']['load_exceptions']));
 			$importedList[] = 'homepage_exceptions';
 		}
 
 		// "Site-Wide" (Everywhere) Unloads
 		if (isset($valuesArray['global_unload']['scripts'])
 		    || isset($valuesArray['global_unload']['styles'])) {
-			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_global_unload', json_encode($valuesArray['global_unload']));
+			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_global_unload', wp_json_encode($valuesArray['global_unload']));
 			$importedList[] = 'sitewide_unloads';
 		}
 
 		// Bulk Unloads (e.g. Unload on all pages of product post type)
 		if (isset($valuesArray['bulk_unload']['scripts'])
 		    || isset($valuesArray['bulk_unload']['styles'])) {
-			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_bulk_unload', json_encode($valuesArray['bulk_unload']));
+			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_bulk_unload', wp_json_encode($valuesArray['bulk_unload']));
 			$importedList[] = 'bulk_unload';
 		}
+
+		// Post type: load exception
+		if (isset($valuesArray['post_type_exceptions']) && ! empty($valuesArray['post_type_exceptions'])) {
+			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_post_type_load_exceptions', wp_json_encode($valuesArray['post_type_exceptions']));
+			$importedList[] = 'post_type_load_exceptions';
+		}
+
+		// [wpacu_pro]
+		// Post type: load exception via taxonomy
+		if (isset($valuesArray['post_type_via_tax_exceptions']) && ! empty($valuesArray['post_type_via_tax_exceptions'])) {
+			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_post_type_via_tax_exceptions', wp_json_encode($valuesArray['post_type_via_tax_exceptions']));
+			$importedList[] = 'post_type_via_tax_exceptions';
+		}
+		// [/wpacu_pro]
 
 		// Global Data
 		if (isset($valuesArray['global_data']['scripts'])
 		    || isset($valuesArray['global_data']['styles'])) {
-			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_global_data', json_encode($valuesArray['global_data']));
+			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_global_data', wp_json_encode($valuesArray['global_data']));
 			$importedList[] = 'global_data';
 		}
 
@@ -273,9 +307,9 @@ SQL;
 			// After import was completed, clear all CSS/JS cache
 			OptimizeCommon::clearCache();
 
-			set_transient('wpacu_import_done', json_encode($importedList), 30);
+			set_transient('wpacu_import_done', wp_json_encode($importedList), 30);
 
-			wp_redirect(admin_url('admin.php?page=wpassetcleanup_tools&wpacu_for=import_export&wpacu_time=' . time()));
+			wp_redirect(admin_url('admin.php?page=wpassetcleanup_tools&wpacu_for=import_export&wpacu_import_done=1&wpacu_time=' . time()));
 			exit();
 		}
 	}

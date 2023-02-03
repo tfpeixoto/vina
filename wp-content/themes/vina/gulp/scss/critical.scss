@@ -4,7 +4,6 @@
 @import "./node_modules/bootstrap/scss/mixins";
 @import "./node_modules/bootstrap/scss/reboot";
 
-
 @import './node_modules/@fortawesome/fontawesome-free/scss/fontawesome';
 @import "./node_modules/@fortawesome/fontawesome-free/scss/brands";
 @import "./node_modules/@fortawesome/fontawesome-free/scss/solid";
@@ -18,5 +17,7 @@
 
 // CONTEUDO
 @import "components/banner-interno";
+/*! purgecss start ignore */
 @import "components/header";
+/*! purgecss end ignore */
 @import "components/slideshow";

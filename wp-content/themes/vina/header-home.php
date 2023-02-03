@@ -2,35 +2,44 @@
 <html lang="pt-br">
 
 <head>
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-102072980-1"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-
-    gtag('config', 'UA-102072980-1');
+    <!-- Google Tag Manager -->
+    <script>
+    (function(w, d, s, l, i) {
+      w[l] = w[l] || [];
+      w[l].push({
+        'gtm.start': new Date().getTime(),
+        event: 'gtm.js'
+      });
+      var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s),
+        dl = l != 'dataLayer' ? '&l=' + l : '';
+      j.async = true;
+      j.src =
+        'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-TWRLC82');
   </script>
+  <!-- End Google Tag Manager -->
 
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&display=swap" rel="stylesheet">
   <?php wp_head(); ?>
   <link rel="stylesheet" href="<?= get_template_directory_uri() . '/assets/css/' . $estiloPagina ?>" as="style" media="print" onload="this.media='all'; this.onload=null;" crossorigin>
 </head>
 
 <body <?php body_class(); ?>>
-  <header class="header-home">
+  <header class="header header__home">
     <div class="container">
       <nav class="navbar navbar-expand-lg">
-        <?php the_custom_logo(); ?>
+        <a href="<?php $url = home_url();
+                  echo $url; ?>" class="custom-logo-link" title="<?php bloginfo('title'); ?>">
+          <img src="<?= get_template_directory_uri(); ?>/assets/images/marca-vina.svg" width="150" height="46" class="custom-logo" alt="<?php bloginfo('title'); ?>" />
+        </a>
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navheader" aria-controls="navheader" aria-expanded="false" aria-label="Alterna navegação">
           <span class="navbar-toggler-trace"></span>

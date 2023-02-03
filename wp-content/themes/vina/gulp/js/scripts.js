@@ -1,6 +1,6 @@
 $('.carousel').carousel({
-  interval: 3000,
-  pause: false
+  interval: 5000,
+  pause: true
 });
 $('.carousel-inner .carousel-item:first-child').addClass('active');
 

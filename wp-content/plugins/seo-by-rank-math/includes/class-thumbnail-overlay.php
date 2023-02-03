@@ -45,6 +45,11 @@ class Thumbnail_Overlay {
 	public function generate_overlay_thumbnail() {
 		$thumbnail_id = Param::request( 'id', 0, FILTER_VALIDATE_INT );
 		$type         = Param::request( 'type', 'play' );
+		$secret       = Param::request( 'hash', '' );
+		if ( ! $secret ) {
+			$secret = Param::request( 'secret', '' );
+		}
+
 		$choices      = Helper::choices_overlay_images();
 		if ( ! isset( $choices[ $type ] ) ) {
 			die();
@@ -52,16 +57,18 @@ class Thumbnail_Overlay {
 		$overlay_image = $choices[ $type ]['path'];
 		$image         = Helper::get_scaled_image_path( $thumbnail_id, 'large' );
 
+		if ( ! $this->is_secret_valid( $thumbnail_id, $type, $secret ) ) {
+			die();
+		}
+
 		// If 'large' thumbnail is not found, fall back to full size.
 		if ( empty( $image ) ) {
 			$image = Helper::get_scaled_image_path( $thumbnail_id, 'full' );
 		}
 
 		$position = $choices[ $type ]['position'];
+		$this->create_overlay_image( $image, $overlay_image, $position );
 
-		if ( ! empty( $image ) ) {
-			$this->create_overlay_image( $image, $overlay_image, $position );
-		}
 		die();
 	}
 
@@ -147,6 +154,17 @@ class Thumbnail_Overlay {
 	 */
 	private function create_overlay_image( $image_file, $overlay_image, $position ) {
 		wp_raise_memory_limit( 'image' );
+
+		/**
+		 * Filter: 'rank_math/social/create_overlay_image' - Change the create_overlay_image arguments.
+		 */
+		$args = $this->do_filter( 'social/create_overlay_image', compact( 'image_file', 'overlay_image', 'position' ) );
+		extract( $args ); // phpcs:ignore
+
+		if ( empty( $image_file ) || empty( $overlay_image ) ) {
+			return;
+		}
+
 		$method = 'generate_image_' . $this->image_module;
 		$this->$method( $image_file, $overlay_image, $position );
 		die();
@@ -246,5 +264,18 @@ class Thumbnail_Overlay {
 
 		$stamp->clear();
 		$stamp->destroy();
+	}
+
+	/**
+	 * Check if secret key is valid.
+	 *
+	 * @param int    $id     The ID of the attachment.
+	 * @param string $type   Overlay type.
+	 * @param string $secret Secret key.
+	 *
+	 * @return boolean
+	 */
+	private function is_secret_valid( $id, $type, $secret ) {
+		return md5( $id . $type . wp_salt( 'nonce' ) ) === $secret;
 	}
 }

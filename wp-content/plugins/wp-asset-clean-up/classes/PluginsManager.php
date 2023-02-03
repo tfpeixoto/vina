@@ -31,8 +31,8 @@ class PluginsManager
 	{
 		$activePluginsFinal = array();
 
-		// Get active plugins and their basic information
-		$activePlugins = wp_get_active_and_valid_plugins();
+        // Get active plugins and their basic information
+        $activePlugins = wp_get_active_and_valid_plugins();
 
 		// Also check any network activated plugins in case we're dealing with a MultiSite setup
 		if ( is_multisite() ) {

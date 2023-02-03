@@ -8,8 +8,7 @@ if (! isset($data)) {
 // "Plugins", "Themes" (parent theme and child theme), "WordPress Core"
 // External locations (outside plugins and themes)
 // 3rd party external locations (e.g. Google API Fonts, CND urls such as the ones for Bootstrap etc.)
-$listAreaStatus = $data['plugin_settings']['assets_list_layout_areas_status'];
-
+$listAreaStatus    = $data['plugin_settings']['assets_list_layout_areas_status'];
 $pluginsAreaStatus = $data['plugin_settings']['assets_list_layout_plugin_area_status'] ?: 'expanded';
 /*
 * -------------------------
@@ -23,9 +22,9 @@ if (! empty($data['all']['styles']) || ! empty($data['all']['scripts'])) {
         require_once ABSPATH . 'wp-admin/includes/plugin.php';
     }
 
-    $allPlugins = get_plugins();
-    $allThemes  = wp_get_themes();
-    $allActivePluginsIcons = \WpAssetCleanUp\Misc::getAllActivePluginsIcons();
+	$allPlugins            = get_plugins();
+	$allThemes             = wp_get_themes();
+	$allActivePluginsIcons = \WpAssetCleanUp\Misc::getAllActivePluginsIcons();
 
     $data['view_by_location'] =
     $data['rows_build_array'] =
@@ -37,11 +36,11 @@ if (! empty($data['all']['styles']) || ! empty($data['all']['scripts'])) {
     require_once __DIR__.'/_asset-script-rows.php';
 
     $locationsText = array(
-        'plugins'   => '<span class="dashicons dashicons-admin-plugins"></span> From Plugins (.css &amp; .js)',
-        'themes'    => '<span class="dashicons dashicons-admin-appearance"></span> From Themes (.css &amp; .js)',
-        'uploads'   => '<span class="dashicons dashicons-wordpress"></span> WordPress Uploads Directory (.css &amp; .js)',
-        'wp_core'   => '<span class="dashicons dashicons-wordpress"></span> WordPress Core (.css &amp; .js)',
-        'external'  => '<span class="dashicons dashicons-cloud"></span> External 3rd Party (.css &amp; .js)'
+        'plugins'   => '<span class="dashicons dashicons-admin-plugins"></span> '.esc_html__('From Plugins', 'wp-asset-clean-up').' (.css &amp; .js)',
+        'themes'    => '<span class="dashicons dashicons-admin-appearance"></span> '.esc_html__('From Themes', 'wp-asset-clean-up').' (.css &amp; .js)',
+        'uploads'   => '<span class="dashicons dashicons-wordpress"></span> '.esc_html__('WordPress Uploads Directory', 'wp-asset-clean-up').' (.css &amp; .js)',
+        'wp_core'   => '<span class="dashicons dashicons-wordpress"></span> '.esc_html__('WordPress Core', 'wp-asset-clean-up').' (.css &amp; .js)',
+        'external'  => '<span class="dashicons dashicons-cloud"></span> '.esc_html__('External 3rd Party', 'wp-asset-clean-up').' (.css &amp; .js)'
     );
 
     if (! empty($data['rows_assets'])) {
@@ -62,10 +61,10 @@ if (! empty($data['all']['styles']) || ! empty($data['all']['scripts'])) {
             ?>
             <div <?php if ($hideLocationMainArea) {
                 echo 'style="display: none;"';
-            } ?> class="wpacu-assets-collapsible-wrap wpacu-by-location wpacu-<?php echo $locationMain; ?>">
+            } ?> class="wpacu-assets-collapsible-wrap wpacu-by-location wpacu-<?php echo esc_attr($locationMain); ?>">
             <a class="wpacu-assets-collapsible <?php if ($listAreaStatus !== 'contracted') { ?>wpacu-assets-collapsible-active<?php } ?>"
-               href="#wpacu-assets-collapsible-content-<?php echo $locationMain; ?>">
-                <?php echo $locationsText[$locationMain]; ?> &#10141; Total files: {total_files_<?php echo $locationMain; ?>}
+               href="#wpacu-assets-collapsible-content-<?php echo esc_attr($locationMain); ?>">
+                <?php echo wp_kses($locationsText[$locationMain], array('span' => array('class' => array()))); ?> &#10141; Total files: {total_files_<?php echo esc_html($locationMain); ?>}
             </a>
 
             <div class="wpacu-assets-collapsible-content <?php if ($listAreaStatus !== 'contracted') { ?>wpacu-open<?php } ?>">
@@ -177,15 +176,15 @@ if (! empty($data['all']['styles']) || ! empty($data['all']['scripts'])) {
                                     <a href="#"
                                        class="wpacu-plugin-contracted-wrap-link wpacu-pro wpacu-link-closed <?php if ( ( count( $values ) - 1 ) === $locationRowCount ) { echo 'wpacu-last-wrap-link'; } ?>">
                                         <div class="wpacu-plugin-title-contracted wpacu-area-contracted">
-                                            <?php echo $locationChildText; ?> <span style="font-weight: 200;">/</span> <span style="font-weight: 400;"><?php echo $totalPluginAssets; ?></span> files
+                                            <?php echo wp_kses($locationChildText, array('div' => array('class' => array(), 'style' => array()), 'span' => array('class' => array()))); ?> <span style="font-weight: 200;">/</span> <span style="font-weight: 400;"><?php echo (int)$totalPluginAssets; ?></span> files
                                         </div>
                                     </a>
                                     <?php
                                 } else { ?>
-                                    <div data-wpacu-plugin="<?php echo $locationChild; ?>"
-                                         class="wpacu-location-child-area wpacu-area-expanded <?php echo $extraClassesToAppend; ?>">
+                                    <div data-wpacu-plugin="<?php echo esc_attr($locationChild); ?>"
+                                         class="wpacu-location-child-area wpacu-area-expanded <?php echo esc_attr($extraClassesToAppend); ?>">
                                         <div class="wpacu-area-title">
-                                            <?php echo $locationChildText; ?> <span style="font-weight: 200;">/</span> <span style="font-weight: 400;"><?php echo $totalPluginAssets; ?></span> files
+	                                        <?php echo wp_kses($locationChildText, array('div' => array('class' => array(), 'style' => array()), 'span' => array('class' => array()))); ?> <span style="font-weight: 200;">/</span> <span style="font-weight: 400;"><?php echo (int)$totalPluginAssets; ?></span> files
                                             <?php
                                             include '_view-by-location/_plugin-list-expanded-actions.php';
                                             ?>
@@ -194,27 +193,30 @@ if (! empty($data['all']['styles']) || ! empty($data['all']['scripts'])) {
                                 <?php }
                             } elseif ( $locationMain === 'themes' ) {
                                 ?>
-                                <div data-wpacu-plugin="<?php echo $locationChild; ?>"
-                                     class="wpacu-location-child-area wpacu-area-expanded <?php echo $extraClassesToAppend; ?>">
-                                    <div class="wpacu-area-title <?php if ($locationChildThemeArray['has_icon'] === true) { echo 'wpacu-theme-has-icon'; } ?>"><?php echo $locationChildText; ?></div>
+                                <div data-wpacu-plugin="<?php echo esc_attr($locationChild); ?>"
+                                     class="wpacu-location-child-area wpacu-area-expanded <?php echo esc_attr($extraClassesToAppend); ?>">
+                                    <div class="wpacu-area-title <?php if ($locationChildThemeArray['has_icon'] === true) { echo 'wpacu-theme-has-icon'; } ?>"><?php echo \WpAssetCleanUp\Misc::stripIrrelevantHtmlTags($locationChildText); ?></div>
                                 </div>
                                 <?php
                             } else { // WordPress Core, Uploads, 3rd Party etc.
                                 ?>
-                                <div data-wpacu-plugin="<?php echo $locationChild; ?>"
-                                     class="wpacu-location-child-area wpacu-area-expanded <?php echo $extraClassesToAppend; ?>">
-                                    <div class="wpacu-area-title"><?php echo $locationChildText; ?></div>
+                                <div data-wpacu-plugin="<?php echo esc_attr($locationChild); ?>"
+                                     class="wpacu-location-child-area wpacu-area-expanded <?php echo esc_attr($extraClassesToAppend); ?>">
+                                    <div class="wpacu-area-title"><?php echo wp_kses($locationChildText, array('div' => array('class' => array(), 'style' => array()), 'span' => array('class' => array()))); ?></div>
                                 </div>
                                 <?php
                             }
                         }
                         ?>
 
-                        <div class="wpacu-assets-table-list-wrap <?php if ( $locationMain === 'plugins' ) { ?> wpacu-plugin-assets-wrap <?php } ?> <?php if ( $pluginListContracted ) {
-                            echo 'wpacu-area-closed';
-                        } ?> <?php if ( $pluginListContracted && $isLastPluginAsset ) {
-                            echo 'wpacu-plugin-assets-last';
-                        } ?>">
+                        <div class="wpacu-assets-table-list-wrap <?php if ( $locationMain === 'plugins' ) { echo ' wpacu-plugin-assets-wrap '; }
+                            if ( $pluginListContracted ) {
+                                echo ' wpacu-area-closed ';
+
+                                if (isset($isLastPluginAsset) && $isLastPluginAsset) {
+                                    echo ' wpacu-plugin-assets-last ';
+                                }
+                            } ?>">
                             <?php
                             // CONTRACTED (+ -)
                             if ( $locationMain === 'plugins' && $pluginListContracted ) {
@@ -229,7 +231,7 @@ if (! empty($data['all']['styles']) || ! empty($data['all']['scripts'])) {
                                         do_action('wpacu_assets_plugin_notice_table_row', $locationChild);
                                     }
 
-                                    echo $assetRowsOutput;
+                                    echo \WpAssetCleanUp\Misc::stripIrrelevantHtmlTags($assetRowsOutput);
                                     ?>
                                 </tbody>
                             </table>
@@ -245,7 +247,7 @@ if (! empty($data['all']['styles']) || ! empty($data['all']['scripts'])) {
                     ?>
                         <div style="padding: 12px 0;">
                             <img style="height: 30px; vertical-align: bottom;" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHdpZHRoPSIzODFweCIgaGVpZ2h0PSIzODVweCIgdmlld0JveD0iMCAwIDM4MSAzODUiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+ICAgICAgICA8dGl0bGU+VW50aXRsZWQgMzwvdGl0bGU+ICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPiAgICA8ZGVmcz4gICAgICAgIDxwb2x5Z29uIGlkPSJwYXRoLTEiIHBvaW50cz0iMC4wNiAzODQuOTQgMzgwLjgwNSAzODQuOTQgMzgwLjgwNSAwLjYyOCAwLjA2IDAuNjI4Ij48L3BvbHlnb24+ICAgIDwvZGVmcz4gICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9IiNhMGE1YWEiIGZpbGwtcnVsZT0iZXZlbm9kZCI+ICAgICAgICA8ZyBpZD0iT3h5Z2VuLUljb24tQ01ZSyI+ICAgICAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgZmlsbD0iI2EwYTVhYSI+ICAgICAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+ICAgICAgICAgICAgPC9tYXNrPiAgICAgICAgICAgIDxnIGlkPSJDbGlwLTIiPjwvZz4gICAgICAgICAgICA8cGF0aCBkPSJNMjk3LjUwOCwzNDkuNzQ4IEMyNzUuNDQzLDM0OS43NDggMjU3LjU1NiwzMzEuODYgMjU3LjU1NiwzMDkuNzk2IEMyNTcuNTU2LDI4Ny43MzEgMjc1LjQ0MywyNjkuODQ0IDI5Ny41MDgsMjY5Ljg0NCBDMzE5LjU3MywyNjkuODQ0IDMzNy40NiwyODcuNzMxIDMzNy40NiwzMDkuNzk2IEMzMzcuNDYsMzMxLjg2IDMxOS41NzMsMzQ5Ljc0OCAyOTcuNTA4LDM0OS43NDggTDI5Ny41MDgsMzQ5Ljc0OCBaIE0yMjIuMzA0LDMwOS43OTYgQzIyMi4zMDQsMzEyLjAzOSAyMjIuNDQ3LDMxNC4yNDcgMjIyLjYzOSwzMTYuNDQxIEMyMTIuMzMsMzE5LjA5MiAyMDEuNTI4LDMyMC41MDUgMTkwLjQwMywzMjAuNTA1IEMxMTkuMDEsMzIwLjUwNSA2MC45MjksMjYyLjQyMyA2MC45MjksMTkxLjAzMSBDNjAuOTI5LDExOS42MzggMTE5LjAxLDYxLjU1NyAxOTAuNDAzLDYxLjU1NyBDMjYxLjc5NCw2MS41NTcgMzE5Ljg3NywxMTkuNjM4IDMxOS44NzcsMTkxLjAzMSBDMzE5Ljg3NywyMDYuODMzIDMxNy4wMiwyMjEuOTc4IDMxMS44MTUsMjM1Ljk5IEMzMDcuMTc5LDIzNS4wOTcgMzAyLjQwNCwyMzQuNTkyIDI5Ny41MDgsMjM0LjU5MiBDMjU1Ljk3NCwyMzQuNTkyIDIyMi4zMDQsMjY4LjI2MiAyMjIuMzA0LDMwOS43OTYgTDIyMi4zMDQsMzA5Ljc5NiBaIE0zODAuODA1LDE5MS4wMzEgQzM4MC44MDUsODYuMDQyIDI5NS4zOTIsMC42MjggMTkwLjQwMywwLjYyOCBDODUuNDE0LDAuNjI4IDAsODYuMDQyIDAsMTkxLjAzMSBDMCwyOTYuMDIgODUuNDE0LDM4MS40MzMgMTkwLjQwMywzODEuNDMzIEMyMTIuNDk4LDM4MS40MzMgMjMzLjcwOCwzNzcuNjA5IDI1My40NTYsMzcwLjY1NyBDMjY1Ljg0NSwzNzkuNjQxIDI4MS4wMzQsMzg1IDI5Ny41MDgsMzg1IEMzMzkuMDQyLDM4NSAzNzIuNzEyLDM1MS4zMyAzNzIuNzEyLDMwOS43OTYgQzM3Mi43MTIsMjk2LjA5MiAzNjguOTg4LDI4My4yODMgMzYyLjU4NCwyNzIuMjE5IEMzNzQuMjUxLDI0Ny41NzUgMzgwLjgwNSwyMjAuMDU4IDM4MC44MDUsMTkxLjAzMSBMMzgwLjgwNSwxOTEuMDMxIFoiIGlkPSJGaWxsLTEiIGZpbGw9IiNhMGE1YWEiIG1hc2s9InVybCgjbWFzay0yKSI+PC9wYXRoPiAgICAgICAgPC9nPiAgICA8L2c+PC9zdmc+" alt="" />
-                            &nbsp;You're using <a href="<?php echo admin_url('admin.php?page=ct_dashboard_page'); ?>" target="_blank"><span style="font-weight: 600; color: #6036ca;">Oxygen</span></a> to design your site, which disables the WordPress theme system. Thus, no assets related to the theme are loaded.
+                            &nbsp;You're using <a href="<?php echo esc_url(admin_url('admin.php?page=ct_dashboard_page')); ?>" target="_blank"><span style="font-weight: 600; color: #6036ca;">Oxygen</span></a> to design your site, which disables the WordPress theme system. Thus, no assets related to the theme are loaded.
                         </div>
                     <?php } else { ?>
                         <div style="padding: 0 0 16px 16px;"><?php _e('There are no CSS/JS loaded from this location.', 'wp-asset-clean-up'); ?></div>
@@ -263,15 +265,15 @@ if (! empty($data['all']['styles']) || ! empty($data['all']['scripts'])) {
                 $locationMainOutput
             );
 
-            echo $locationMainOutput;
+            echo \WpAssetCleanUp\Misc::stripIrrelevantHtmlTags($locationMainOutput);
         }
     }
 
     if ( isset( $data['all']['hardcoded'] ) && ! empty( $data['all']['hardcoded'] ) ) {
         $data['print_outer_html'] = true; // AJAX call from the Dashboard
         include_once __DIR__ . '/_assets-hardcoded-list.php';
-    } elseif (isset($hardcodedManageAreaHtml, $data['is_frontend_view']) && $data['is_frontend_view']) {
-        echo $hardcodedManageAreaHtml; // AJAX call from the front-end view
+    } elseif (isset($data['is_frontend_view']) && $data['is_frontend_view']) {
+        echo \WpAssetCleanUp\HardcodedAssets::getHardCodedManageAreaForFrontEndView($data); // AJAX call from the front-end view
     }
 }
 /*

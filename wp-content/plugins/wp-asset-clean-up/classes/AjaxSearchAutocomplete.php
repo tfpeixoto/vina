@@ -17,7 +17,7 @@ class AjaxSearchAutocomplete
 	}
 
 	/**
-	 *
+	 * Only valid for "CSS & JS Manager" -- "Manage CSS/JS" -- ("Posts" | "Pages" | "Custom Post Types" | "Media")
 	 */
 	public function enqueueScripts()
     {
@@ -25,8 +25,17 @@ class AjaxSearchAutocomplete
 			return;
 	    }
 
-	    $wpacuFor = $_REQUEST['wpacu_for'];
-	    $forPostType = '';
+		$isManageCssJsDash = isset($_GET['page']) && $_GET['page'] === WPACU_PLUGIN_ID.'_assets_manager';
+		$subPage = isset($_GET['wpacu_sub_page']) ? $_GET['wpacu_sub_page'] : 'manage_css_js';
+
+		$loadAutoCompleteOnManageCssJsDash = ($isManageCssJsDash && $subPage === 'manage_css_js') &&
+			in_array($_REQUEST['wpacu_for'], array('posts', 'pages', 'media-attachment', 'custom-post-types'));
+
+		if ( ! $loadAutoCompleteOnManageCssJsDash ) {
+			return;
+		}
+
+	    $wpacuFor = sanitize_text_field($_REQUEST['wpacu_for']);
 
 	    switch ($wpacuFor) {
 		    case 'posts':
@@ -41,6 +50,8 @@ class AjaxSearchAutocomplete
 		    case 'custom-post-types':
 		    	$forPostType = 'wpacu-custom-post-types';
 		    	break;
+		    default:
+			    $forPostType = '';
 	    }
 
 	    if ( ! $forPostType ) {
@@ -48,24 +59,24 @@ class AjaxSearchAutocomplete
 	    }
 
 	    wp_enqueue_script(
-	    	'wpacu-autocomplete-search',
-		    WPACU_PLUGIN_URL . '/assets/auto-complete/main.js',
+		    OwnAssets::$ownAssets['scripts']['autocomplete_search']['handle'],
+		    plugins_url(OwnAssets::$ownAssets['scripts']['autocomplete_search']['rel_path'], WPACU_PLUGIN_FILE),
 		    array('jquery', 'jquery-ui-autocomplete'),
-		    OwnAssets::assetVer('/assets/auto-complete/main.js'),
+		    OwnAssets::assetVer(OwnAssets::$ownAssets['scripts']['autocomplete_search']['rel_path']),
 		    true
 	    );
 
-	    wp_localize_script('wpacu-autocomplete-search', 'wpacu_autocomplete_search_obj', array(
-		    'ajax_url'       => admin_url('admin-ajax.php'),
+	    wp_localize_script(OwnAssets::$ownAssets['scripts']['autocomplete_search']['handle'], 'wpacu_autocomplete_search_obj', array(
+		    'ajax_url'       => esc_url(admin_url('admin-ajax.php')),
 		    'ajax_nonce'     => wp_create_nonce('wpacu_autocomplete_search_nonce'),
 		    'ajax_action'    => WPACU_PLUGIN_ID . '_autocomplete_search',
 		    'post_type'      => $forPostType,
-		    'redirect_to'    => admin_url('admin.php?page=wpassetcleanup_assets_manager&wpacu_for='.$wpacuFor.'&wpacu_post_id=[post_id_here]')
+		    'redirect_to'    => esc_url(admin_url('admin.php?page=wpassetcleanup_assets_manager&wpacu_for='.$wpacuFor.'&wpacu_post_id=post_id_here'))
 	    ));
 
-	    $wp_scripts = wp_scripts();
-	    wp_enqueue_style('wpacu-jquery-ui-css',
-		    '//ajax.googleapis.com/ajax/libs/jqueryui/' . $wp_scripts->registered['jquery-ui-autocomplete']->ver . '/themes/smoothness/jquery-ui.css',
+	    wp_enqueue_style(
+			OwnAssets::$ownAssets['styles']['autocomplete_search_jquery_ui_custom']['handle'],
+		    plugins_url(OwnAssets::$ownAssets['styles']['autocomplete_search_jquery_ui_custom']['rel_path'], WPACU_PLUGIN_FILE),
 		    false, null, false
 	    );
 
@@ -74,7 +85,7 @@ class AjaxSearchAutocomplete
 	background-position: 99% 6px;
 }
 CSS;
-	    wp_add_inline_style('wpacu-jquery-ui-css', $jqueryUiCustom);
+	    wp_add_inline_style(OwnAssets::$ownAssets['styles']['autocomplete_search_jquery_ui_custom']['handle'], $jqueryUiCustom);
     }
 
 	/**
@@ -86,11 +97,11 @@ CSS;
 
 		global $wpdb;
 
-		$search_term = isset($_REQUEST['wpacu_term'])      ? $_REQUEST['wpacu_term']      : '';
-		$post_type   = isset($_REQUEST['wpacu_post_type']) ? $_REQUEST['wpacu_post_type'] : '';
+		$search_term = isset($_REQUEST['wpacu_term'])      ? sanitize_text_field($_REQUEST['wpacu_term']) : '';
+		$post_type   = isset($_REQUEST['wpacu_post_type']) ? sanitize_text_field($_REQUEST['wpacu_post_type']) : '';
 
 		if ( $search_term === '' ) {
-			echo json_encode(array());
+			echo wp_json_encode(array());
 		}
 
 		$results = array();
@@ -105,7 +116,7 @@ CSS;
 		    );
 	    } else {
 	    	// 'attachment'
-		    $search = $wpdb->get_col( $wpdb->prepare( " SELECT DISTINCT ID FROM {$wpdb->posts} WHERE post_title = '%s' ", $search_term ) );
+		    $search = $wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT ID FROM {$wpdb->posts} WHERE post_title = '%s'", $search_term ) );
 		    $queryDataByKeyword = array(
 			    'post_type' => 'attachment',
 			    'post_status' => 'inherit',
@@ -150,7 +161,7 @@ CSS;
 					$resultToShow .= ' / '.$iconPrivate.' Private';
 				}
 
-				// This is a page and it was set as the homepage (point this out)
+				// This is a page, and it was set as the homepage (point this out)
 				if ($pageOnFront === $resultPostId) {
 					$iconHome = '<span class="dashicons dashicons-admin-home"></span>';
 					$resultToShow .= ' / '.$iconHome.' Homepage';
@@ -175,7 +186,7 @@ CSS;
 			wp_die();
 		}
 
-		echo json_encode($results);
+		echo wp_json_encode($results);
 		wp_die();
 	}
 }

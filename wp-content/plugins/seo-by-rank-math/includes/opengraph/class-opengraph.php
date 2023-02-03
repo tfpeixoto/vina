@@ -1,6 +1,6 @@
 <?php
 /**
- * This code adds the OpenGraph output.
+ * Add the OpenGraph tags to the header.
  *
  * @since      0.9.0
  * @package    RankMath
@@ -19,6 +19,7 @@ use RankMath\User;
 use RankMath\Helper;
 use RankMath\Paper\Paper;
 use RankMath\Traits\Hooker;
+use MyThemeShop\Helpers\Str;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -81,7 +82,7 @@ class OpenGraph {
 	public function get_title() {
 		$title = $this->_title();
 		if ( $title && Helper::get_settings( 'titles.capitalize_titles' ) ) {
-			$title = ucwords( $title );
+			$title = Str::mb_ucwords( $title );
 		}
 
 		return $title ? $title : Paper::get()->get_title();
@@ -96,7 +97,7 @@ class OpenGraph {
 		$key = $this->prefix . '_title';
 
 		if ( Post::is_simple_page() ) {
-			return Post::get_meta( $key, Post::get_simple_page_id() );
+			return Post::get_meta( $key, Post::get_page_id() );
 		}
 
 		if ( is_front_page() ) {
@@ -120,7 +121,7 @@ class OpenGraph {
 		$key  = $this->prefix . '_description';
 
 		if ( Post::is_simple_page() ) {
-			$desc = Post::get_meta( $key, Post::get_simple_page_id() );
+			$desc = Post::get_meta( $key, Post::get_page_id() );
 			$desc = '' !== $desc ? $desc : $this->fallback_description( 'get_the_excerpt' );
 		} elseif ( is_front_page() ) {
 			$desc = Helper::get_settings( 'titles.homepage_facebook_description' );

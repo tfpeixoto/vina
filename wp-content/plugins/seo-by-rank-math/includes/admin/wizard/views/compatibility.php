@@ -24,7 +24,8 @@ $simplexml_ext = extension_loaded( 'SimpleXML' );
 $image_ext     = extension_loaded( 'gd' ) || extension_loaded( 'imagick' );
 $mb_string     = extension_loaded( 'mbstring' );
 $openssl       = extension_loaded( 'openssl' );
-$all_good      = $php_version_ok && $dom_ext && $simplexml_ext && $image_ext && $mb_string && $openssl;
+$base64_func   = function_exists( 'base64_encode' ) && function_exists( 'base64_decode' ) && (bool) base64_decode( base64_encode( '1' ) );
+$all_good      = $php_version_ok && $dom_ext && $simplexml_ext && $image_ext && $mb_string && $openssl && $base64_func;
 
 ?>
 
@@ -58,8 +59,8 @@ if ( $all_good ) :
 						<p class="description">
 						<?php
 							echo ( ! Helper::is_whitelabel() ) ?
-								esc_html__( 'Rank Math is compatible with your PHP version but we recommend updating to PHP 7.2 for increased speed and security.', 'rank-math' ) . ' <a href="' . KB::get( 'rm-requirements' ) . '" target="_blank">' . esc_html__( 'More information', 'rank-math' ) . '</a>' :
-								esc_html__( 'This plugin is compatible with your PHP version but we recommend updating to PHP 7.2 for increased speed and security.', 'rank-math' );
+								esc_html__( 'Rank Math is compatible with your PHP version but we recommend updating to PHP 7.4 for increased speed and security.', 'rank-math' ) . ' <a href="' . KB::get( 'requirements', 'Setup wizard compatibility step' ) . '" target="_blank">' . esc_html__( 'More information', 'rank-math' ) . '</a>' :
+								esc_html__( 'This plugin is compatible with your PHP version but we recommend updating to PHP 7.4 for increased speed and security.', 'rank-math' );
 						?>
 						</p>
 						<?php
@@ -109,6 +110,12 @@ if ( $all_good ) :
 				<?php echo $openssl ? esc_html__( 'PHP OpenSSL Extension installed', 'rank-math' ) : esc_html__( 'PHP OpenSSL Extension missing', 'rank-math' ); ?>
 			</th>
 			<td><span class="dashicons dashicons-<?php echo $mb_string ? 'yes' : 'no'; ?>"></span></td>
+		</tr>
+		<tr class="check-<?php echo $base64_func ? 'yes' : 'no'; ?>">
+			<th>
+				<?php echo $base64_func ? esc_html__( 'Base64 encode &amp; decode functions available', 'rank-math' ) : esc_html__( 'Base64 encode &amp; decode functions missing', 'rank-math' ); ?>
+			</th>
+			<td><span class="dashicons dashicons-<?php echo $base64_func ? 'yes' : 'no'; ?>"></span></td>
 		</tr>
 	</table>
 	<?php if ( $all_good ) { ?>

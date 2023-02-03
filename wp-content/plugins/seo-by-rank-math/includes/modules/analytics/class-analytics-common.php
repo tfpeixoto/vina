@@ -59,6 +59,7 @@ class Analytics_Common {
 
 		$this->filter( 'rank_math/tools/analytics_clear_caches', 'analytics_clear_caches' );
 		$this->filter( 'rank_math/tools/analytics_reindex_posts', 'analytics_reindex_posts' );
+		$this->filter( 'rank_math/tools/analytics_fix_collations', 'analytics_fix_collations' );
 		$this->filter( 'wp_helpers_notifications_render', 'replace_notice_link', 10, 3 );
 	}
 
@@ -71,10 +72,10 @@ class Analytics_Common {
 			<?php esc_html_e( 'Analytics', 'rank-math' ); ?>
 			<span><?php esc_html_e( 'Last 30 Days', 'rank-math' ); ?></span>
 			<a href="<?php echo esc_url( Helper::get_admin_url( 'analytics' ) ); ?>" class="rank-math-view-report" title="<?php esc_html_e( 'View Report', 'rank-math' ); ?>">
-				<i class="dashicons dashicons-ellipsis"></i>
+				<i class="dashicons dashicons-chart-bar"></i>
 			</a>
 		</h3>
-		<div class="rank-math-dashabord-block items-4">
+		<div class="rank-math-dashboard-block items-4">
 			<?php
 			$items = $this->get_dashboard_widget_items();
 			foreach ( $items as $label => $item ) {
@@ -176,6 +177,33 @@ class Analytics_Common {
 		( new \RankMath\Analytics\Workflow\Objects() )->flat_posts();
 
 		return __( 'Post re-index in progress.', 'rank-math' );
+	}
+
+	/**
+	 * Fix table & column collations.
+	 *
+	 * @return string
+	 */
+	public function analytics_fix_collations() {
+		$tables = [
+			'rank_math_analytics_ga',
+			'rank_math_analytics_gsc',
+			'rank_math_analytics_keyword_manager',
+			'rank_math_analytics_inspections',
+		];
+
+		$objects_coll = Helper::get_table_collation( 'rank_math_analytics_objects' );
+		$changed      = 0;
+		foreach ( $tables as $table ) {
+			$changed += (int) Helper::check_collation( $table, 'all', $objects_coll );
+		}
+
+		return $changed ? sprintf(
+			/* translators: %1$d: number of changes, %2$s: new collation. */
+			_n( '%1$d collation changed to %2$s.', '%1$d collations changed to %2$s.', $changed, 'rank-math' ),
+			$changed,
+			'`' . $objects_coll . '`'
+		) : __( 'No collation mismatch to fix.', 'rank-math' );
 	}
 
 	/**
@@ -309,15 +337,17 @@ class Analytics_Common {
 	 * @param boolean $revert Flag whether to revert difference icon or not.
 	 */
 	private function get_analytic_block( $item, $revert = false ) {
-		$is_negative = abs( $item['difference'] ) !== $item['difference'];
+		$total       = isset( $item['total'] ) ? abs( $item['total'] ) : 0;
+		$difference  = isset( $item['difference'] ) ? abs( $item['difference'] ) : 0;
+		$is_negative = isset( $item['difference'] ) && abs( $item['difference'] ) !== $item['difference'];
 		$diff_class  = 'up';
 		if ( ( ! $revert && $is_negative ) || ( $revert && ! $is_negative && $item['difference'] > 0 ) ) {
 			$diff_class = 'down';
 		}
 		?>
 		<div class="rank-math-item-numbers">
-			<strong class="text-large" title="<?php echo esc_html( Str::human_number( $item['total'] ) ); ?>"><?php echo esc_html( Str::human_number( $item['total'] ) ); ?></strong>
-			<span class="rank-math-item-difference <?php echo esc_attr( $diff_class ); ?>" title="<?php echo esc_html( Str::human_number( abs( $item['difference'] ) ) ); ?>"><?php echo esc_html( Str::human_number( abs( $item['difference'] ) ) ); ?></span>
+			<strong class="text-large" title="<?php echo esc_html( Str::human_number( $total ) ); ?>"><?php echo esc_html( Str::human_number( $total ) ); ?></strong>
+			<span class="rank-math-item-difference <?php echo esc_attr( $diff_class ); ?>" title="<?php echo esc_html( Str::human_number( $difference ) ); ?>"><?php echo esc_html( Str::human_number( $difference ) ); ?></span>
 		</div>
 		<?php
 	}

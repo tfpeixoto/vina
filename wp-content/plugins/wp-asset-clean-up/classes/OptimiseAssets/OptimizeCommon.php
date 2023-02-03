@@ -94,14 +94,24 @@ class OptimizeCommon
 			return self::alterHtmlSource($htmlSource, true);
 		});
 
-		// Make sure HTML changes are applied to cached pages from "Cache Enabler" plugin
-		add_filter('cache_enabler_before_store', static function($htmlSource) {
-			return self::alterHtmlSource($htmlSource); // deprecated, include it in case other users have an older version of "Cache Enabler"
-		}, 1, 1);
+		if (Misc::isPluginActive('cache-enabler/cache-enabler.php')) {
+			if (defined('CE_VERSION') && version_compare(CE_VERSION, '1.6.0', '<')) {
+				// Cache Enabler: BEFORE 1.6.0 (1.5.5 and below)
+				// Make sure HTML changes are applied to cached pages from "Cache Enabler" plugin
+				add_filter( 'cache_enabler_before_store', static function( $htmlSource ) {
+					return self::alterHtmlSource( $htmlSource ); // deprecated, include it in case other users have an older version of "Cache Enabler"
+				}, 1, 1 );
+			} else {
+				// Cache Enabler: 1.6.0+
+				global $cache_enabler_constants;
 
-		add_filter('cache_enabler_page_contents_before_store', static function($htmlSource) {
-			return self::alterHtmlSource($htmlSource);
-		}, 1, 1);
+				if (isset($cache_enabler_constants['CACHE_ENABLER_VERSION']) && version_compare($cache_enabler_constants['CACHE_ENABLER_VERSION'], '1.6.0', '>=')) {
+					add_filter( 'cache_enabler_page_contents_before_store', static function( $htmlSource ) {
+						return self::alterHtmlSource( $htmlSource );
+					}, 1, 1 );
+				}
+			}
+		}
 
 		// In case HTML Minify is enabled in W3 Total Cache, make sure any settings (e.g. JS combine) in Asset CleanUp will be applied
 		add_filter('w3tc_minify_before', static function ($htmlSource) {
@@ -225,7 +235,7 @@ class OptimizeCommon
 
 		// The admin is editing the CSS/JS list within the front-end view
 		if (HardcodedAssets::useBufferingForEditFrontEndView()) {
-			ObjectCache::wpacu_cache_set('wpacu_hardcoded_assets_encoded', base64_encode( json_encode($anyHardCodedAssetsList) ));
+			ObjectCache::wpacu_cache_set('wpacu_hardcoded_assets_encoded', base64_encode( wp_json_encode($anyHardCodedAssetsList) ));
 		}
 
 		$htmlSource = OptimizeCss::alterHtmlSource( $htmlSource );
@@ -327,16 +337,15 @@ class OptimizeCommon
 
 	/**
 	 * @param $htmlSource
-	 * @param $for
+	 * @param string $for
 	 *
-	 * @return bool|\DOMDocument|mixed
+	 * @return \DOMDocument
 	 */
 	public static function getDomLoadedTag($htmlSource, $for = '')
 	{
 		$htmlSourceBefore = $htmlSource;
 
-		$domTag = new \DOMDocument();
-		libxml_use_internal_errors( true );
+		$domTag = Misc::initDOMDocument();
 
 		$cleanerDomRegEx = '';
 
@@ -386,13 +395,114 @@ class OptimizeCommon
 
 		// Avoid "Warning: DOMDocument::loadHTML(): Empty string supplied as input"
 		// Just in case $htmlSource has been altered incorrectly for any reason, fallback to the original $htmlSource value ($htmlSourceBefore)
-		if (! $htmlSource) {
+		if ( ! $htmlSource ) {
 			$domTag->loadHTML($htmlSourceBefore);
 			return $domTag;
 		}
 
 		$domTag->loadHTML($htmlSource);
 		return $domTag;
+	}
+
+	/**
+	 * @param $htmlSource
+	 * @param $params
+	 *
+	 * @return array|mixed|string|string[]
+	 */
+	public static function matchAndReplaceLinkTags($htmlSource, $params = array())
+	{
+		if (isset($params['as']) && $params['as']) {
+			$fallbackToRegex = false;
+
+			/*
+			  * Option 1: DOM + Regular Expression (Best)
+			 */
+			if ( Misc::isDOMDocumentOn() ) {
+				$dom = Misc::initDOMDocument();
+
+				$dom->loadHTML($htmlSource);
+
+				$selector = new \DOMXPath($dom);
+
+				$domTagQuery = $selector->query('//link[@as="'.$params['as'].'"]');
+
+				if (count($domTagQuery) < 1) {
+					// No LINK tags found with the specified "as" attribute? Stop here!
+					return $htmlSource;
+				}
+
+				foreach($domTagQuery as $link) {
+					if ( ! $link->hasAttributes() ) {
+						continue;
+					}
+
+					$linkTagParts = array();
+					$linkTagParts[] = '<link ';
+
+					foreach ($link->attributes as $attr) {
+						$attrName = $attr->nodeName;
+						$attrValue = $attr->nodeValue;
+
+						if ($attrName) {
+							if ($attrValue !== '') {
+								$linkTagParts[] = '(\s+|)' . preg_quote($attrName, '/') . '(\s+|)=(\s+|)(|"|\')' . preg_quote($attrValue, '/') . '(|"|\')(|\s+)';
+							} else {
+								$linkTagParts[] = '(\s+|)' . preg_quote($attrName, '/') . '(|((\s+|)=(\s+|)(|"|\')(|"|\')))';
+							}
+						}
+					}
+
+					$linkTagParts[] = '(|\s+)(|/)>';
+
+					$linkTagFinalRegExPart = implode('', $linkTagParts);
+
+					preg_match_all(
+						'#'.$linkTagFinalRegExPart.'#Umi',
+						$htmlSource,
+						$matchSourceFromTag,
+						PREG_SET_ORDER
+					);
+
+					// It always has to be a match from the DOM generated tag
+					// Otherwise, default it to RegEx
+					if ( empty($matchSourceFromTag) || ! (isset($matchSourceFromTag[0]) && ! empty($matchSourceFromTag[0])) ) {
+						$fallbackToRegex = true;
+						break;
+					}
+
+					$matchesSourcesFromTags[] = $matchSourceFromTag[0];
+				}
+			}
+
+			/*
+			  * Option 2: Regular Expression (Fallback)
+			 */
+			if ($fallbackToRegex || ! Misc::isDOMDocumentOn()) {
+				preg_match_all( '#<link[^>]*(as(\s+|)=(\s+|)(|"|\')'.$params['as'].'(|"|\'))[^>]*>#Umi', $htmlSource, $matchesSourcesFromTags, PREG_SET_ORDER );
+			}
+
+			// Are there any preloaded / prefetched scripts that are inside the unloaded list?
+			// Strip the preloading tag as it's not relevant, since the script was unloaded
+			// These can be generated via plugins such as "Pre* Party Resource Hints" where users can manually insert scripts to preload
+			if ( ! empty( $matchesSourcesFromTags ) ) {
+				foreach ( $matchesSourcesFromTags as $matchedLink ) {
+					$matchedLinkTag = isset( $matchedLink[0] ) ? $matchedLink[0] : '';
+
+					if ( ! ( $matchedLinkTag && strpos( $matchedLinkTag, ' href' ) !== false ) ) {
+						continue;
+					}
+
+					foreach ( $params['unloaded_assets_rel_sources'] as $unloadedAssetRelSource ) {
+						if ( strpos( $matchedLinkTag, $unloadedAssetRelSource ) !== false ) {
+							$htmlSource = str_replace( $matchedLinkTag, '', $htmlSource );
+						}
+					}
+				}
+			}
+		}
+
+		return $htmlSource;
 	}
 
 	/**
@@ -505,21 +615,35 @@ class OptimizeCommon
 			$hrefRelPath = substr($hrefRelPath, 1);
 		}
 
-		$localAssetPath = Misc::getWpRootDirPath() . $hrefRelPath;
+		$localAssetPossiblePaths = array(Misc::getWpRootDirPath() . $hrefRelPath);
 
-		if (strpos($localAssetPath, '?ver') !== false) {
-			list($localAssetPathAlt,) = explode('?ver', $localAssetPath);
-			$localAssetPath = $localAssetPathAlt;
+		// Perhaps the URL starts with / (not //) and site_url() was not used
+		$parseSiteUrlPath = parse_url(site_url(), PHP_URL_PATH);
+
+		// This is in case we have something like this in the source (hardcoded or generated through a plugin)
+		// /blog/wp-content/plugins/custom-plugin-slug/script.js
+		// and the site_url() is equal with https://www.mysite.com/blog
+		if ($parseSiteUrlPath !== '/' && strlen($parseSiteUrlPath) > 1 && strpos($href, $parseSiteUrlPath) === 0) {
+			$relPathFromWpRootDir = str_replace($parseSiteUrlPath, '', $href);
+			$altHrefRelPath = str_replace('//', '/', Misc::getWpRootDirPath() . $relPathFromWpRootDir);
+			$localAssetPossiblePaths[] = $altHrefRelPath;
 		}
 
-		// Not using "?ver="
-		if (strpos($localAssetPath, '.' . $assetType . '?') !== false) {
-			list($localAssetPathAlt,) = explode('.' . $assetType . '?', $localAssetPath);
-			$localAssetPath = $localAssetPathAlt . '.' . $assetType;
-		}
+		foreach ($localAssetPossiblePaths as $localAssetPath) {
+			if ( strpos( $localAssetPath, '?ver' ) !== false ) {
+				list( $localAssetPathAlt, ) = explode( '?ver', $localAssetPath );
+				$localAssetPath = $localAssetPathAlt;
+			}
 
-		if (strrchr($localAssetPath, '.') === '.' . $assetType && is_file($localAssetPath)) {
-			return $localAssetPath;
+			// Not using "?ver="
+			if ( strpos( $localAssetPath, '.' . $assetType . '?' ) !== false ) {
+				list( $localAssetPathAlt, ) = explode( '.' . $assetType . '?', $localAssetPath );
+				$localAssetPath = $localAssetPathAlt . '.' . $assetType;
+			}
+
+			if ( strrchr( $localAssetPath, '.' ) === '.' . $assetType && is_file( $localAssetPath ) ) {
+				return $localAssetPath;
+			}
 		}
 
 		return false;
@@ -528,7 +652,7 @@ class OptimizeCommon
 	/**
 	 * @param $assetHref
 	 *
-	 * @return bool|mixed|string
+	 * @return array|false|string|string[]
 	 */
 	public static function getPathToAssetDir($assetHref)
 	{
@@ -556,23 +680,16 @@ class OptimizeCommon
 
 	/**
 	 * @param $sourceTag
-	 * @param string $forAttr
 	 *
 	 * @return array|bool
 	 */
-	public static function getLocalCleanSourceFromTag($sourceTag, $forAttr)
+	public static function getLocalCleanSourceFromTag($sourceTag)
 	{
-		preg_match_all('#'.$forAttr.'=(["\'])' . '(.*)' . '(["\'])#Usmi', $sourceTag, $outputMatchesSource);
-
-		$sourceFromTag = (isset($outputMatchesSource[2][0]) && $outputMatchesSource[2][0])
-			? trim($outputMatchesSource[2][0], '"\'')
-			: false;
+		$sourceFromTag = Misc::getValueFromTag($sourceTag);
 
 		if (! $sourceFromTag) {
 			return false;
 		}
-
-		$isRelPath = false;
 
 		// Check if it starts without "/" or a protocol; e.g. "wp-content/theme/style.css", "wp-content/theme/script.js"
 		if (strpos($sourceFromTag, '/')   !== 0 &&
@@ -584,7 +701,24 @@ class OptimizeCommon
 		}
 
 		// Perhaps the URL starts with / (not //) and site_url() was not used
-		if (strpos($sourceFromTag, '/') === 0 && strpos($sourceFromTag, '//') !== 0 && is_file(Misc::getWpRootDirPath() . $sourceFromTag)) {
+		$altFilePathForRelSource = $isRelPath = false;
+		$parseSiteUrlPath = parse_url(site_url(), PHP_URL_PATH);
+
+		// This is in case we have something like this in the HTML source (hardcoded or generated through a plugin)
+		// <link href="/blog/wp-content/plugins/custom-plugin-slug/script.js" rel="preload" as="script" type="text/javascript">
+		// and the site_url() is equal with https://www.mysite.com/blog
+		if ($parseSiteUrlPath !== '/' && strlen($parseSiteUrlPath) > 1 && strpos($sourceFromTag, $parseSiteUrlPath) !== false) {
+			$relPathFromRootDir = str_replace($parseSiteUrlPath, '', $sourceFromTag);
+			$altFilePathForRelSource = str_replace('//', '/', Misc::getWpRootDirPath() . $relPathFromRootDir);
+		} elseif (strpos($sourceFromTag, '/') === 0 && strpos($sourceFromTag, '//') !== 0) {
+			$altFilePathForRelSource = str_replace('//', '/', Misc::getWpRootDirPath() . $sourceFromTag);
+		}
+
+		if ($altFilePathForRelSource && (strpos($altFilePathForRelSource, '.css?') !== false || strpos($altFilePathForRelSource, '.js?') !== false)) {
+			list($altFilePathForRelSource) = explode('?', $altFilePathForRelSource);
+		}
+
+		if ( $altFilePathForRelSource && (is_file(Misc::getWpRootDirPath() . $sourceFromTag) || is_file($altFilePathForRelSource)) ) {
 			$isRelPath = true;
 		}
 
@@ -747,7 +881,7 @@ class OptimizeCommon
 	 * @param $cdnUrl
 	 * @param $hrefAlt
 	 *
-	 * @return mixed
+	 * @return array
 	 */
 	public static function getCleanHrefAfterCdnStrip($cdnUrl, $hrefAlt)
 	{
@@ -827,7 +961,7 @@ class OptimizeCommon
 			return array();
 		}
 
-		$optionValue = FileSystem::file_get_contents($assetsFile);
+		$optionValue = FileSystem::fileGetContents($assetsFile);
 
 		if ($optionValue) {
 			$optionValueArray = @json_decode($optionValue, ARRAY_A);
@@ -931,7 +1065,7 @@ class OptimizeCommon
 			$assetsValue = $list;
 		}
 
-		FileSystem::file_put_contents($assetsFile, $assetsValue);
+		FileSystem::filePutContents($assetsFile, $assetsValue);
 	}
 
 	/**
@@ -1048,7 +1182,7 @@ class OptimizeCommon
 				$storageDir.'/item/',
 				$assetCleanUpCacheDir.'css/',
 				$assetCleanUpCacheDir.'js/',
-				// Possible common directories with less files
+				// Possible common directories with fewer files
 				$relPathToPossibleDir.'/category/',
 				$relPathToPossibleDir.'/author/',
 				$relPathToPossibleDir.'/tag/'
@@ -1119,7 +1253,7 @@ class OptimizeCommon
 			// Clear all JSON files separately from the storage directory as it will be rebuilt
 			self::rmNonEmptyJsonStorageDir($storageDir);
 
-			// Now go through the JSONs and collect the latest assets so they would be kept
+			// Now go through the JSONs and collect the latest assets, so they would be kept
 			// Finally, collect the rest of $allAssetsToKeep from the database transients (if any)
 			// Do not check if they are expired or not as their assets could still be referenced
 			// until those pages will be accessed in a non-cached way
@@ -1235,7 +1369,7 @@ SQL;
 				if ($isUriRequest) { echo '<br />'; }
 
 				foreach ($clearedOutput as $clearedInfo) {
-					echo $clearedInfo."\n";
+					echo esc_html($clearedInfo)."\n";
 					if ($isUriRequest) { echo '<br />'; }
 				}
 			}
@@ -1245,7 +1379,7 @@ SQL;
 				if ($isUriRequest) { echo '<br />'; }
 
 				foreach ($keptOutput as $keptInfo) {
-					echo $keptInfo."\n";
+					echo esc_html($keptInfo)."\n";
 					if ($isUriRequest) { echo '<br />'; }
 				}
 			}
@@ -1282,7 +1416,7 @@ SQL;
 
 	/**
 	 * This is usually done when the plugin is deactivated
-	 * e.g. if you use Autoptimize and it remains active, you will likely want to have its caching cleared with traces from Asset CleanUp
+	 * e.g. if you use Autoptimize, and it remains active, you will likely want to have its caching cleared with traces from Asset CleanUp
 	 */
 	public static function clearOtherPluginsCache()
 	{
@@ -1294,9 +1428,11 @@ SQL;
 	}
 
 	/**
+	 * @param bool $includeHtmlTags
+	 *
 	 * @return array
 	 */
-	public static function getStorageStats()
+	public static function getStorageStats($includeHtmlTags = true)
 	{
 		$assetCleanUpCacheDir = WP_CONTENT_DIR . self::getRelPathPluginCacheDir();
 
@@ -1336,10 +1472,10 @@ SQL;
 			ksort($fileDirs, SORT_ASC);
 
 			return array(
-				'total_size'         => Misc::formatBytes($totalSize),
+				'total_size'         => Misc::formatBytes($totalSize, 2, '', $includeHtmlTags),
 				'total_files'        => $totalFiles,
 
-				'total_size_assets'  => Misc::formatBytes($totalSizeAssets),
+				'total_size_assets'  => Misc::formatBytes($totalSizeAssets, 2, '', $includeHtmlTags),
 				'total_files_assets' => $totalFilesAssets,
 
 				'dirs_files_sizes'   => $fileDirs,
@@ -1372,7 +1508,7 @@ SQL;
 	/**
 	 * @param $fileName
 	 *
-	 * @return mixed
+	 * @return array|string|string[]
 	 */
 	public static function filterStorageFileName($fileName)
 	{
@@ -1403,9 +1539,9 @@ SQL;
 	}
 
 	/**
-	 * @param $anyCdnUrl
+	 * @param string $anyCdnUrl
 	 *
-	 * @return mixed|string
+	 * @return array|string|string[]
 	 */
 	public static function filterWpContentUrl($anyCdnUrl = '')
 	{
@@ -1414,10 +1550,9 @@ SQL;
 		$parseContentUrl = parse_url($wpContentUrl);
 		$parseBaseUrl = parse_url(site_url());
 
-		// Perhaps WPML plugin is used and the content URL is different then the current domain which might be for a different language
+		// Perhaps WPML plugin is used and the content URL is different from the current domain which might be for a different language
 		if ( ($parseContentUrl['host'] !== $parseBaseUrl['host']) &&
-		     (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== $parseContentUrl['host']) &&
-		     isset($parseContentUrl['path']) &&
+		     (isset($_SERVER['HTTP_HOST'], $parseContentUrl['path']) && $_SERVER['HTTP_HOST'] !== $parseContentUrl['host']) &&
 			 is_dir(rtrim(ABSPATH, '/') . $parseContentUrl['path']) ) {
 			$wpContentUrl = str_replace($parseContentUrl['host'], $parseBaseUrl['host'], $wpContentUrl);
 		}
@@ -1466,13 +1601,13 @@ SQL;
 	}
 
 	/**
-	 * @param $assetType
+	 * @param $for ("css" or "js")
 	 *
 	 * @return bool
 	 */
-	public static function appendInlineCodeToCombineAssetType($assetType)
+	public static function appendInlineCodeToCombineAssetType($for)
 	{
-		$settingsIndex = '_combine_loaded_'.$assetType.'_append_handle_extra';
+		$settingsIndex = '_combine_loaded_'.$for.'_append_handle_extra';
 		return (Misc::isWpVersionAtLeast('5.5') &&
 		        isset(Main::instance()->settings[$settingsIndex]) &&
 	            Main::instance()->settings[$settingsIndex]);
@@ -1489,26 +1624,82 @@ SQL;
 		$isPreview = (isset($_GET['preview_id'], $_GET['preview_nonce'], $_GET['preview'])
 		              || isset($_GET['preview'])); // show the CSS/JS as combined IF the option is enabled despite the query string (for debugging purposes)
 
+		if ($isPreview) {
+			return true;
+		}
+
 		$ignoreQueryStrings = array(
-			'wpacu_do_combine', // show the CSS/JS as combined IF the option is enabled despite the query string (for debugging purposes)
-			'wpacu_no_css_minify', 'wpacu_no_js_minify', 'wpacu_no_css_combine', 'wpacu_no_js_combine', 'wpacu_debug', 'wpacu_preload', 'wpacu_skip_test_mode',
-			'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_expid', 'utm_referrer', // Google Analytics
-			'gclid', // Google Click ID
-			'fbclick', 'fbclid', 'fb_action_ids', 'fb_action_types', 'fb_source', // Facebook
-			'SSAID', 'sscid', // ShareASale
-			'ao_noptimize', // Autoptimize feature (strip its settings on page request for debugging purposes)
+			'wpacu_no_css_minify',
+			'wpacu_no_js_minify',
+			'wpacu_no_css_combine',
+			'wpacu_no_js_combine',
+			'wpacu_debug',
+			'wpacu_preload',
+			'wpacu_skip_test_mode',
+		);
+
+		$queryStringsToIgnoreFromTheURIForOptimizingAssets = array(
+			'_ga',
+			'_ke',
+			'adgroupid',
+			'adid',
+			'age-verified',
+			'ao_noptimize',
+			'campaignid',
+			'ck_subscriber_id', // ConvertKit's query parameter
+			'cn-reloaded',
+			'dclid',
+			'dm_i', // dotdigital
+			'dm_t', // dotdigital
+			'ef_id',
+			'epik', // Pinterest
+			'fb_action_ids',
+			'fb_action_types',
+			'fb_source',
+			'fbclick',
+			'fbclid',
+			'gclid',
+			'gclsrc',
+			'mc_cid',
+			'mc_eid',
+			'mkt_tok',      // Marketo (tracking users)
+			'msclkid',      // Microsoft Click ID
+			'mtm_campaign',
+			'mtm_cid',
+			'mtm_content',
+			'mtm_keyword',
+			'mtm_medium',
+			'mtm_source',
+			'pk_campaign',  // Piwik PRO URL builder
+			'pk_cid',       // Piwik PRO URL builder
+			'pk_content',   // Piwik PRO URL builder
+			'pk_keyword',   // Piwik PRO URL builder
+			'pk_medium',    // Piwik PRO URL builder
+			'pk_source',    // Piwik PRO URL builder
+			'ref',
+			'SSAID',
+			'sscid',
+			'usqp',
+			'utm_campaign',
+			'utm_content',
+			'utm_expid',
+			'utm_expid',
+			'utm_medium',
+			'utm_referrer',
+			'utm_source',
+			'utm_term',
 		);
 
 		$isQueryString = false;
 
-		foreach ($ignoreQueryStrings as $ignoreQueryString) {
+		foreach (array_merge($ignoreQueryStrings, $queryStringsToIgnoreFromTheURIForOptimizingAssets) as $ignoreQueryString) {
 			if (isset($_GET[$ignoreQueryString])) {
 				$isQueryString = true;
 				break;
 			}
 		}
 
-		return ($isPreview || $isQueryString);
+		return $isQueryString;
 	}
 
 	/**
@@ -1530,7 +1721,7 @@ SQL;
 			$assetsFile = $dirToFilename . $transient.'.json';
 
 			if (is_file($assetsFile)) {
-				$contents = trim(FileSystem::file_get_contents($assetsFile));
+				$contents = trim(FileSystem::fileGetContents($assetsFile));
 
 				if (! $contents) {
 					// The file is empty or the contents could not be retrieved
@@ -1610,7 +1801,7 @@ SQL;
 
 			if ( isset( $valueDecoded['optimize_uri'] ) && $valueDecoded['optimize_uri'] && (strrchr( $valueDecoded['optimize_uri'], '.' ) === '.'.$assetType) ) {
 				$handleDbStr = str_replace( 'wpacu_' . $assetType . '_optimize_', '', $transient );
-				FileSystem::file_put_contents(
+				FileSystem::filePutContents(
 					$recentItemStorageDir . 'file-handle-' . $assetType . '-'. md5( $handleDbStr ) . '.txt',
 					$valueDecoded['optimize_uri']
 				);
@@ -1632,7 +1823,7 @@ SQL;
 		$mostRecentCachedAssetsInfoList = glob($patternToUse);
 		if ( ! empty($mostRecentCachedAssetsInfoList) ) {
 			foreach ( $mostRecentCachedAssetsInfoList as $fileFullPath ) {
-				$mostRecentCachedAssets[] = trim(FileSystem::file_get_contents($fileFullPath));
+				$mostRecentCachedAssets[] = trim(FileSystem::fileGetContents($fileFullPath));
 			}
 		}
 
@@ -1668,7 +1859,7 @@ SQL;
 	 * @param $cdnUrl
 	 * @param $getType
 	 *
-	 * @return string|void
+	 * @return string
 	 */
 	public static function cdnToUrlFormat($cdnUrl, $getType)
 	{
@@ -1815,7 +2006,7 @@ SQL;
 			$existingList[$assetType]['already_minified'] = array_slice($existingList[$assetType]['already_minified'], 0, 100);
 		}
 
-		update_option($optionToUpdate, json_encode(Misc::filterList($existingList)));
+		update_option($optionToUpdate, wp_json_encode(Misc::filterList($existingList)));
 	}
 
 	// [START] For debugging purposes
@@ -1868,7 +2059,7 @@ SQL;
 			unset($existingList['scripts']['already_minified']);
 		}
 
-		update_option($optionToUpdate, json_encode(Misc::filterList($existingList)));
+		update_option($optionToUpdate, wp_json_encode(Misc::filterList($existingList)));
 	}
 
 	/**
@@ -1895,7 +2086,7 @@ SQL;
 			}
 		}
 
-		update_option($optionToUpdate, json_encode(Misc::filterList($existingList)));
+		update_option($optionToUpdate, wp_json_encode(Misc::filterList($existingList)));
 	}
 	// [END] For debugging purposes
 }

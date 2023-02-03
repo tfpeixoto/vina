@@ -11,6 +11,7 @@
 namespace RankMath\Analytics;
 
 use RankMath\Helper;
+use RankMath\KB;
 use RankMath\Traits\Hooker;
 
 defined( 'ABSPATH' ) || exit;
@@ -37,7 +38,7 @@ class Analytics_Stats {
 	 * Enqueue Styles and Scripts
 	 */
 	public function enqueue() {
-		if ( ! is_singular() || is_admin() || is_preview() ) {
+		if ( ! is_singular() || is_admin() || is_preview() || Helper::is_divi_frontend_editor() ) {
 			return;
 		}
 
@@ -47,5 +48,7 @@ class Analytics_Stats {
 
 		Helper::add_json( 'isAnalyticsConnected', \RankMath\Google\Analytics::is_analytics_connected() );
 		Helper::add_json( 'hideFrontendStats', get_user_meta( get_current_user_id(), 'rank_math_hide_frontend_stats', true ) );
+
+		Helper::add_json( 'links', KB::get_links() );
 	}
 }

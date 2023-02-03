@@ -1,7 +1,4 @@
 on:
-  push:
-    branches:
-      - master
   pull_request:
     branches:
       - master
@@ -22,8 +19,9 @@ jobs:
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_SECRET }}
           server-dir: public/
-          protocol: ftps
           exclude: | 
             **/wp-content/uploads/**
             **/wp-content/updraft/**
+            **/wp-content/webp-express/**
+            **/wp-content/cache/**
             .htaccess

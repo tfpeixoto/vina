@@ -6,13 +6,13 @@ $ancora = 0;
 
 if ($images) : ?>
 
-  <section class="slideshow">
+  <section id="galeria-interna" class="slideshow">
     <div id="<?= $ancora ? "slide-${ancora}" : "slideGaleria" ?>" class="carousel slide" data-ride="carousel">
       <div class="carousel-inner">
         <?php foreach ($images as $image) : ?>
 
           <div class="carousel-item <?php $contadorSlides == 0 ? 'active' : ''; ?>">
-            <img class="d-block" src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">
+            <img class="d-block img-desktop" src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">
           </div>
 
         <?php endforeach; ?>

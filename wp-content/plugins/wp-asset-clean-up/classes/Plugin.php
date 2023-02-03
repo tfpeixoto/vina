@@ -38,24 +38,10 @@ class Plugin
 		add_filter('admin_footer_text', array($this, 'adminFooterText'), 1, 1);
 		// [/wpacu_lite]
 
-		// Show "Settings" and "Go Pro" as plugin action links
-		add_filter('plugin_action_links_'.WPACU_PLUGIN_BASE, array($this, 'actionLinks'));
-
-		// Languages
-		add_action('plugins_loaded', array($this, 'loadTextDomain'));
+		// Show default action links: "Getting Started", "Settings"
+		add_filter('plugin_action_links_'.WPACU_PLUGIN_BASE, array($this, 'addActionLinksInPluginsPage'));
 
 		}
-
-	/**
-	 *
-	 */
-	public function loadTextDomain()
-	{
-		load_plugin_textdomain('wp-asset-clean-up',
-			FALSE,
-			basename(WPACU_PLUGIN_DIR) . '/languages/'
-		);
-	}
 
 	// [wpacu_lite]
 	/**
@@ -65,7 +51,7 @@ class Plugin
 	 */
 	public function adminFooterText($text)
 	{
-		if (isset($_GET['page']) && strpos($_GET['page'], WPACU_PLUGIN_ID) !== false) {
+		if (Menu::isPluginPage()) {
 			$text = sprintf(__('Thank you for using %s', 'wp-asset-clean-up'), WPACU_PLUGIN_TITLE.' v'.WPACU_PLUGIN_VERSION)
 			        . ' <span class="dashicons dashicons-smiley"></span> &nbsp;&nbsp;';
 
@@ -95,15 +81,15 @@ class Plugin
 		    wp_die($recordMsg);
 	    }
 
-		// Is the plugin activated for the first time?
 		// Prepare for the redirection to the WPACU_ADMIN_PAGE_ID_START plugin page
-		if (! get_transient(WPACU_PLUGIN_ID.'_do_activation_redirect_first_time')) {
-			set_transient(WPACU_PLUGIN_ID.'_do_activation_redirect_first_time', 1);
+        // If there is no record that the plugin was already activated at least once
+		if ( ! get_option(WPACU_PLUGIN_ID.'_first_usage') ) {
 			set_transient(WPACU_PLUGIN_ID . '_redirect_after_activation', 1, 15);
-		}
 
-		// Make a record when Asset CleanUp (Pro) is used for the first time
-		self::triggerFirstUsage();
+			// Make a record when Asset CleanUp (Pro) is used for the first time
+			// In case this is the first time the plugin is activated
+			self::triggerFirstUsage();
+		}
 
 		/**
          * Note: Could be /wp-content/uploads/ if constant WPACU_CACHE_DIR was used
@@ -265,7 +251,7 @@ HTACCESS;
 
 		    if ( ! is_file( $cacheDir . 'index.php' ) ) {
 			    // /wp-content/cache/asset-cleanup/cache/(css|js)/index.php
-			    FileSystem::file_put_contents( $cacheDir . 'index.php', $emptyPhpFileContents );
+			    FileSystem::filePutContents( $cacheDir . 'index.php', $emptyPhpFileContents );
 		    }
 
 			if ( ! is_dir( $cacheDir . OptimizeCommon::$optimizedSingleFilesDir ) ) {
@@ -281,19 +267,19 @@ HTACCESS;
 
 		    if ( ! is_file( $cacheDir . OptimizeCommon::$optimizedSingleFilesDir.'/inline/index.php' ) ) {
 			    // /wp-content/cache/asset-cleanup/cache/(css|js)/item/inline/index.php
-			    FileSystem::file_put_contents( $cacheDir . OptimizeCommon::$optimizedSingleFilesDir.'/inline/index.php', $emptyPhpFileContents );
+			    FileSystem::filePutContents( $cacheDir . OptimizeCommon::$optimizedSingleFilesDir.'/inline/index.php', $emptyPhpFileContents );
 		    }
 
 		    $htAccessFilePath = dirname( $cacheDir ) . '/.htaccess';
 
 		    if ( ! is_file( $htAccessFilePath ) ) {
 			    // /wp-content/cache/asset-cleanup/.htaccess
-			    FileSystem::file_put_contents( $htAccessFilePath, $htAccessContents );
+			    FileSystem::filePutContents( $htAccessFilePath, $htAccessContents );
 		    }
 
 		    if ( ! is_file( dirname( $cacheDir ) . '/index.php' ) ) {
 			    // /wp-content/cache/asset-cleanup/index.php
-			    FileSystem::file_put_contents( dirname( $cacheDir ) . '/index.php', $emptyPhpFileContents );
+			    FileSystem::filePutContents( dirname( $cacheDir ) . '/index.php', $emptyPhpFileContents );
 		    }
 	    }
 
@@ -304,7 +290,7 @@ HTACCESS;
 			@mkdir( $storageDir . OptimizeCommon::$optimizedSingleFilesDir, 0755, true );
 		}
 
-		// Storage directory for the most recent items (these ones are never deleted from the cache)
+		// Storage directory for the most recent items (these are never deleted from the cache)
 		$storageDirRecentItems = WP_CONTENT_DIR . OptimiseAssets\OptimizeCommon::getRelPathPluginCacheDir() . '_storage/_recent_items/';
 
 		if ( ! is_dir($storageDirRecentItems) ) {
@@ -323,42 +309,35 @@ HTACCESS;
 	 */
 	public function adminInit()
 	{
-		if (strpos($_SERVER['REQUEST_URI'], '/plugins.php') !== false && get_transient(WPACU_PLUGIN_ID . '_redirect_after_activation')) {
-			// Remove it as only one redirect is needed (first time the plugin is activated)
-			delete_transient(WPACU_PLUGIN_ID . '_redirect_after_activation');
+		if ( // If this condition does not match, do not make the extra DB calls to "options" table to save resources
+             isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], '/plugins.php') !== false &&
+             get_transient(WPACU_PLUGIN_ID . '_redirect_after_activation') ) {
+            // Remove it as only one redirect is needed (first time the plugin is activated)
+            delete_transient(WPACU_PLUGIN_ID . '_redirect_after_activation');
 
-			// Do the 'first activation time' redirection
-			wp_redirect(admin_url('admin.php?page=' . WPACU_ADMIN_PAGE_ID_START));
-			exit();
+            // Do the 'first activation time' redirection
+            wp_redirect(admin_url('admin.php?page=' . WPACU_ADMIN_PAGE_ID_START));
+            exit();
 		}
 
-        $triggerFirstUsage = (strpos($_SERVER['REQUEST_URI'], '/plugins.php') !== false ||
-                              strpos($_SERVER['REQUEST_URI'], '/plugin-install.php') !== false ||
-                              strpos($_SERVER['REQUEST_URI'], '/options-general.php') !== false ||
-                              strpos($_SERVER['REQUEST_URI'], '/update-core.php') !== false);
-
-		// No first usage timestamp set, yet? Set it now!
-		if ($triggerFirstUsage) {
-			self::triggerFirstUsage();
 		}
-	}
 
 	/**
 	 * @param $links
 	 *
 	 * @return mixed
 	 */
-	public function actionLinks($links)
+	public function addActionLinksInPluginsPage($links)
 	{
-		$links['getting_started'] = '<a href="admin.php?page=' . WPACU_PLUGIN_ID . '_getting_started">' . __('Getting Started', 'wp-asset-clean-up') . '</a>';
-		$links['settings']        = '<a href="admin.php?page=' . WPACU_PLUGIN_ID . '_settings">'        . __('Settings', 'wp-asset-clean-up') . '</a>';
+		$links['getting_started'] = '<a href="admin.php?page=' . WPACU_PLUGIN_ID . '_getting_started">'.__('Getting Started', 'wp-asset-clean-up').'</a>';
+		$links['settings']        = '<a href="admin.php?page=' . WPACU_PLUGIN_ID . '_settings">'.__('Settings', 'wp-asset-clean-up').'</a>';
 
 		// [wpacu_lite]
 		$allPlugins = get_plugins();
 
 		// If the Pro version is not installed (active or not), show the upgrade link
 		if (! array_key_exists('wp-asset-clean-up-pro/wpacu.php', $allPlugins)) {
-			$links['go_pro'] = '<a target="_blank" style="font-weight: bold;" href="'.WPACU_PLUGIN_GO_PRO_URL.'">'.__('Go Pro', 'wp-asset-clean-up').'</a>';
+			$links['go_pro'] = '<a target="_blank" style="font-weight: bold;" href="'.apply_filters('wpacu_go_pro_affiliate_link', WPACU_PLUGIN_GO_PRO_URL).'">'.__('Go Pro', 'wp-asset-clean-up').'</a>';
 		}
 		// [/wpacu_lite]
 
@@ -370,10 +349,7 @@ HTACCESS;
 	 */
 	public static function triggerFirstUsage()
 	{
-		// No first usage timestamp set, yet? Set it now!
-		if (! get_option(WPACU_PLUGIN_ID.'_first_usage')) {
-			Misc::addUpdateOption(WPACU_PLUGIN_ID . '_first_usage', time());
-		}
+        Misc::addUpdateOption(WPACU_PLUGIN_ID . '_first_usage', time());
 	}
 
 	/**
@@ -405,7 +381,7 @@ HTACCESS;
 		// Is it an AMP endpoint?
 		if ( ($isAmpInRequestUri && Misc::isPluginActive('accelerated-mobile-pages/accelerated-mobile-pages.php')) // "AMP for WP – Accelerated Mobile Pages"
 		     || ($isAmpInRequestUri && Misc::isPluginActive('amp/amp.php')) // "AMP – WordPress plugin"
-		     || (function_exists('is_wp_amp') && Misc::isPluginActive('wp-amp/wp-amp.php') && is_wp_amp()) // "WP AMP — Accelerated Mobile Pages for WordPress and WooCommerce" (Premium plugin)
+		     || ((function_exists('is_wp_amp') && Misc::isPluginActive('wp-amp/wp-amp.php') && is_wp_amp())) // "WP AMP — Accelerated Mobile Pages for WordPress and WooCommerce" (Premium plugin)
 		) {
 			return true; // do not print anything on an AMP page
 		}
@@ -423,7 +399,7 @@ HTACCESS;
 			return true;
 		}
 
-		// $tagActionName needs to be different than 'parse_query' because is_singular() would trigger too soon and cause notice errors
+		// $tagActionName needs to be different from 'parse_query' because is_singular() would trigger too soon and cause notice errors
 		// Has the following page option set: "Do not apply any front-end optimization on this page (this includes any changes related to CSS/JS files)"
 		if ($tagActionName !== 'parse_query' && MetaBoxes::hasNoFrontendOptimizationPageOption()) {
 			return true;
