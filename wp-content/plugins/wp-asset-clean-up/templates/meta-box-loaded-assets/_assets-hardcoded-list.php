@@ -43,6 +43,10 @@ if ($totalFoundHardcodedTags === 0) {
             $handlesInfo = \WpAssetCleanUp\Main::getHandlesInfo();
 
 			foreach (array('link_and_style_tags', 'script_src_or_inline_and_noscript_inline_tags') as $targetKey) {
+                if ( ! (isset($hardcodedTags[$targetKey]) && ! empty($hardcodedTags[$targetKey])) ) {
+                    continue; // None found in the list? do not trigger the code below!
+                }
+
 				$hardcodedTags[ $targetKey ] = array_unique( $hardcodedTags[ $targetKey ] );
 
 				if ( ! empty( $hardcodedTags[ $targetKey ] ) ) {

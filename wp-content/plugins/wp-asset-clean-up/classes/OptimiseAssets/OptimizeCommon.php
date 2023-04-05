@@ -223,6 +223,13 @@ class OptimizeCommon
 		// In order to check how fast the page loads without the DOM changes (for debugging purposes)
 		$wpacuNoHtmlChanges = isset($_REQUEST['wpacu_no_html_changes']) || ( defined('WPACU_NO_HTML_CHANGES') && WPACU_NO_HTML_CHANGES );
 
+		// Not a normal WordPress page load
+		// e.g. it could be JS content loaded dynamically such as /?wpml-app=ate-widget
+		if ( ! (did_action('wp_head') && did_action('wp_footer')) && Plugin::preventAnyFrontendOptimization('', $htmlSource) ) {
+			/* [wpacu_timing] */ Misc::scriptExecTimer( 'alter_html_source', 'end' ); /* [/wpacu_timing] */
+			return $htmlSource;
+		}
+
 		if ( $wpacuNoHtmlChanges || Plugin::preventAnyFrontendOptimization() ) {
 			/* [wpacu_timing] */ Misc::scriptExecTimer( 'alter_html_source', 'end' ); /* [/wpacu_timing] */
 			return $htmlSource;

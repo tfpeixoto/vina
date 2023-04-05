@@ -380,6 +380,13 @@ if (! function_exists('assetCleanUpNoLoad')) {
 			return true;
 		}
 
+		// WPML Multilingual CMS plugin loading its JavaScript content (no need to trigger Asset CleanUp in this case)
+		if ( isset($_GET['wpml-app']) && $_GET['wpml-app'] ) {
+			define( 'WPACU_NO_LOAD_SET', true );
+
+			return true;
+		}
+
 		$wpacuIsAjaxRequest = ( ! empty( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && strtolower( $_SERVER['HTTP_X_REQUESTED_WITH'] ) === 'xmlhttprequest' );
 
 		// If an AJAX call is made to /wp-admin/admin-ajax.php and the action doesn't start with WPACU_PLUGIN_ID.'_

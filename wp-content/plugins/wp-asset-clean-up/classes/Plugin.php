@@ -358,10 +358,11 @@ HTACCESS;
      * e.g. in situations when the page is an AMP one, prevent any changes to the HTML source by Asset CleanUp (Pro)
      *
 	 * @param string $tagActionName
+     * @param string $htmlSource
 	 *
 	 * @return bool
 	 */
-	public static function preventAnyFrontendOptimization($tagActionName = '')
+	public static function preventAnyFrontendOptimization($tagActionName = '', $htmlSource = '')
 	{
 		// Only relevant if all the plugins are already loaded
 		// and in the front-end view
@@ -404,6 +405,46 @@ HTACCESS;
 		if ($tagActionName !== 'parse_query' && MetaBoxes::hasNoFrontendOptimizationPageOption()) {
 			return true;
 		}
+
+		// e.g. it could be JS content loaded dynamically such as /?wpml-app=ate-widget
+        // in this case, any Asset CleanUp alteration of the content should be avoided
+        // often, the code below is not reached as extra measures are taken before if well known plugins are used
+        if ($htmlSource !== '') {
+	        $startsWithPassed = $endsWithPassed = false;
+
+            // More common delimiters can be added with time
+            // This is just an extra measure to prevent possible empty pages due to lots of memory used in case a possible JavaScript output is too large
+	        $startsWithAnyFromTheList = array(
+		        '/*!',
+		        '(function()'
+	        );
+
+	        $endsWithAnyFromTheList = array(
+		        ');',
+                ')'
+	        );
+
+            // Possible JS content
+            foreach ($startsWithAnyFromTheList as $startsWithString) {
+                if (substr(trim($htmlSource), 0, strlen($startsWithString)) === $startsWithString) {
+	                $startsWithPassed = true;
+                    break;
+                }
+            }
+
+            if ($startsWithPassed) {
+	            foreach ($endsWithAnyFromTheList as $endsWithString) {
+		            if (substr(trim($htmlSource), -strlen($endsWithString)) === $endsWithString) {
+			            $endsWithPassed = true;
+			            break;
+		            }
+	            }
+            }
+
+            if ($startsWithPassed && $endsWithPassed) {
+                return true;
+            }
+        }
 
 		return false;
 	}
