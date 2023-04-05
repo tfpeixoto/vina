@@ -4,7 +4,7 @@ Tags: minify css, minify javascript, defer css javascript, page speed, dequeue, 
 Donate link: https://www.gabelivan.com/items/wp-asset-cleanup-pro/?utm_source=wp_org_lite&utm_medium=donate
 Requires at least: 4.6
 Tested up to: 6.1.1
-Stable tag: 1.3.9.0
+Stable tag: 1.3.9.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -191,6 +191,11 @@ With the recently released "Test Mode" feature, you can safely unload assets on 
 4. Homepage CSS & JS Management (List sorted by location)
 
 == Changelog ==
+= 1.3.9.1 =
+* Improvement: Avoid deprecated errors related to PHP 8+ (although harmless, they are annoying to notice on the error_log files)
+* WPML Fix: Prevent Asset CleanUp triggering its front-end optimisation code whenever /?wpml-app=ate-widget is triggered OR JavaScript code is detected in the content of the source
+* Fix / PHP Warning: Undefined array key "script_src_or_inline_and_noscript_inline_tags" in [...]/templates/meta-box-loaded-assets/_assets-hardcoded-list.php / Sometimes, if there are no STYLES OR SCRIPTS to be detected on a specific page (it rarely happens), the list of assets will not be fetched in PHP 8+
+
 = 1.3.9.0 =
 * When managing the assets via "Manage in the front-end view", make sure to notify the user when scripts are wrapped by Internet Explorer conditional comments
 * Hide "Manage CSS/JS" link on post types that aren't relevant such as "Elementor" templates
