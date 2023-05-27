@@ -5,7 +5,7 @@ Tags: seo, sitemap, google search console, schema, redirection, WordPress SEO
 Tested up to: 6.2
 Requires at least: 5.6
 Requires PHP: 7.4
-Stable tag: 1.0.112
+Stable tag: 1.0.115
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -583,16 +583,10 @@ Please drop us an email at support@rankmath.com and we would be more than happy 
 
 == Changelog ==
 
-= 1.0.112 [Apr 19, 2023] =
-- Improved: Significant code improvements in the [Analytics module](https://rankmath.com/kb/analytics) resulting in FASTER and LIGHTER performance of the plugin
-- Fixed: [Schema Block](https://rankmath.com/kb/rich-snippets/) was not working with WordPress 6.2
-- Fixed: Missing SEO tab in the beta version of [Elementor editor](https://rankmath.com/blog/elementor-seo/)
-- Fixed: PHP error related to [SEO Analyzer](https://rankmath.com/kb/seo-analysis/) on some setups
-- Fixed: PHP warning related to [Slack Open Graph tags](https://rankmath.com/kb/slack-enhanced-sharing/) on some setups
-- Fixed: [Title wrapper option](https://rankmath.com/kb/table-of-contents-block/#title-wrapper) in the Table of Contents Block was not working with the default TOC title on the frontend
-- Fixed: Redirection rules from Trash will no longer be displayed when searching for [Redirection](https://rankmath.com/kb/setting-up-redirections/).
-- Fixed: Empty Taxonomies & Author archive pages displayed in the [HTML sitemap](https://rankmath.com/kb/html-sitemap/)
-- Fixed: Misaligned [SEO Metabox](https://rankmath.com/kb/on-page-seo/#classic-editor) on Product taxonomy pages in the latest version of WooCommerce
-- Fixed: [Analytics pages](https://rankmath.com/kb/analytics/) were not working with the Gutenberg plugin
+= 1.0.115 [May 18, 2023] =
+- Fixed: [HTML Sitemap](https://rankmath.com/kb/html-sitemap/) was incorrectly repeating subcategories as standalone categories
+- Fixed: Issue with importing [Analytics](https://rankmath.com/kb/analytics/) data on Multisite setup with sub-directory domain
+- Fixed: Incompatibility between Rank Math Site Analytics and WPML plugin's 'Use directory for default language' option
+- Fixed: Missing [Table of Contents Block](https://rankmath.com/kb/table-of-contents-block/) ID after editing the title or heading in the block
 
 Full changelog can be found here - **[Rank Math changelog](https://rankmath.com/changelog/?utm_source=Plugin&utm_medium=Changelog&utm_campaign=WP)**
