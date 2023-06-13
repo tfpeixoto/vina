@@ -71,6 +71,12 @@ require_once('header-home.php');
       <span class="sr-only">Próximo</span>
     </a>
   </div>
+
+  <div class="destaque">
+    <a href="/socioambiental" title="E-book Livro ao Contrário">
+      <img src="<?= get_template_directory_uri(); ?>/assets/images/ebook-livro-ao-contrario.jpg" width="214" height="399" alt="E-book Livro ao Contrário" />
+    </a>
+  </div>
 </section>
 
 <?php
