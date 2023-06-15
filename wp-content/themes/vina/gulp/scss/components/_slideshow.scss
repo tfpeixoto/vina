@@ -8,7 +8,7 @@
     overflow: hidden;
   }
 
-  &#galeria-home{
+  &#galeria-home {
     background: $black;
     height: 100vh;
 
@@ -20,9 +20,40 @@
         }
       }
     }
+
+    .destaque {
+      position: absolute;
+      left: 25px;
+      top: 150px;
+      z-index: 1000;
+
+      @include media-breakpoint-up(sm) {
+        left: 75px;
+      }
+
+      @include media-breakpoint-up(md) {
+        left: 150px;
+        top: 150px;
+      }
+
+      @include media-breakpoint-up(lg) {
+        left: 250px;
+        top: 150px;
+      }
+
+      img {
+        height: 205px;
+        width: 110px;
+
+        @include media-breakpoint-up(md) {
+          height: 399px;
+          width: 214px;
+        }
+      }
+    }
   }
 
-  &#galeria-interna{
+  &#galeria-interna {
     background: $white;
     height: 50vh;
 
@@ -78,7 +109,7 @@
         object-position: center center;
         // height: 100vh;
         width: 100%;
-        
+
         @include media-breakpoint-up(sm) {
           height: auto;
           // min-height: 100vh;
