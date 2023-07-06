@@ -3,8 +3,8 @@ Contributors: gabelivan
 Tags: minify css, minify javascript, defer css javascript, page speed, dequeue, performance
 Donate link: https://www.gabelivan.com/items/wp-asset-cleanup-pro/?utm_source=wp_org_lite&utm_medium=donate
 Requires at least: 4.6
-Tested up to: 6.1.1
-Stable tag: 1.3.9.1
+Tested up to: 6.2.2
+Stable tag: 1.3.9.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -191,6 +191,14 @@ With the recently released "Test Mode" feature, you can safely unload assets on 
 4. Homepage CSS & JS Management (List sorted by location)
 
 == Changelog ==
+= 1.3.9.2 =
+* New Option: Contract / Expand All Assets within an area (e.g. from a plugin)
+* "Overview" area: Added notifications about deleted posts, post types, taxonomies and users, making the admin aware that some rules might not be relevant anymore (e.g. the admin uninstalled WooCommerce, but unload rules about "product" post types or a specific product page remained in the database)
+* Stopped using the "error" class (e.g. on HTML DIV elements) and renamed it to "wpacu-error" as some plugins/themes sometimes interfere with it (e.g. not showing the error at all, thus confusing the admin)
+* Keep the same strict standard for the values within the following HTML attributes: "id", "for" to prevent any errors by avoiding any interferences with other plugins
+* Improvement: Only print the notice (as an HTML comment) about the "photoswipe" unload to the administrator (it's a special case where the HTML has to be hidden in case the CSS file gets unloaded)
+* WPML Fix: Prevent Asset CleanUp Pro from triggering whenever /?wpml-app=ate-widget is loaded (in some environments, the content returned was empty and the automatic translation area was not loading)
+
 = 1.3.9.1 =
 * Improvement: Avoid deprecated errors related to PHP 8+ (although harmless, they are annoying to notice on the error_log files)
 * WPML Fix: Prevent Asset CleanUp triggering its front-end optimisation code whenever /?wpml-app=ate-widget is triggered OR JavaScript code is detected in the content of the source

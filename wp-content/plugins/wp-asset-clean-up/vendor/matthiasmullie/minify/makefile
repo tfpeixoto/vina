@@ -1,23 +1,18 @@
-PHP ?= '8.1'
-UP ?= 1
-DOWN ?= 1
+PHP ?=
+TEST ?=
 
 docs:
-	wget http://apigen.org/apigen.phar
-	chmod +x apigen.phar
-	php apigen.phar generate --source=src --destination=docs --template-theme=bootstrap
-	rm apigen.phar
-
-image:
-	docker build -t matthiasmullie/minify .
-
-up:
-	docker-compose up -d $(PHP)
-
-down:
-	docker-compose stop -t0 $(PHP)
+	docker run --rm -v $$(pwd)/src:/data/src -v $$(pwd)/docs:/data/docs -w /data php:cli bash -c "\
+		curl -s -L -O https://phpdoc.org/phpDocumentor.phar;\
+		php phpDocumentor.phar --directory=src --target=docs --visibility=public --defaultpackagename=Minify --title=Minify;"
 
 test:
-	[ $(UP) -eq 1 ] && make up || true
-	$(eval cmd='docker-compose run $(PHP) env XDEBUG_MODE=coverage vendor/bin/phpunit')
-	eval $(cmd); status=$$?; [ $(DOWN) -eq 1 ] && make down; exit $$status
+	VERSION=$$(echo "$(PHP)-cli" | sed "s/^-//");\
+	test $$(docker images -q matthiasmullie/minify:$$VERSION) || docker build -t matthiasmullie/minify:$$VERSION . --build-arg VERSION=$$VERSION;\
+	docker run -v $$(pwd)/src:/var/www/src -v $$(pwd)/tests:/var/www/tests -v $$(pwd)/build:/var/www/build matthiasmullie/minify:$$VERSION env XDEBUG_MODE=coverage vendor/bin/phpunit $(TEST) --coverage-clover build/coverage-$(PHP)-$(TEST).clover
+
+format:
+	test $$(docker images -q matthiasmullie/minify:cli) || docker build -t matthiasmullie/minify:cli .
+	docker run -v $$(pwd)/src:/var/www/src -v $$(pwd)/tests:/var/www/tests matthiasmullie/minify:cli sh -c "PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix && vendor/bin/phpcbf --standard=ruleset.xml"
+
+.PHONY: docs

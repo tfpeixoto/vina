@@ -209,13 +209,15 @@ SQL;
                 }
 		    }
 
-		    usort($allDirs, static function($a, $b) {
-			    return strlen($b) - strlen($a);
-		    });
+            if ( ! empty($allDirs) ) {
+	            usort( $allDirs, static function( $a, $b ) {
+		            return strlen( $b ) - strlen( $a );
+	            } );
 
-		    // Then, remove the empty dirs in descending order (up to the root)
-            foreach ($allDirs as $dir) {
-                Misc::rmDir($dir);
+	            // Then, remove the empty dirs in descending order (up to the root)
+	            foreach ($allDirs as $dir) {
+		            Misc::rmDir($dir);
+	            }
             }
 	    }
     }
