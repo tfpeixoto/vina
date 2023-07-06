@@ -66,10 +66,11 @@ class PluginsManager
 			);
 		}
 
-		usort($activePluginsFinal, static function($a, $b)
-		{
-			return strcmp($a['title'], $b['title']);
-		});
+        if ( ! empty($activePluginsFinal) ) {
+	        usort( $activePluginsFinal, static function( $a, $b ) {
+		        return strcmp( $a['title'], $b['title'] );
+	        } );
+        }
 
 		return $activePluginsFinal;
 	}

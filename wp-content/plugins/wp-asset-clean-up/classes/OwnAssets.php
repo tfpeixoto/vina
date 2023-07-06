@@ -89,7 +89,7 @@ class OwnAssets
 
         // If script debugging is enabled, load the non-minified versions of the plugin's assets
         // Read more: https://wordpress.org/support/article/debugging-in-wordpress/#script_debug
-	    if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+	    if ( (defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG) || isset($_GET['wpacu_debug']) ) {
 		    self::$ownAssets['styles']['style_core']['rel_path']   = '/assets/style.css';
 		    self::$ownAssets['scripts']['script_core']['rel_path'] = '/assets/script.js';
 
@@ -186,6 +186,7 @@ class OwnAssets
 		    // Security nonces for AJAX calls
 		    $wpacu_object_data['wpacu_update_specific_settings_nonce'] = wp_create_nonce('wpacu_update_specific_settings_nonce');
 		    $wpacu_object_data['wpacu_update_asset_row_state_nonce'] = wp_create_nonce('wpacu_update_asset_row_state_nonce');
+		    $wpacu_object_data['wpacu_area_update_assets_row_state_nonce'] = wp_create_nonce('wpacu_area_update_assets_row_state_nonce');
             $wpacu_object_data['wpacu_print_loaded_hardcoded_assets_nonce'] = wp_create_nonce('wpacu_print_loaded_hardcoded_assets_nonce');
 		    $wpacu_object_data['wpacu_ajax_check_remote_file_size_nonce'] = wp_create_nonce('wpacu_ajax_check_remote_file_size_nonce');
             $wpacu_object_data['wpacu_ajax_check_external_urls_nonce'] = wp_create_nonce('wpacu_ajax_check_external_urls_nonce');

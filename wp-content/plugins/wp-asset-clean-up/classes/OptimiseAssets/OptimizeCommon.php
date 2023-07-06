@@ -1181,7 +1181,7 @@ class OptimizeCommon
 			$mostRecentCachedAssets = self::getMostRecentCachedAssets();
 
 			$siteHost = (string)parse_url(site_url(), PHP_URL_HOST);
-			$siteUri = (string)parse_url(site_url(), PHP_URL_PATH);
+			$siteUri  = (string)parse_url(site_url(), PHP_URL_PATH);
 
 			$relPathToPossibleDir = $storageDir.'/'.$siteHost . $siteUri;
 
@@ -1732,7 +1732,7 @@ SQL;
 
 				if (! $contents) {
 					// The file is empty or the contents could not be retrieved
-					// If a PHP reading error was triggered it should be logged in the "error_log" file
+					// If a PHP reading error was triggered, it should be logged in the "error_log" file
 					return false;
 				}
 			}

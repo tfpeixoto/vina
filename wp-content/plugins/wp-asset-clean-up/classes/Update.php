@@ -92,11 +92,14 @@ HTML;
 	    add_action('wp_ajax_' . WPACU_PLUGIN_ID . '_clear_cache', array($this, 'ajaxClearCache'), PHP_INT_MAX);
 
 	    // After an update, preload the page for the guest view; the preload for the admin is done within /assets/script.min.js
-	    add_action('wp_ajax_' . WPACU_PLUGIN_ID . '_preload', array($this, 'ajaxPreloadGuest'), PHP_INT_MAX);
+	    add_action('wp_ajax_' . WPACU_PLUGIN_ID . '_preload',     array($this, 'ajaxPreloadGuest'), PHP_INT_MAX);
 
 	    // e.g. when "+" or "-" is used within an asset's row (CSS/JS manager), the state is updated in the background to be remembered
-	    add_action( 'wp_ajax_' . WPACU_PLUGIN_ID . '_update_asset_row_state', array($this, 'ajaxUpdateAssetRowState') );
-	    add_action( 'wp_ajax_nopriv_' . WPACU_PLUGIN_ID . '_update_asset_row_state', array($this, 'ajaxUpdateAssetRowState') );
+	    add_action( 'wp_ajax_' . WPACU_PLUGIN_ID . '_update_asset_row_state',              array($this, 'ajaxUpdateAssetRowState') );
+	    add_action( 'wp_ajax_nopriv_' . WPACU_PLUGIN_ID . '_update_asset_row_state',       array($this, 'ajaxUpdateAssetRowState') );
+
+	    add_action( 'wp_ajax_' . WPACU_PLUGIN_ID . '_area_update_assets_row_state',        array($this, 'ajaxAreaUpdateAssetsRowState') );
+	    add_action( 'wp_ajax_nopriv_' . WPACU_PLUGIN_ID . '_area_update_assets_row_state', array($this, 'ajaxAreaUpdateAssetsRowState') );
     }
 
 	/**
@@ -491,7 +494,7 @@ HTML;
 	public function changesNotMadeInvalidNonce()
     {
         ?>
-        <div class="error notice wpacu-error is-dismissible">
+        <div class="notice wpacu-error is-dismissible">
             <p><?php echo wp_kses(
                     $this->afterSubmitMsg['invalid_nonce_error'],
 		            array(
@@ -1211,7 +1214,17 @@ HTML;
 
 		Misc::addUpdateOption($optionToUpdate, wp_json_encode(Misc::filterList($existingList)));
 
-        return $existingList[$keyList][$globalKey];
+        $toReturn = array();
+
+        if (isset($existingList['styles'][$globalKey])) {
+	        $toReturn['styles'] = $existingList['styles'][$globalKey];
+        }
+
+		if (isset($existingList['scripts'][$globalKey])) {
+			$toReturn['scripts'] = $existingList['scripts'][$globalKey];
+        }
+
+        return $toReturn;
 	}
 
 	/**
@@ -1399,5 +1412,50 @@ HTML;
 	    }
 
 	    exit();
+    }
+
+	/**
+     * Update state for all assets within a plugin
+     *
+	 * @return void
+	 */
+	public function ajaxAreaUpdateAssetsRowState()
+    {
+        if (isset($_POST['wpacu_area_update_assets_row_state'])) {
+	        if ( ! isset( $_POST['action'], $_POST['wpacu_area_assets_row_state'], $_POST['wpacu_area_handles'], $_POST['wpacu_nonce'] )
+	             || ! Menu::userCanManageAssets() ) {
+		        return;
+	        }
+
+	        if ( $_POST['wpacu_area_update_assets_row_state'] !== 'yes' ) {
+		        return;
+	        }
+
+	        if ( ! isset($_POST['wpacu_nonce']) ) {
+		        echo 'Error: The security nonce was not sent for verification. Location: '.__METHOD__;
+		        return;
+	        }
+
+	        if ( ! wp_verify_nonce($_POST['wpacu_nonce'], 'wpacu_area_update_assets_row_state_nonce') ) {
+		        echo 'Error: The security check has failed. Location: '.__METHOD__;
+		        return;
+	        }
+
+	        $areaAllAssetsRowState = $_POST['wpacu_area_assets_row_state'];
+
+            if ( ! empty($_POST['wpacu_area_handles']) && is_array($_POST['wpacu_area_handles']) ) {
+                foreach ($_POST['wpacu_area_handles'] as $areaAssetHandleFormat) {
+	                $areaAssetHandleFor = substr(strrchr($areaAssetHandleFormat, '_'), 1);
+                    $areaAssetHandle    = substr($areaAssetHandleFormat, 0, -(strlen($areaAssetHandleFor) + 1));
+
+	                echo 'New State: '.$areaAllAssetsRowState.' / Handle: '.$areaAssetHandle . ' / For: '.$areaAssetHandleFor."\n";
+
+	                $newContractedList = self::updateHandleRowStatus( $areaAllAssetsRowState, $areaAssetHandle, $areaAssetHandleFor );
+	                echo "<pre>" . print_r( $newContractedList, true );
+                }
+            }
+
+	        exit();
+        }
     }
 }

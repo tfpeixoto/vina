@@ -39,7 +39,7 @@
                  * [Start] Unload on this page
                  */
                 // Check All
-                $('.wpacu-plugin-check-all').on('click', function (e) {
+                $('.wpacu-area-check-all').on('click', function (e) {
                     e.preventDefault();
 
                     let wpacuPluginTarget = $(this).attr('data-wpacu-plugin');
@@ -51,7 +51,7 @@
                 });
 
                 // Uncheck All
-                $('.wpacu-plugin-uncheck-all').on('click', function (e) {
+                $('.wpacu-area-uncheck-all').on('click', function (e) {
                     e.preventDefault();
 
                     let wpacuPluginTarget = $(this).attr('data-wpacu-plugin');
@@ -68,7 +68,7 @@
                 * [Start] Make exception, Load it on this page
                 */
                 // Check All
-                $('.wpacu-plugin-check-load-all').on('click change', function (e) {
+                $('.wpacu-area-check-load-all').on('click change', function (e) {
                     e.preventDefault();
 
                     let wpacuPluginTarget = $(this).attr('data-wpacu-plugin');
@@ -82,7 +82,7 @@
                 });
 
                 // Uncheck All
-                $('.wpacu-plugin-uncheck-load-all').on('click change', function (e) {
+                $('.wpacu-area-uncheck-load-all').on('click change', function (e) {
                     e.preventDefault();
 
                     let wpacuPluginTarget = $(this).attr('data-wpacu-plugin');
@@ -335,6 +335,47 @@
                         }
 
                     $.fn.wpAssetCleanUp().wpacuAjaxUpdateKeepTheAssetRowState(wpacuNewAssetRowState, wpacuAssetHandle, wpacuAssetHandleFor, $(this));
+                });
+
+                $(document).on('click', '.wpacu_area_handles_row_expand_contract', function (e) {
+                    e.preventDefault();
+
+                    let wpacuAreaName = $(this).attr('data-wpacu-area'),
+                        wpacuNewAreaAssetsRowState,
+                        wpacuAllAreaHandles = [],
+                        $areaWrap = $('table.wpacu_list_table[data-wpacu-area="'+ wpacuAreaName +'"]');
+
+                    if ($(this).hasClass('wpacu-area-contract-all-assets')) {
+                        wpacuNewAreaAssetsRowState = 'contracted';
+                    } else if ($(this).hasClass('wpacu-area-expand-all-assets')) {
+                        wpacuNewAreaAssetsRowState = 'expanded';
+                    }
+
+                    // Get all plugin / area handles and wrap them in a list together with their type ("style" or "script")
+                    $areaWrap.find('tr.wpacu_asset_row').each(function(index, value) {
+                        var handleStyleAttr  = $(this).attr('data-style-handle-row');
+                        var handleScriptAttr = $(this).attr('data-script-handle-row');
+
+                        if (typeof handleStyleAttr !== 'undefined' && handleStyleAttr !== false) {
+                            wpacuAllAreaHandles[index] = handleStyleAttr + '_style';
+                        } else if (typeof handleScriptAttr !== 'undefined' && handleScriptAttr !== false) {
+                            wpacuAllAreaHandles[index] = handleScriptAttr + '_script';
+                        }
+
+                        var $tdAssetRow = $(this).find('td[data-wpacu-row-status]');
+
+                        if (wpacuNewAreaAssetsRowState === 'contracted') {
+                            $tdAssetRow.attr('data-wpacu-row-status', wpacuNewAreaAssetsRowState)
+                                .find('.wpacu_handle_row_expanded_area').addClass('wpacu_hide');
+                            $tdAssetRow.find('a.wpacu_handle_row_expand_contract').find('span').removeClass('dashicons-minus').addClass('dashicons-plus');
+                        } else if (wpacuNewAreaAssetsRowState === 'expanded') {
+                            $tdAssetRow.attr('data-wpacu-row-status', wpacuNewAreaAssetsRowState)
+                                .find('.wpacu_handle_row_expanded_area').removeClass('wpacu_hide');
+                            $tdAssetRow.find('a.wpacu_handle_row_expand_contract').find('span').removeClass('dashicons-plus').addClass('dashicons-minus');
+                        }
+                    });
+
+                    $.fn.wpAssetCleanUp().wpacuAjaxUpdateAllAreaAssetsRowState(wpacuNewAreaAssetsRowState, wpacuAllAreaHandles, $areaWrap);
                 });
             },
 
@@ -764,6 +805,7 @@
                     $('#'+ btnIdClicked).prop('disabled', false); // Any problems with the AJAX call? Don't keep the button disabled
                 }
             },
+
             wpacuAjaxUpdateKeepTheAssetRowState: function(newState, handle, handleFor, $currentElement) {
                 let dataUpdateSetting = {
                     'action'                       : wpacu_object.plugin_prefix + '_update_asset_row_state',
@@ -779,6 +821,25 @@
 
                 $.post(wpacu_object.ajax_url, dataUpdateSetting, function (response) {
                     $currentElement.removeClass('wpacu_hide');
+                    console.log(response);
+                });
+            },
+
+            // This triggers when all the assets from a plugin are expanded or contracted
+            wpacuAjaxUpdateAllAreaAssetsRowState: function(newState, handles, $areaWrap) {
+                let dataUpdateSetting = {
+                    'action'                             : wpacu_object.plugin_prefix + '_area_update_assets_row_state',
+                    'wpacu_area_update_assets_row_state' : 'yes',
+                    'wpacu_area_assets_row_state'        : newState, // "expanded" or "contracted"
+                    'wpacu_area_handles'                 : handles,
+                    'time_r'                             : new Date().getTime(), // avoid any caching
+                    'wpacu_nonce'                        : wpacu_object.wpacu_area_update_assets_row_state_nonce
+                };
+
+                $areaWrap.find('.wpacu_handle_row_expand_contract').addClass('wpacu_hide');
+
+                $.post(wpacu_object.ajax_url, dataUpdateSetting, function (response) {
+                    $areaWrap.find('.wpacu_handle_row_expand_contract').removeClass('wpacu_hide');
                     console.log(response);
                 });
             },
