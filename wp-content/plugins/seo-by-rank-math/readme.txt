@@ -5,7 +5,7 @@ Tags: seo, sitemap, google search console, schema, redirection, WordPress SEO
 Tested up to: 6.2.2
 Requires at least: 5.6
 Requires PHP: 7.4
-Stable tag: 1.0.118
+Stable tag: 1.0.120
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -583,16 +583,13 @@ Please drop us an email at support@rankmath.com and we would be more than happy 
 
 == Changelog ==
 
-= 1.0.118 [June 28, 2023] =
-- Improved: [`%customfield%` variable](https://rankmath.com/kb/variables-in-seo-title-description/#custom-field-advanced) now works on Taxonomy & Author pages
-- Improved: [Image-related tests in SEO Analyzer](https://rankmath.com/kb/seo-analysis/#image-alt-attributes-test) will now display a clear message when Images are not found on the homepage
-- Fixed: SEO Analyzer was showing an option to [Enable Auto Update](https://rankmath.com/kb/seo-analysis/#priority) even when Auto-updates were disabled on the site using a function
-- Fixed: [Icon Overlay feature](https://rankmath.com/kb/meta-box-social-tab/#add-icon-overlay-to-thumbnails) compatibility issues with sites using the Imagick module
-- Fixed: Incorrect seller ID error in the [Product Schema](https://rankmath.com/kb/product-schema/) on secondary languages
-- Fixed: Timezones in [Sitemap](https://rankmath.com/kb/configure-sitemaps/) were not accurate when using half hours like (+5:30)
-- Fixed: [SEO Score](https://rankmath.com/kb/general-tab/) was shown in Classic Editor even to the users who didn't have the required capabilities
-- Fixed: [404 Monitor](https://rankmath.com/kb/advanced-404-monitor/) log was not including the language slug on multilingual sites
-- Fixed: Redirection with [Contains, Starts With, & Ends with](https://rankmath.com/kb/setting-up-redirections/#contains) was not working well when trailing slash is added in the Source URL
-- Fixed: Incompatibility with the Molongui Authorship plugin
+= 1.0.120 [July 26, 2023] =
+- Added: [New filter](https://rankmath.com/kb/filters-hooks-api-developer/#modify-post-object-in-sitemap) to change the post object passed to the Sitemap
+- Improved: [Redirection](https://rankmath.com/kb/setting-up-redirections/) code to deactivate self redirects by default when they are created.
+- Improved: URLs in the [404 monitor](https://rankmath.com/kb/advanced-404-monitor/) are now clickable
+- Fixed: Incorrect modified date added to the [Sitemap](https://rankmath.com/kb/sitemaps-seo-benefits/) when a scheduled post was published
+- Fixed: Analytics settings were not updating when configured through [Setup Wizard](https://rankmath.com/kb/how-to-setup/#analytics)
+- Fixed: Error in the [Author Sitemap](https://rankmath.com/kb/configure-sitemaps/#authors) on some setups
+- Fixed: Broken Analytics styling in Dashboard Widget on German sites
 
 Full changelog can be found here - **[Rank Math changelog](https://rankmath.com/changelog/?utm_source=Plugin&utm_medium=Changelog&utm_campaign=WP)**
