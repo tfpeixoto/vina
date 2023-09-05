@@ -2,10 +2,10 @@
 Contributors: rankmath
 Plugin link: https://rankmath.com/?utm_source=LP&utm_campaign=WP
 Tags: seo, sitemap, google search console, schema, redirection, WordPress SEO
-Tested up to: 6.2.2
+Tested up to: 6.3
 Requires at least: 5.6
 Requires PHP: 7.4
-Stable tag: 1.0.120
+Stable tag: 1.0.122
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -583,13 +583,12 @@ Please drop us an email at support@rankmath.com and we would be more than happy 
 
 == Changelog ==
 
-= 1.0.120 [July 26, 2023] =
-- Added: [New filter](https://rankmath.com/kb/filters-hooks-api-developer/#modify-post-object-in-sitemap) to change the post object passed to the Sitemap
-- Improved: [Redirection](https://rankmath.com/kb/setting-up-redirections/) code to deactivate self redirects by default when they are created.
-- Improved: URLs in the [404 monitor](https://rankmath.com/kb/advanced-404-monitor/) are now clickable
-- Fixed: Incorrect modified date added to the [Sitemap](https://rankmath.com/kb/sitemaps-seo-benefits/) when a scheduled post was published
-- Fixed: Analytics settings were not updating when configured through [Setup Wizard](https://rankmath.com/kb/how-to-setup/#analytics)
-- Fixed: Error in the [Author Sitemap](https://rankmath.com/kb/configure-sitemaps/#authors) on some setups
-- Fixed: Broken Analytics styling in Dashboard Widget on German sites
+= 1.0.122 [Aug 23, 2023] =
+- Added: New option in [Webmaster Tools](https://rankmath.com/kb/general-settings/#webmaster-tools) to add additional verification tags
+- Added: [New filter](https://rankmath.com/kb/filters-hooks-api-developer/#modify-link-counter-content) to modify the content passed to the [Link Counter](https://rankmath.com/kb/link-counter/)
+- Fixed: PHP Warning with WP CLI command `wp rankmath sitemap generate`
+- Fixed: Setup Wizard was not updating [Person/Organization Name](https://rankmath.com/kb/how-to-setup/#your-site)
+- Fixed: PHP warnings on the [Redirections](https://rankmath.com/kb/setting-up-redirections/) page in PHP 8.1, occurring when no Redirections are present on the site
+
 
 Full changelog can be found here - **[Rank Math changelog](https://rankmath.com/changelog/?utm_source=Plugin&utm_medium=Changelog&utm_campaign=WP)**
