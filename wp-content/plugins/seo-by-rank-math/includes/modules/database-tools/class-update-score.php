@@ -15,8 +15,8 @@ use RankMath\Traits\Hooker;
 use RankMath\Paper\Paper;
 use RankMath\Admin\Metabox\Screen;
 use RankMath\Schema\DB;
-use MyThemeShop\Helpers\Param;
-use MyThemeShop\Helpers\Conditional;
+use RankMath\Helpers\Param;
+use RankMath\Helpers\Conditional;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -157,6 +157,8 @@ class Update_Score {
 				$non_cacheable[] = 'excerpt';
 				$non_cacheable[] = 'excerpt_only';
 				$non_cacheable[] = 'seo_description';
+				$non_cacheable[] = 'keywords';
+				$non_cacheable[] = 'focuskw';
 				return $non_cacheable;
 			}
 		);

@@ -10,8 +10,8 @@
 
 namespace RankMath\Redirections;
 
-use MyThemeShop\Helpers\Str;
-use MyThemeShop\Database\Database;
+use RankMath\Helpers\Str;
+use RankMath\Admin\Database\Database;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -41,9 +41,9 @@ class DB {
 		}
 
 		$redirction_counts = self::table()
-			->selectSum( 'status = "active"', 'active' )
-			->selectSum( 'status = "inactive"', 'inactive' )
-			->selectSum( 'status = "trashed"', 'trashed' )
+			->selectSum( "status = 'active'", 'active' )
+			->selectSum( "status = 'inactive'", 'inactive' )
+			->selectSum( "status = 'trashed'", 'trashed' )
 			->one( ARRAY_A );
 
 		$redirction_counts = array_map(
