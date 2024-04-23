@@ -29,8 +29,8 @@ require_once('header.php');
         $termo_buscado = get_search_query();
 
         $frase_retorno = ($total_resultados > 1) ?
-          "Encontramos <strong> ${total_resultados} </strong> resultados com o termo <strong> ${termo_buscado} </strong>" :
-          "Encontramos <strong> ${total_resultados} </strong> resultado com o termo <strong> ${termo_buscado} </strong>";
+          "Encontramos <strong> {$total_resultados} </strong> resultados com o termo <strong> {$termo_buscado} </strong>" :
+          "Encontramos <strong> {$total_resultados} </strong> resultado com o termo <strong> {$termo_buscado} </strong>";
 
         if ($total_resultados != 0) echo $frase_retorno;
         ?>
