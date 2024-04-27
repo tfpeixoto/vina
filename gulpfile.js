@@ -24,7 +24,7 @@ gulp.task('browser-sync', function () {
   ];
 
   browserSync.init(files, {
-    proxy: "http://localhost/vina",
+    proxy: "http://vinaec.local",
     notify: true,
     stream: true,
     port: 3000
