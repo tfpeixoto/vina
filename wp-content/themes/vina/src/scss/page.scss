@@ -1,11 +1,19 @@
-@import "components/variaveis";
-@import "~bootstrap/scss/bootstrap";
-@import "components/wordpress";
+// // BOOTSTRAP
+// @import "~bootstrap/scss/functions";
+// @import "~bootstrap/scss/variables";
+// @import "~bootstrap/scss/mixins";
+// @import "~bootstrap/scss/reboot";
 
-@import "components/geral";
-/*! purgecss start ignore */
-@import "components/conteudo";
-/*! purgecss end ignore */
-@import "components/galeria";
-@import "components/formulario";
-@import "components/footer";
+// @import "components/variaveis";
+// @import "mixins/_grid";
+
+// @import "~bootstrap/scss/bootstrap";
+// @import "components/wordpress";
+
+// @import "components/geral";
+// /*! purgecss start ignore */
+// @import "components/conteudo";
+// /*! purgecss end ignore */
+// @import "components/galeria";
+// @import "components/formulario";
+// @import "components/footer";

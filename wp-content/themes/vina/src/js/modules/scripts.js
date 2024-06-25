@@ -1,3 +1,5 @@
+import * as bootstrap from 'bootstrap'
+
 $('.carousel').carousel({
   interval: 5000,
   pause: true
