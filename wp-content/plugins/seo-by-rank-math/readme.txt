@@ -1,11 +1,11 @@
-=== Rank Math SEO with AI SEO Tools ===
+=== Rank Math SEO – AI SEO Tools to Dominate SEO Rankings ===
 Contributors: rankmath
 Plugin link: https://rankmath.com/?utm_source=LP&utm_campaign=WP
 Tags: seo, sitemap, google search console, schema, redirection, WordPress SEO
-Tested up to: 6.4.1
-Requires at least: 6.0
+Tested up to: 6.5
+Requires at least: 6.3
 Requires PHP: 7.4
-Stable tag: 1.0.212.1
+Stable tag: 1.0.221
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -583,19 +583,13 @@ Please drop us an email at support@rankmath.com and we would be more than happy 
 
 == Changelog ==
 
-= 1.0.212 [Jan 31, 2024] =
-- Added: Options to [Bulk generate meta tags using Content AI](https://rankmath.com/kb/bulk-generate-seo-meta-tags/) for Taxonomies (Categories, Tags, etc).
-- Improved: Images from the Product gallery are now included in the [Product Schema](https://rankmath.com/kb/woocommerce-product-schema/)
-- Improved: Reusable Block Content Analysis code
-- Fixed: Dashboard notification was persistently shown on some sites
-- Fixed: [Filter to change meta keywords](https://rankmath.com/kb/filters-hooks-api-developer/#change-meta-keywords) was not working
-- Fixed: [Instant Indexing API Key location file](https://rankmath.com/kb/how-to-use-indexnow/#check-api-key-location) was redirecting to the homepage when [Fallback Behaviour in Redirection settings](https://rankmath.com/kb/general-settings/#fallback-behaviour) was set to Homepage
-- Fixed: Child pages were duplicated in the [HTML Sitemap](https://rankmath.com/kb/html-sitemap/) on multisite setups
-- Fixed: [Researching a Keyword with Content AI](https://rankmath.com/kb/how-to-use-content-ai/#research-keywords) was not working for some countries
-
-= 1.0.212.1 [Feb 07, 2024] =
-- Fixed: [Bulk Editing for Media Library](https://rankmath.com/kb/bulk-editing-in-rank-math/#bulk-editing-media) was not working after the latest update
-- Fixed: [XML Sitemap](https://rankmath.com/kb/sitemaps-seo-benefits/#xml-sitemap) was not displaying Taxonomies after the latest update
+= 1.0.221 [June 12, 2024] =
+- Improved: Moved [Role Manager](https://rankmath.com/kb/role-manager/) code to React. Now it loads blazing fast. We will gruadually make other modules load fast as well. 
+- Fixed: Update button state in the [Elementor editor](https://rankmath.com/blog/elementor-seo/) remained active even without any content changes when the Schema module was enabled
+- Fixed: [Table of Contents Block](https://rankmath.com/kb/table-of-contents-block/) was not working with Full Site editing templates
+- Fixed: [Organization name variable](https://rankmath.com/kb/variables-in-seo-title-description/#organization-name) `%org_name%` was displaying the site name in the Preview editor instead of the Organization name
+- Fixed: Missing link to [add new Redirection](https://rankmath.com/kb/setting-up-redirections/#redirections) in the Redirections Table
+- Fixed: Missing checkbox to allow editing [.htaccess file](https://rankmath.com/kb/general-settings/#edit-htaccess)
 
 
 Full changelog can be found here - **[Rank Math changelog](https://rankmath.com/changelog/?utm_source=Plugin&utm_medium=Changelog&utm_campaign=WP)**

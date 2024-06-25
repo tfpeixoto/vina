@@ -37,7 +37,7 @@ package-lock.json
 #
 # Note: If you wish to whitelist plugins,
 # uncomment the next line
-/wp-content/plugins
+# /wp-content/plugins
 
 # All themes
 #
@@ -46,11 +46,11 @@ package-lock.json
 assinatura
 node_modules
 tmpnodejsnpm-cache
-wp-content/uploads
-wp-content/updraft
-
-wp-content/webp-express/webp-images
-wp-content/webp-express/config/config.json
-wp-content/webp-express/config/wod-options.json
-wp-content/webp-express/htaccess-capability-tests/header-set/request-me.txt
-wp-content/webp-express/htaccess-capability-tests/pass-info-from-rewrite-to-script-through-env/test.php
+/wp-content/ai1wm-backups
+/wp-content/cache
+/wp-content/plugins
+/wp-content/updraft
+/wp-content/upgrade
+/wp-content/upgrade-temp-backup
+/wp-content/uploads
+/wp-content/webp-express
