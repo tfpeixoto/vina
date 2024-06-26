@@ -1,19 +1,23 @@
 // // BOOTSTRAP
-// @import "~bootstrap/scss/functions";
-// @import "~bootstrap/scss/variables";
-// @import "~bootstrap/scss/mixins";
-// @import "~bootstrap/scss/reboot";
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/root";
 
-// @import "components/variaveis";
-// @import "mixins/_grid";
+@import "components/variaveis";
 
-// @import "~bootstrap/scss/bootstrap";
-// @import "components/wordpress";
+@import "~bootstrap/scss/bootstrap";
 
-// @import "components/geral";
-// /*! purgecss start ignore */
-// @import "components/conteudo";
-// /*! purgecss end ignore */
-// @import "components/galeria";
-// @import "components/formulario";
-// @import "components/footer";
+@import "components/wordpress";
+/*! purgecss start ignore */
+@import "../../../../../node_modules/lightbox2/dist/css/lightbox.min.css";
+/*! purgecss end ignore */
+
+@import "components/geral";
+/*! purgecss start ignore */
+@import "components/conteudo";
+/*! purgecss end ignore */
+@import "components/galeria";
+@import "components/formulario";
+@import "components/footer";

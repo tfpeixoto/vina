@@ -1,12 +1,18 @@
-import * as bootstrap from 'bootstrap'
+import { Carousel } from 'bootstrap'
+import lightbox from 'lightbox2';
 
-$('.carousel').carousel({
-  interval: 5000,
-  pause: true
-});
-$('.carousel-inner .carousel-item:first-child').addClass('active');
+const slideCarousel = document.querySelector('#slideHome')
+if (slideCarousel) {
+  $('.carousel-inner .carousel-item:first-child').addClass('active');
 
-$(document).on('click', '[data-toggle="lightbox"]', function (event) {
-  event.preventDefault();
-  $(this).ekkoLightbox();
-});
+  new bootstrap.Carousel(slideCarousel, {
+    interval: 5000,
+    pause: true
+  })
+}
+
+lightbox.option({
+  'resizeDuration': 500,
+  'wrapAround': true,
+  'maxWidth': 600,
+})

@@ -6,8 +6,8 @@ require_once('header-home.php');
 ?>
 
 <section id="galeria-home" class="slideshow">
-  <div id="slideHome" class="carousel slide" data-ride="carousel">
-    <ol class="carousel-indicators" href="#slideHome">
+  <div id="slideHome" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
       <?php
       $contadorSlides = 0;
       $args = array(
@@ -17,14 +17,15 @@ require_once('header-home.php');
       $slides = new WP_Query($args);
       if ($slides->have_posts()) : while ($slides->have_posts()) : $slides->the_post(); ?>
 
-          <li data-target="#slideHome" data-slide-to="<?= $contadorSlides++ ?>"></li>
+          <button type="button" data-bs-target="#slideHome" data-bs-slide-to="<?= $contadorSlides++ ?>" class="<?= $contadorSlides === 1 ? 'active' : ''; ?>" aria-current="<?= $contadorSlides === 1 ? 'true' : ''; ?>" aria-label="Slide <?= $contadorSlides; ?>"></button>
 
       <?php endwhile;
       endif; ?>
-    </ol>
+    </div>
 
     <div class="carousel-inner">
       <?php
+      $contadorSlide = 0;
       $args = array(
         'post_type' => 'slideshow',
         'posts_per_page' => -1
@@ -32,7 +33,7 @@ require_once('header-home.php');
       $slides = new WP_Query($args);
       if ($slides->have_posts()) : while ($slides->have_posts()) : $slides->the_post(); ?>
 
-          <div class="carousel-item">
+          <div class="carousel-item <?= $contadorSlides === 1 ? 'active' : ''; ?>">
             <?php
             $image_mobile = get_field('imagem_mobile');
             if ($image_mobile) :
@@ -62,14 +63,15 @@ require_once('header-home.php');
       <?php endif; ?>
     </div>
 
-    <a class="carousel-control-prev" href="#slideHome" role="button" data-slide="prev">
+    <button class="carousel-control-prev" type="button" data-bs-target="#slideHome" data-bs-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="sr-only">Anterior</span>
-    </a>
-    <a class="carousel-control-next" href="#slideHome" role="button" data-slide="next">
+      <span class="visually-hidden">Anterior</span>
+    </button>
+
+    <button class="carousel-control-next" type="button" data-bs-target="#slideHome" data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="sr-only">Próximo</span>
-    </a>
+      <span class="visually-hidden">Próximo</span>
+    </button>
   </div>
 
   <div class="destaque">

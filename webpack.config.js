@@ -6,6 +6,8 @@ const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin")
 const copyPlugin = require("copy-webpack-plugin")
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 const { PurgeCSSPlugin } = require("purgecss-webpack-plugin")
+const autoprefixer = require('autoprefixer')
+const jquery = require('jquery')
 var webpack = require("webpack")
 
 THEME_NAME = 'vina'
@@ -17,7 +19,7 @@ BUILD_DIR = path.resolve(__dirname, `wp-content/themes/${THEME_NAME}/assets`)
 const localServer = {
   host: 'localhost',
   port: 3000,
-  proxy: `http://${THEME_NAME}.local/`
+  proxy: `http://vinaec.local/`
 }
 
 const config = {
@@ -97,13 +99,15 @@ const config = {
           {
             loader: miniCssExtractPlugin.loader
           },
-          'css-loader',
+          {
+            loader: 'css-loader',
+          },
           {
             loader: 'postcss-loader',
             options: {
               postcssOptions: {
                 plugins: [
-                  'autoprefixer'
+                  autoprefixer
                 ]
               }
             }

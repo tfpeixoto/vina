@@ -10,7 +10,7 @@
 
   .container {
     padding: 0;
-    
+
     @include media-breakpoint-up(md) {
       border-top: 1px solid $white;
     }
@@ -65,8 +65,8 @@
           height: 2rem;
           width: 2rem;
 
-          &.icone-whatsapp{
-            opacity: .5;
+          &.icone-whatsapp {
+            opacity: 0.5;
           }
         }
       }
@@ -131,20 +131,24 @@
             width: 125px;
           }
         }
+
         a {
+          text-decoration: none;
           transition: all ease-in-out 0.25s;
+
           &:hover {
             text-decoration: none;
             opacity: 0.75;
           }
         }
+
         img {
           height: 2rem;
           margin-bottom: 0;
           width: 2rem;
 
-          &.icone-whatsapp{
-            opacity: .5;
+          &.icone-whatsapp {
+            opacity: 0.5;
           }
         }
       }

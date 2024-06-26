@@ -193,6 +193,7 @@
             right: 0;
             text-align: left;
           }
+
           h5 {
             display: none;
 
@@ -202,6 +203,7 @@
               font-weight: 700;
             }
           }
+
           p {
             display: none;
 
@@ -211,6 +213,7 @@
               line-height: 1.2;
             }
           }
+
           a {
             justify-content: center;
 
@@ -222,6 +225,7 @@
           }
         }
       }
+
       .carousel-indicators {
         bottom: -60px;
         margin: 15px;
@@ -230,7 +234,7 @@
           justify-content: flex-start;
         }
 
-        li {
+        button {
           @include media-breakpoint-up(md) {
             background: none;
             color: $white;

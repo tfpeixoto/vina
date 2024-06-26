@@ -20,19 +20,13 @@ if (have_posts()) : while (have_posts()) : the_post();
         <div class="row">
           <div class="col-12 col-md-8">
             <ul class="row galeria__lista">
-
               <?php foreach ($images as $image) : ?>
 
-                <li class="col-12 col-md-4 galeria__item">
-                  <a href="<?php echo esc_url($image['url']); ?>" data-toggle="lightbox" data-gallery="example-gallery" data-type="image" data-max-width="700">
-                    <div class="galeria__boximage">
-                      <img src="<?php echo esc_url($image['url']); ?>" class="img-fluid galeria__imagem" alt="<?php echo esc_attr($image['alt']); ?>">
-                    </div>
-                  </a>
-                </li>
+                <a href="<?php echo esc_url($image['url']); ?>" class="col-12 col-md-4 galeria__item" data-lightbox="roadtrip">
+                  <img src="<?php echo esc_url($image['url']); ?>" class="img-fluid galeria__imagem" alt="<?php echo esc_attr($image['alt']); ?>">
+                </a>
 
               <?php endforeach; ?>
-
             </ul>
           </div>
 

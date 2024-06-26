@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "webpack --watch --mode development --config webpack.config.js",
     "build": "webpack --mode production --config webpack.config.js",
-    "start": "webpack-dev-server"
+    "start": "webpack-dev-server",
+    "postinstall": "patch-package"
   },
   "repository": {
     "type": "git",
@@ -38,9 +39,10 @@
     "imagemin-svgo": "^10.0.1",
     "mini-css-extract-plugin": "^2.7.2",
     "node-sass": "^8.0.0",
+    "patch-package": "^8.0.0",
     "postcss-loader": "^7.0.2",
     "purgecss-webpack-plugin": "^5.0.0",
-    "sass": "^1.58.0",
+    "sass": "~1.64.2",
     "sass-loader": "^13.2.0",
     "style-loader": "^3.3.1",
     "webpack": "^5.75.0",
@@ -49,11 +51,12 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.7",
-    "bootstrap": "^4.5.0",
+    "bootstrap": "^5.3.1",
     "copy-webpack-plugin": "^11.0.0",
     "jquery": "^3.6.4",
+    "lightbox2": "^2.11.4",
     "node-polyfill-webpack-plugin": "^2.0.1",
-    "slick-carousel": "^1.8.1",
-    "owl.carousel": "^2.3.4"
+    "owl.carousel": "^2.3.4",
+    "slick-carousel": "^1.8.1"
   }
 }
