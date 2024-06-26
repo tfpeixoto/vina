@@ -19,6 +19,11 @@
       <div class="col-12 col-md-2 footer-home__social">
         <ul>
           <li>
+            <a href="https://www.linkedin.com/company/vina-gestao-de-residuos" target="_blank" rel="noopener noreferrer">
+              <img src="<?php bloginfo('template_url'); ?>/assets/images/icone-linkedin.svg" alt="Linkedin Vina" />
+            </a>
+          </li>
+          <li>
             <a href="https://www.facebook.com/vinasocial/" target="_blank" rel="noopener noreferrer">
               <img src="<?php bloginfo('template_url'); ?>/assets/images/icone-facebook.svg" alt="Facebook Vina" />
             </a>
