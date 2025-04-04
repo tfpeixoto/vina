@@ -6,6 +6,7 @@ const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin")
 const copyPlugin = require("copy-webpack-plugin")
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 const { PurgeCSSPlugin } = require("purgecss-webpack-plugin")
+const ImageminWebpWebpackPlugin = require("imagemin-webp-webpack-plugin");
 const autoprefixer = require('autoprefixer')
 const jquery = require('jquery')
 var webpack = require("webpack")
@@ -26,7 +27,6 @@ const config = {
   entry: {
     home: `${JS_DIR}/home.js`,
     page: `${JS_DIR}/page.js`,
-    critical: `${JS_DIR}/critical.js`,
   },
 
   output: {
@@ -58,6 +58,19 @@ const config = {
     new PurgeCSSPlugin({
       paths: glob.sync(`${THEME_DIR}/**/*`, { nodir: true }),
       safelist: [],
+    }),
+
+    new ImageminWebpWebpackPlugin({
+      config: [{
+        test: /\.(jpe?g|png)/,
+        options: {
+          quality: 75
+        }
+      }],
+      overrideExtension: true,
+      detailedLogs: false,
+      silent: false,
+      strict: true
     }),
 
     new webpack.ProvidePlugin({
