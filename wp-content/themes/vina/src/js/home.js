@@ -1,5 +1,5 @@
 //JS
-import './modules/scripts.js'
+import './modules/carousel.js'
 
 // SCSS
 import '../scss/home.scss'

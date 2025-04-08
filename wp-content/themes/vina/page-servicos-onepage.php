@@ -2,7 +2,7 @@
 /* Template name: Serviços One Page */
 
 $estiloPagina = 'page.css';
-require_once('header.php');
+require_once('parts/header.php');
 ?>
 
 <section id="menuServicos" class="conteudo laranja">
@@ -63,7 +63,7 @@ if ($servicos->have_posts()) : while ($servicos->have_posts()) : $servicos->the_
     </section>
 
     <?php get_template_part(
-      'template_parts/galeria',
+      'parts/galeria',
       'galeria',
       array(
           'id' => $ancora,
@@ -74,5 +74,5 @@ if ($servicos->have_posts()) : while ($servicos->have_posts()) : $servicos->the_
 endif; ?>
 
 <?php
-require_once('footer.php');
+require_once('parts/footer.php');
 ?>

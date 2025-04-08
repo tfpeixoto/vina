@@ -37,4 +37,23 @@ RewriteRule . /index.php [L]
   ExpiresByType font/otf "access plus 6 months"
 </IfModule>
 
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Ativa o cabeçalho Vary: Accept (se mod_headers estiver habilitado)
+  <IfModule mod_headers.c>
+    Header append Vary Accept
+  </IfModule>
+
+  # Redireciona imagens JPG/PNG para versões WebP, se o navegador aceitar
+  RewriteCond %{HTTP_ACCEPT} image/webp
+  RewriteCond %{REQUEST_FILENAME} \.(jpe?g|png)$
+  RewriteCond %{REQUEST_FILENAME}.webp -f
+  RewriteRule ^(.+)\.(jpe?g|png)$ $1.$2.webp [T=image/webp,E=REQUEST_image]
+
+  <IfModule mod_mime.c>
+    AddType image/webp .webp
+  </IfModule>
+</IfModule>
+
 # END WordPress

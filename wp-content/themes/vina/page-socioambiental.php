@@ -1,7 +1,7 @@
 <?php
 /* Template Name: Socioambiental */
 $estiloPagina = 'page.css';
-require_once('header.php');
+require_once('parts/header.php');
 ?>
 
 <section class="banner-interno socioambiental">
@@ -112,5 +112,5 @@ require_once('header.php');
 </section>
 
 <?php
-require_once('footer.php');
+require_once('parts/footer.php');
 ?>

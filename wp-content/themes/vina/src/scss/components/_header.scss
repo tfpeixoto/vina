@@ -1,14 +1,15 @@
 header {
   position: fixed;
   top: 0;
-  z-index: 10;
+  z-index: 15;
   width: 100vw;
 
   .navbar-toggler {
     border: 2px solid $white;
+    cursor: pointer;
     width: 50px;
 
-    .navbar-toggler-trace {
+    span {
       background: $white;
       border-radius: 50px;
       content: " ";
@@ -64,8 +65,11 @@ header {
 
         .nav-link {
           color: $white;
+          display: block;
           font-size: 1rem;
           font-weight: 700;
+          padding: .5rem;
+          text-decoration: none;
           text-transform: uppercase;
           transition: all ease-in-out 0.25s;
 
@@ -110,16 +114,20 @@ header {
       @include media-breakpoint-up(md) {
         margin-top: 0;
       }
+
       .nav-item {
         &.active {
           .nav-link {
             color: $primary;
           }
         }
+
         .nav-link {
           color: $white;
+          display: block;
           font-size: 1rem;
           font-weight: 700;
+          padding: .5rem 0;
           text-transform: uppercase;
           transition: all ease-in-out 0.25s;
 

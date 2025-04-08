@@ -4,7 +4,7 @@
  * Template name: Galeria
  */
 $estiloPagina = 'page.css?v=1';
-require_once('header.php');
+require_once('parts/header.php');
 ?>
 
 <section class="conteudo galeria">
@@ -45,5 +45,5 @@ require_once('header.php');
 </section>
 
 <?php
-require_once('footer.php');
+require_once('parts/footer.php');
 ?>

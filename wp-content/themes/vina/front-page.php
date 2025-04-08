@@ -2,11 +2,11 @@
 /* Template name: Página Inicial */
 
 $estiloPagina = 'home.css';
-require_once('header-home.php');
+require_once('parts/header.php');
 ?>
 
 <section id="galeria-home" class="slideshow">
-  <div id="slideHome" class="carousel slide" data-bs-ride="carousel">
+  <div id="slideHome" class="carousel slide">
     <div class="carousel-indicators">
       <?php
       $contadorSlides = 0;
@@ -33,29 +33,31 @@ require_once('header-home.php');
       $slides = new WP_Query($args);
       if ($slides->have_posts()) : while ($slides->have_posts()) : $slides->the_post(); ?>
 
-          <div class="carousel-item <?= $contadorSlides === 1 ? 'active' : ''; ?>">
+          <div class="carousel-item <?= $contadorSlide === 1 ? 'active' : ''; ?>">
             <?php
             $image_mobile = get_field('imagem_mobile');
             if ($image_mobile) :
             ?>
 
-              <img class="d-block d-md-none img-mobile" src="<?= $image_mobile['url'] ?>" alt="<?= $image_mobile['alt'] ?>">
+              <img class="d-block d-md-none img-mobile" src="<?= $image_mobile['url'] ?>" alt="<?= $image_mobile['alt'] ?>" loading="<?= $contadorSlide > 0 ? 'lazy' : ''; ?>" width="100%" height="100%" />
 
             <?php else : ?>
 
-              <img class="d-block d-md-none img-mobile" src="<?php the_post_thumbnail_url(); ?>" alt="<?php the_title(); ?>">
+              <img class="d-block d-md-none img-mobile" src="<?php the_post_thumbnail_url(); ?>" alt="<?php the_title(); ?>" loading="<?= $contadorSlide > 0 ? 'lazy' : ''; ?>" width="720" height="1280">
 
             <?php endif; ?>
 
-            <img class="d-none d-md-block img-desktop" src="<?php the_post_thumbnail_url(); ?>" width="1920" height="1080" alt="<?php the_title(); ?>">
+            <img class="d-none d-md-block img-desktop" src="<?php the_post_thumbnail_url(); ?>" width="1920" height="1080" loading="<?= $contadorSlide > 0 ? 'lazy' : ''; ?>" alt="<?php the_title(); ?>">
 
             <div class="carousel-caption">
-              <img src="<?= get_template_directory_uri(); ?>/assets/images/marca-vina.svg" class="marca-slide" width="250" height="76" alt="<?php bloginfo('title'); ?>" />
+              <img src="<?= get_template_directory_uri(); ?>/assets/images/marca-vina.svg" class="marca-slide" width="250" height="76" loading="<?= $contadorSlide > 0 ? 'lazy' : ''; ?>" alt="<?php bloginfo('title'); ?>" />
               <h5><?php the_title(); ?></h5>
             </div>
           </div>
 
-        <?php endwhile;
+        <?php
+          $contadorSlide++;
+        endwhile;
       else : ?>
 
         <p>Não há slides publicados</p>
@@ -76,11 +78,11 @@ require_once('header-home.php');
 
   <div class="destaque">
     <a href="socioambiental#ebook-contrario" title="E-book Livro ao Contrário">
-      <img src="<?= get_template_directory_uri(); ?>/assets/images/ebook-livro-ao-contrario.jpg" width="214" height="399" alt="E-book Livro ao Contrário" />
+      <img src="<?= get_template_directory_uri(); ?>/assets/images/ebook-livro-ao-contrario.webp" width="214" height="399" alt="E-book Livro ao Contrário" />
     </a>
   </div>
 </section>
 
 <?php
-require_once('footer-home.php');
+require_once('parts/footer-home.php');
 ?>

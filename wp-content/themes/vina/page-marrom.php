@@ -1,7 +1,7 @@
 <?php
 /* Template Name: Marrom */
 $estiloPagina = 'page.css';
-require_once('header.php');
+require_once('parts/header.php');
 ?>
 
 <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
@@ -17,7 +17,7 @@ require_once('header.php');
       </div>
     </section>
 
-    <?php get_template_part('template_parts/galeria'); ?>
+    <?php get_template_part('parts/galeria'); ?>
 
   <?php endwhile;
 else : ?>
@@ -27,5 +27,5 @@ else : ?>
 <?php endif; ?>
 
 <?php
-require_once('footer.php');
+require_once('parts/footer.php');
 ?>

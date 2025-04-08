@@ -1,6 +1,6 @@
 <?php
 $estiloPagina = 'page.css';
-require_once('header.php');
+require_once('parts/header.php');
 
 // ativação do loop
 if (have_posts()) : while (have_posts()) : the_post();
@@ -55,5 +55,5 @@ else : ?>
 <?php endif; ?>
 
 <?php
-require_once('footer.php');
+require_once('parts/footer.php');
 ?>

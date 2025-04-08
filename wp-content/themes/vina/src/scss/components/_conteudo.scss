@@ -75,6 +75,7 @@
       color: $secondary;
       border-color: $white;
     }
+
     a {
       color: $white;
       text-decoration: underline;
@@ -156,6 +157,7 @@
         }
       }
     }
+
     a {
       transition: all ease-in-out 0.25s;
 
@@ -293,6 +295,7 @@
         transition: all ease-in-out 0.25s;
       }
     }
+
     p {
       margin-left: 1rem;
     }
@@ -309,6 +312,11 @@
     li {
       list-style: none;
       margin-bottom: 0.25rem;
+
+      .nav-link {
+        display: block;
+        padding: .5rem 0;
+      }
 
       &.active {
         .nav-link {

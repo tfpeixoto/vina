@@ -1,22 +1,24 @@
 .slideshow {
+  background-color: black !important; // remove
   display: flex;
   justify-content: center;
   width: 100%;
 
   @include media-breakpoint-up(sm) {
-    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
   }
 
   &#galeria-home {
     background: $black;
-    height: 100vh;
+    height: 100dvh;
 
     .carousel {
       .carousel-item {
+
         .img-mobile,
         .img-desktop {
-          height: 100vh;
+          height: 100dvh;
         }
       }
     }
@@ -25,7 +27,7 @@
       position: absolute;
       left: 25px;
       top: 150px;
-      z-index: 1000;
+      z-index: 2;
 
       @include media-breakpoint-up(sm) {
         left: 75px;
@@ -63,6 +65,7 @@
 
     .carousel {
       .carousel-item {
+
         .img-mobile,
         .img-desktop {
           min-height: 50vh;
@@ -73,11 +76,25 @@
         }
       }
     }
+
+    .carousel-indicators {
+      justify-content: center;
+    }
+
+    .sr-only {
+      display: none;
+      visibility: hidden;
+    }
   }
 
   .carousel-indicators {
+    justify-content: flex-end;
     margin-bottom: 1.25rem;
     z-index: 100;
+
+    @include media-breakpoint-up(sm) {
+      justify-content: center;
+    }
 
     button {
       background-color: $white;
@@ -106,24 +123,23 @@
       .img-desktop {
         object-fit: cover;
         object-position: center center;
-        // height: 100vh;
         width: 100%;
 
         @include media-breakpoint-up(sm) {
           height: auto;
-          // min-height: 100vh;
           width: 100vw;
         }
       }
 
       .carousel-caption {
-        bottom: 35%;
+        bottom: 30%;
         text-transform: uppercase;
 
         .marca-slide {
           margin-bottom: 2rem;
           width: 250px !important;
         }
+
         h5 {
           font-size: 1.5rem;
           font-weight: 400;
