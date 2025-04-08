@@ -1,6 +1,6 @@
 <?php
 $estiloPagina = 'page.css';
-require_once('parts/header.php');
+require_once('header.php');
 ?>
 
 <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
@@ -16,7 +16,7 @@ require_once('parts/header.php');
       </div>
     </section>
 
-    <?php get_template_part('parts/galeria'); ?>
+    <?php get_template_part('template_parts/galeria'); ?>
 
   <?php endwhile;
 else : ?>
@@ -26,5 +26,5 @@ else : ?>
 <?php endif; ?>
 
 <?php
-require_once('parts/footer.php');
+require_once('footer.php');
 ?>

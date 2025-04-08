@@ -1,7 +1,7 @@
 <?php
 /* Template Name: Socioambiental */
 $estiloPagina = 'page.css';
-require_once('parts/header.php');
+require_once('header.php');
 ?>
 
 <section class="banner-interno socioambiental">
@@ -42,9 +42,9 @@ require_once('parts/header.php');
 
     <div class="row justify-content-center">
       <div class="col-12 col-md-10 socioambiental__galeria">
-        <div id="galeria-socioambiental" class="carousel slide">
+        <div id="galeria-socioambiental" class="carousel slide" data-ride="carousel">
           <div class="carousel-inner">
-            <div class="carousel-item active">
+            <div class="carousel-item">
               <img class="d-block" src="<?php bloginfo('template_url'); ?>/assets/images/galeria-socioambiental/socioambiental-origem.jpg" alt="Vina + UFMG">
               <div class="carousel-caption d-md-block">
                 <h5>A ORIGEM</h5>
@@ -89,22 +89,22 @@ require_once('parts/header.php');
             </div>
           </div>
 
-          <div class="carousel-indicators">
-            <button type="button" data-bs-target="#galeria-socioambiental" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1">Nossa Origem</button>
-            <button type="button" data-bs-target="#galeria-socioambiental" data-bs-slide-to="1" aria-label="Slide 2">Parceria UFMG</button>
-            <button type="button" data-bs-target="#galeria-socioambiental" data-bs-slide-to="2" aria-label="Slide 3">Projeto Aracê</button>
-            <button type="button" data-bs-target="#galeria-socioambiental" data-bs-slide-to="3" aria-label="Slide 4">Empresa Parque</button>
-            <button type="button" data-bs-target="#galeria-socioambiental" data-bs-slide-to="4" aria-label="Slide 5">Práticas Socioambientais</button>
-          </div>
+          <ol class="carousel-indicators" href="#galeria-socioambiental">
+            <li data-target="#galeria-socioambiental" data-slide-to="0">Nossa Origem</li>
+            <li data-target="#galeria-socioambiental" data-slide-to="1">Parceria UFMG</li>
+            <li data-target="#galeria-socioambiental" data-slide-to="2">Projeto Aracê</li>
+            <li data-target="#galeria-socioambiental" data-slide-to="3">Empresa Parque</li>
+            <li data-target="#galeria-socioambiental" data-slide-to="4">Práticas Socioambientais</li>
+          </ol>
 
-          <button class="carousel-control-prev" type="button" data-bs-target="#galeria-socioambiental" data-bs-slide="prev">
+          <a class="carousel-control-prev" href="#galeria-socioambiental" role="button" data-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Anterior</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#galeria-socioambiental" data-bs-slide="next">
+            <span class="sr-only">Anterior</span>
+          </a>
+          <a class="carousel-control-next" href="#galeria-socioambiental" role="button" data-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Próximo</span>
-          </button>
+            <span class="sr-only">Próximo</span>
+          </a>
         </div>
       </div>
     </div>
@@ -112,5 +112,5 @@ require_once('parts/header.php');
 </section>
 
 <?php
-require_once('parts/footer.php');
+require_once('footer.php');
 ?>

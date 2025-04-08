@@ -2,7 +2,7 @@
 /* Template name: Blog */
 
 $estiloPagina = 'page.css';
-require_once('parts/header.php');
+require_once('header.php');
 
 $category = get_category(get_query_var('cat'));
 $cat_id = $category->cat_ID;
@@ -67,5 +67,5 @@ $cat_id = $category->cat_ID;
 </section>
 
 <?php
-require_once('parts/footer.php');
+require_once('footer.php');
 ?>

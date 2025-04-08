@@ -1,0 +1,134 @@
+header {
+  position: fixed;
+  top: 0;
+  z-index: 10;
+  width: 100vw;
+
+  .navbar-toggler {
+    border: 2px solid $white;
+    width: 50px;
+
+    .navbar-toggler-trace {
+      background: $white;
+      border-radius: 50px;
+      content: " ";
+      display: block;
+      height: 3px;
+      margin: 5px 0;
+      width: 100%;
+    }
+  }
+
+  //header home
+  &.header__home {
+    background: $black;
+
+    #navheader {
+      display: none;
+
+      &.show {
+        display: block;
+
+        .nav-item {
+          &.active {
+            .nav-link {
+              color: $primary;
+
+              @include media-breakpoint-up(md) {
+                color: $primary;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .navbar-nav {
+      margin-top: 2rem;
+      margin-left: auto;
+
+      @include media-breakpoint-up(md) {
+        margin-top: 0;
+      }
+
+      .nav-item {
+        &.active {
+          .nav-link {
+            color: $secondary;
+
+            @include media-breakpoint-up(md) {
+              color: $primary;
+            }
+          }
+        }
+
+        .nav-link {
+          color: $white;
+          font-size: 1rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          transition: all ease-in-out 0.25s;
+
+          &:hover {
+            color: $primary;
+            font-weight: 700;
+          }
+        }
+      }
+    }
+  }
+
+  // header-geral
+  &.header__geral {
+    background: $secondary;
+    color: $white;
+
+    #navheader {
+      display: none;
+
+      &.show {
+        display: block;
+
+        .nav-item {
+          &.active {
+            .nav-link {
+              color: $primary;
+
+              @include media-breakpoint-up(md) {
+                color: $primary;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .navbar-nav {
+      margin-top: 2rem;
+      margin-left: auto;
+
+      @include media-breakpoint-up(md) {
+        margin-top: 0;
+      }
+      .nav-item {
+        &.active {
+          .nav-link {
+            color: $primary;
+          }
+        }
+        .nav-link {
+          color: $white;
+          font-size: 1rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          transition: all ease-in-out 0.25s;
+
+          &:hover {
+            color: $primary;
+            font-weight: 700;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 <?php
 $estiloPagina = 'page.css';
-require_once('parts/header.php');
+require_once('header.php');
 ?>
 
 <section class="conteudo">
@@ -15,8 +15,8 @@ require_once('parts/header.php');
   </div>
 </section>
 
-<?php get_template_part('parts/galeria'); ?>
+<?php get_template_part('template_parts/galeria'); ?>
 
 <?php
-require_once('parts/footer.php');
+require_once('footer.php');
 ?>

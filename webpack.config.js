@@ -11,7 +11,7 @@ const autoprefixer = require('autoprefixer')
 const jquery = require('jquery')
 var webpack = require("webpack")
 
-THEME_NAME = 'vina'
+THEME_NAME = 'vina-2025'
 JS_DIR = path.resolve(__dirname, `wp-content/themes/${THEME_NAME}/src/js`)
 CSS_DIR = path.resolve(__dirname, `wp-content/themes/${THEME_NAME}/src/css`)
 THEME_DIR = path.resolve(__dirname, `wp-content/themes/${THEME_NAME}`)
