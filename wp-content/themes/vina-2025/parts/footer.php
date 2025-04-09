@@ -24,9 +24,11 @@
         ?>
 
         <ul class="redes-sociais">
-          <li class="marca"><a href="<?= site_url(); ?>">
-              <img src="<?= get_template_directory_uri(); ?>/assets/images/marca-vina.svg" alt="Vina Gestão de Resíduos Sólidos e Locação de Equipamentos" />
-            </a></li>
+          <li class="marca">
+            <a href="<?= site_url(); ?>">
+              <img src="<?= get_template_directory_uri(); ?>/assets/images/marca-vina.svg" alt="Vina Gestão de Resíduos Sólidos e Locação de Equipamentos" width="125" height="38" />
+            </a>
+          </li>
           <li>
             <a href="https://www.linkedin.com/company/vina-gestao-de-residuos" target="_blank" rel="noopener noreferrer">
               <img src="<?= get_template_directory_uri(); ?>/assets/images/icone-linkedin.svg" alt="Linkedin Vina" />

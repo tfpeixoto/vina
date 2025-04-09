@@ -2,6 +2,13 @@
 /* Template Name: Marrom */
 $estiloPagina = 'page.css';
 require_once('parts/header.php');
+
+echo 'Página';
+echo !is_page('vina-gestao-de-residuos');
+echo 'Admin';
+echo !is_admin();
+echo "Duas";
+echo !is_admin() || !is_page('vina-gestao-de-residuos');
 ?>
 
 <?php if (have_posts()) : while (have_posts()) : the_post(); ?>

@@ -14,7 +14,7 @@ if ($images) : ?>
         ?>
 
           <div class="carousel-item <?= $contadorSlides === 0 ? 'active' : ''; ?>">
-            <img class="d-block img-desktop" src="<?= esc_url($image['url']); ?>" alt="<?= esc_attr($image['alt']); ?>">
+            <img class="d-block img-desktop" src="<?= esc_url($image['url']); ?>" alt="<?= esc_attr($image['alt']); ?>" width="2500" height="1400" loading="lazy">
           </div>
 
         <?php
@@ -37,12 +37,12 @@ if ($images) : ?>
 
       <?php endif; ?>
 
-      <button type="button" class="carousel-control-prev" data-bs-target="#<?= $ancora ? "slide-{$ancora}" : "slideGaleria" ?>" data-bs-slide="prev">
+      <button type="button" class="carousel-control-prev" aria-label="Anterior" data-bs-target="#<?= $ancora ? "slide-{$ancora}" : "slideGaleria" ?>" data-bs-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Anterior</span>
       </button>
 
-      <button type="button" class="carousel-control-next" data-bs-target="#<?= $ancora ? "slide-{$ancora}" : "slideGaleria" ?>" data-bs-slide="next">
+      <button type="button" class="carousel-control-next" aria-label="Próximo" data-bs-target="#<?= $ancora ? "slide-{$ancora}" : "slideGaleria" ?>" data-bs-slide="next">
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Próximo</span>
       </button>

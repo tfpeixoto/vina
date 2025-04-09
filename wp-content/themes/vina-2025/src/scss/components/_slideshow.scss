@@ -71,6 +71,7 @@
           min-height: 50vh;
 
           @include media-breakpoint-up(sm) {
+            aspect-ratio: 9/5;
             min-height: 100vh;
           }
         }

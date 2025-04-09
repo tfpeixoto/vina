@@ -27,7 +27,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;700&display=swap" rel="stylesheet">
   <?php wp_head(); ?>
 </head>
 
@@ -39,8 +39,8 @@
   <header class="header <?= is_front_page() ? 'header__home' : 'header__geral'; ?>">
     <div class="container">
       <nav class="navbar navbar-expand-lg">
-        <a href="<?= $url = home_url(); ?>" class="custom-logo-link" title="<?php bloginfo('title'); ?>">
-          <img src="<?= get_template_directory_uri(); ?>/assets/images/marca-vina.svg" width="150" height="46" class="custom-logo" alt="<?php bloginfo('title'); ?>" />
+        <a href="<?= $url = home_url(); ?>" class="custom-logo-link">
+          <img src="<?= get_template_directory_uri(); ?>/assets/images/marca-vina.svg" width="150" height="46" class="custom-logo" alt="Marca da Vina" />
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navheader" aria-controls="navheader" aria-expanded="false" aria-label="Alterna navegação">

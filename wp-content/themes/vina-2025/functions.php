@@ -56,7 +56,7 @@ function vina_scripts()
     wp_enqueue_script('lightbox', 'https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js', array('bootstrap'), '5.3.0', true); // identify page
   }
 
-  wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.js', array(), '5.3.1', true);
+  wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js', array(), '5.3.1', true);
 }
 add_action('wp_enqueue_scripts', 'vina_scripts');
 
@@ -303,14 +303,22 @@ function hot_set_headers_seo()
 add_action('send_headers', 'hot_set_headers_seo');
 
 /*
- * Remove o css do Gutenberg
+ * Remove Gutemberg's css
  */
 function remover_css_block_library()
 {
-  if (!is_admin()) {
+  if (!is_admin() && !is_page('vina-gestao-de-residuos')) {
     wp_dequeue_style('wp-block-library');
     wp_dequeue_style('wp-block-library-theme');
     wp_dequeue_style('global-styles');
   }
 }
-// add_action('wp_enqueue_scripts', 'remover_css_block_library', 100);
+add_action('wp_enqueue_scripts', 'remover_css_block_library', 100);
+
+/*
+  * Identify device
+  */
+function is_mobile_device()
+{
+  return preg_match('/(android|iphone|ipad|ipod|blackberry|windows phone)/i', $_SERVER['HTTP_USER_AGENT']);
+}
