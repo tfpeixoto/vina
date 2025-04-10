@@ -1,5 +1,7 @@
 <?php
 
+include_once('includes/cpt.php');
+
 // FUNCOES DO TEMA
 function vina_adiciona_recursos_tema()
 {
@@ -91,6 +93,7 @@ function tempoDeLeitura()
 
   // $tempo .= ' ('. $word_count .' palavras, '. $char_count .' caracteres)';
   $tempo_leitura = $tempo;
+
   return $tempo_leitura;
 }
 add_shortcode('shortcode-tempo-leitura', 'tempoDeLeitura');
@@ -117,105 +120,6 @@ function vina_paginacao()
     // 'end_size' => 1,
   ));
 }
-
-// POST TYPE SERVICOS
-function vina_post_type_servicos()
-{
-  $nomeSingular = 'Serviço';
-  $nomePlural = 'Serviços';
-  $description = $nomeSingular . ' da Vina';
-
-  $labels = array(
-    'name' => $nomePlural,
-    'singular_name' => $nomeSingular,
-    'add_new_item' => "Adicionar novo " . $nomeSingular,
-    'edit_item' => 'Editar ' . $nomeSingular,
-  );
-
-  $supports = array(
-    'title',
-    'editor',
-    'thumbnail'
-  );
-
-  $args = array(
-    'labels' => $labels,
-    'public' => true,
-    'description' => $description,
-    'menu_icon' => 'dashicons-palmtree',
-    'show_in_rest' => true,
-    'supports' => $supports,
-  );
-
-  register_post_type('servicos', $args);
-}
-add_action('init', 'vina_post_type_servicos');
-
-
-// POST TYPE SLIDESHOW
-function vina_post_type_slideshow()
-{
-  $nomeSingular = 'Slide';
-  $nomePlural = 'Slides';
-  $description = $nomeSingular . ' da Vina';
-
-  $labels = array(
-    'name' => $nomePlural,
-    'singular_name' => $nomeSingular,
-    'add_new_item' => "Adicionar novo " . $nomeSingular,
-    'edit_item' => 'Editar ' . $nomeSingular,
-  );
-
-  $supports = array(
-    'title',
-    'editor',
-    'thumbnail'
-  );
-
-  $args = array(
-    'labels' => $labels,
-    'public' => true,
-    'description' => $description,
-    'menu_icon' => 'dashicons-format-gallery',
-    'supports' => $supports,
-  );
-
-  register_post_type('slideshow', $args);
-}
-add_action('init', 'vina_post_type_slideshow');
-
-// POST TYPE GALERIAS
-function vina_post_type_galerias()
-{
-  $nomeSingular = 'Galeria';
-  $nomePlural = 'Galerias';
-  $description = $nomeSingular . ' da Vina';
-
-  $labels = array(
-    'name' => $nomePlural,
-    'singular_name' => $nomeSingular,
-    'add_new_item' => "Adicionar novo " . $nomeSingular,
-    'edit_item' => 'Editar ' . $nomeSingular,
-  );
-
-  $supports = array(
-    'title',
-    'editor',
-    'thumbnail'
-  );
-
-  $args = array(
-    'labels' => $labels,
-    'public' => true,
-    'description' => $description,
-    'menu_icon' => 'dashicons-format-gallery',
-    'show_in_rest' => true,
-    'supports' => $supports,
-  );
-
-  register_post_type('galerias', $args);
-}
-add_action('init', 'vina_post_type_galerias');
 
 // Configs do Gutemberg
 function vina_config()
@@ -248,14 +152,6 @@ function vina_config()
   ));
 }
 add_action('after_setup_theme', 'vina_config', 0);
-
-
-// Remover o block-library/style.css
-// function wpassist_remove_block_library_css()
-// {
-//   wp_dequeue_style('wp-block-library');
-// }
-// add_action('wp_enqueue_scripts', 'wpassist_remove_block_library_css');
 
 /**
  * Disable the emoji's

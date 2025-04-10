@@ -20,6 +20,25 @@ header {
     }
   }
 
+  .nav-item {
+    &.dropdown {
+      .dropdown-menu {
+        background-color: $secondary;
+
+        .dropdown-item {
+          background-color: $secondary;
+          border-radius: 0;
+          color: white;
+
+          &:hover {
+            background-color: $primary;
+            color: $white;
+          }
+        }
+      }
+    }
+  }
+
   //header home
   &.header__home {
     background: $black;

@@ -8,7 +8,7 @@ require_once('parts/header.php');
     <div class="row justify-content-start">
       <div class="col-12 col-md-8">
         <h1><?php the_title(); ?></h1>
-        <p><strong><?php $data = get_the_date(); echo $data ?></strong></p>
+        <p><strong><?php $data = get_the_date(); echo $data ?> - <?= do_shortcode('[shortcode-tempo-leitura]'); ?></strong></p>
         <?php the_content(); ?>
       </div>
     </div>

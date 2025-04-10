@@ -266,10 +266,9 @@
 
         @include media-breakpoint-up(md) {
           color: $secondary;
-          content: "\f054 ";
-          display: block;
+          content: "→ ";
+          display: flex;
           float: left;
-          font-family: "Font Awesome 5 Free";
           font-size: 1rem;
           font-weight: 900;
           height: 1rem;
@@ -291,6 +290,8 @@
 
       a {
         color: $secondary;
+        display: block;
+        padding-left: 1.5rem;
         text-decoration: none;
         transition: all ease-in-out 0.25s;
       }
