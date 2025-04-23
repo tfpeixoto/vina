@@ -100,10 +100,10 @@ function vina_post_type_galerias()
 add_action('init', 'vina_post_type_galerias');
 
 // POST TYPE LPS
-function vina_post_type_landing_pages()
+function vina_post_type_ebooks()
 {
-  $nomeSingular = 'Landing Page';
-  $nomePlural = 'Landing Pages';
+  $nomeSingular = 'Ebook';
+  $nomePlural = 'Ebooks';
   $description = $nomeSingular . ' da Vina';
 
   $labels = array(
@@ -128,6 +128,6 @@ function vina_post_type_landing_pages()
     'supports' => $supports,
   );
 
-  register_post_type('landing-pages', $args);
+  register_post_type('ebooks', $args);
 }
-add_action('init', 'vina_post_type_landing_pages');
+add_action('init', 'vina_post_type_ebooks');

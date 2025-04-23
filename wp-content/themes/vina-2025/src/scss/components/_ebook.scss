@@ -1,0 +1,64 @@
+.ebook {
+  background: url(../images/padrao-laranja.jpg) repeat;
+  color: $white;
+  padding: 9rem 0 6rem 0;
+
+  &__container {
+    align-items: center;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+
+    @include media-breakpoint-up(lg) {
+      grid-template-columns: 1fr 2fr;
+      gap: 5rem;
+    }
+  }
+
+  &__content {
+    h1 {
+      border-bottom: 1px solid white;
+      border-right: 1px solid white;
+      border-bottom-right-radius: 10px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 3rem;
+      padding: 0 1rem 1rem 0;
+      width: fit-content;
+
+      @include media-breakpoint-up(md) {
+        font-size: 2rem;
+        max-width: 75%;
+      }
+    }
+
+    a {
+      color: white;
+
+      &:hover {
+        color: $secondary;
+        text-decoration: underline;
+      }
+    }
+
+    &__btn {
+      margin-top: 3rem;
+
+      .btn {
+        background: $secondary;
+        border-radius: 100px;
+        color: $white;
+        font-size: 1.2rem;
+        padding: 1rem 2rem;
+        text-decoration: none;
+        transition: all 0.25s ease-in-out;
+
+        &:hover {
+          background: $white;
+          color: $secondary;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}

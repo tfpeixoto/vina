@@ -6,13 +6,6 @@ require_once('parts/header.php');
 
 <section class="banner-interno socioambiental">
   <?php the_post_thumbnail(); ?>
-
-  <div class="container">
-    <div class="row">
-      <div class="col-12">
-      </div>
-    </div>
-  </div>
 </section>
 
 <section class="conteudo socioambiental">
