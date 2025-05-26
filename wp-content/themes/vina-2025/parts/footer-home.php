@@ -1,15 +1,7 @@
-<footer class="footer-geral">
+<footer class="footer footer-home">
   <div class="container">
-    <div class="row d-flex justify-content-between">
-      <div class="col-12 col-md-8 footer-geral__endereco">
-        <p>Telefone: <a href="tel:+553134798181">(31) 3479-8181</a><br />
-          Endereço: Av. Perimetral, 2521<br />
-          Distrito Industrial do Jatobá<br />
-          Cep: 30.670 - 845<br />
-          Belo Horizonte - Minas Gerais</p>
-      </div>
-
-      <div class="col-12 col-md-4 footer-geral__nav">
+    <div class="row d-flex justify-content-end">
+      <div class="col-12 col-md-10 footer-home__nav">
         <?php
         wp_nav_menu(array(
           'theme_location'  => 'menu-rodape',
@@ -22,12 +14,10 @@
           'walker'          => new WP_Bootstrap_Navwalker(),
         ));
         ?>
+      </div>
 
-        <ul class="redes-sociais">
-          <li class="marca"><a href="<?php $home = site_url();
-                                      echo $home; ?>">
-              <img src="<?php bloginfo('template_url'); ?>/assets/images/marca-vina.svg" alt="Vina Gestão de Resíduos Sólidos e Locação de Equipamentos" />
-            </a></li>
+      <div class="col-12 col-md-2 footer-home__social">
+        <ul>
           <li>
             <a href="https://www.linkedin.com/company/vina-gestao-de-residuos" target="_blank" rel="noopener noreferrer">
               <img src="<?php bloginfo('template_url'); ?>/assets/images/icone-linkedin.svg" alt="Linkedin Vina" />
