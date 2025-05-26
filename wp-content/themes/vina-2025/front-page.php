@@ -77,8 +77,8 @@ require_once('parts/header.php');
     </button>
   </div>
 
-  <a href="socioambiental#ebook-contrario" title="E-book Livro ao Contrário" class="destaque">
-    <img src="<?= get_template_directory_uri(); ?>/assets/images/ebook-livro-ao-contrario.webp" width="214" height="399" alt="E-book Livro ao Contrário" />
+  <a href="socioambiental#desafios-projeto-socioambiental" title="Desafios práticos de um projeto socioambiental de corresponsabilidade empresarial" class="destaque">
+    <img src="<?= get_template_directory_uri(); ?>/assets/images/desafios-praticos-projeto-socioambiental-corresponsabilidade-empresarial.jpeg" width="214" height="399" alt="E-book Livro ao Contrário" />
   </a>
 </section>
 
