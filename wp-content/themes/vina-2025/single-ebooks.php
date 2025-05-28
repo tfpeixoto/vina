@@ -1,5 +1,5 @@
 <?php
-/* Template Name: Laranja */
+/* Template Name: Ebooks */
 $estiloPagina = 'page.css';
 require_once('parts/header.php');
 
