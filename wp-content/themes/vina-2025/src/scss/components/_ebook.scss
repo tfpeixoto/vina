@@ -62,3 +62,37 @@
     }
   }
 }
+
+.ebooks {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @include media-breakpoint-up(lg) {
+    flex-direction: row;
+  }
+
+  &__item {
+    margin: 0 auto;;
+    max-width: 50%;
+    text-align: center;
+
+    @include media-breakpoint-up(lg) {
+      max-width: 20%;
+    }
+
+    img {
+      transition: all 0.3s ease-in-out;
+
+      &:hover {
+        transform: scale(1.07);
+      }
+    }
+
+    h2 {
+      font-size: 1rem;
+      color: $secondary;
+      margin-top: 1rem;
+    }
+  }
+}
