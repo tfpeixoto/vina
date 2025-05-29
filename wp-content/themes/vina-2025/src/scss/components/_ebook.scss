@@ -64,21 +64,23 @@
 }
 
 .ebooks {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 1rem;
 
   @include media-breakpoint-up(lg) {
-    flex-direction: row;
+    grid-template-columns: repeat(5, 1fr);
   }
 
   &__item {
-    margin: 0 auto;;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
     max-width: 50%;
     text-align: center;
 
     @include media-breakpoint-up(lg) {
-      max-width: 20%;
+      max-width: 100%;
     }
 
     img {

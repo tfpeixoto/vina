@@ -24,9 +24,9 @@ require_once('parts/header.php');
 
               <article class="ebooks__item">
                 <a href="<?php the_permalink(); ?>" rel="noopener">
-                  <?php the_post_thumbnail('full', array('class' => 'img-fluid')); ?>
+                  <?php the_post_thumbnail('full', array('class' => 'img-fluid ebooks__image')); ?>
                 </a>
-                <h2><?php the_title(); ?></h2>
+                <h2><?php the_field('nome_capitulo'); ?></h2>
               </article>
 
             <?php endwhile;
