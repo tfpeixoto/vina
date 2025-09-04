@@ -19,6 +19,11 @@
       <div class="col-12 col-md-2 footer-home__social">
         <ul>
           <li>
+            <a href="https://www.linkedin.com/company/vina-gestao-de-residuos" target="_blank" rel="noopener noreferrer">
+              <img src="<?php bloginfo('template_url'); ?>/assets/images/icone-linkedin.svg" alt="Linkedin Vina" />
+            </a>
+          </li>
+          <li>
             <a href="https://www.facebook.com/vinasocial/" target="_blank" rel="noopener noreferrer">
               <img src="<?php bloginfo('template_url'); ?>/assets/images/icone-facebook.svg" alt="Facebook Vina" />
             </a>
@@ -33,6 +38,9 @@
     </div>
   </div>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 
 <?php wp_footer(); ?>
 </body>
