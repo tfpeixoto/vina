@@ -5,7 +5,7 @@
 #
 # Note: if you want to stage/commit WP core files
 # you can delete this whole section/until Configuration.
-/wp-admin/
+/wp-admin
 /wp-content/index.php
 /wp-content/languages
 /wp-content/plugins/index.php
@@ -20,7 +20,7 @@
 # Configuration
 wp-config.php
 
-# Example themes
+# All themes
 /wp-content/themes/twenty*/
 
 # Uploads
@@ -39,18 +39,10 @@ package-lock.json
 # uncomment the next line
 /wp-content/plugins
 
-# All themes
-#
-# Note: If you wish to whitelist themes,
-# uncomment the next line
-assinatura
-node_modules
-tmpnodejsnpm-cache
-wp-content/uploads
-wp-content/updraft
-
-wp-content/webp-express/webp-images
-wp-content/webp-express/config/config.json
-wp-content/webp-express/config/wod-options.json
-wp-content/webp-express/htaccess-capability-tests/header-set/request-me.txt
-wp-content/webp-express/htaccess-capability-tests/pass-info-from-rewrite-to-script-through-env/test.php
+# Others
+/assinatura
+/node_modules
+/wp-content/uploads
+/wp-content/updraft
+/wp-content/ai1wm-backups
+/wp-content/webp-express
