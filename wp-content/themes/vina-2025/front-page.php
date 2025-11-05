@@ -6,7 +6,7 @@ require_once('parts/header.php');
 ?>
 
 <section id="galeria-home" class="slideshow">
-  <div id="slideHome" class="carousel slide">
+  <div id="slideHome" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
     <div class="carousel-indicators">
       <?php
       $contadorSlides = 0;

@@ -29,6 +29,11 @@ header {
           background-color: $secondary;
           border-radius: 0;
           color: white;
+          white-space: initial;
+
+          @include media-breakpoint-up(md) {
+            white-space: nowrap;
+          }
 
           &:hover {
             background-color: $primary;

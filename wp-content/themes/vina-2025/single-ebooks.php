@@ -16,7 +16,7 @@ if (have_posts()) : while (have_posts()) : the_post(); ?>
           <?php the_content(); ?>
 
           <div class="ebook__content__btn">
-            <a href="<?= get_field('link_ebook'); ?>" class="btn btn-primary" target="_blank"><?= get_field('label'); ?></a>
+            <a id="<?= get_field('id_ebook'); ?>" href="<?= get_field('link_ebook'); ?>" class="btn btn-primary" target="_blank"><?= get_field('label'); ?></a>
           </div>
         </div>
       </div>
