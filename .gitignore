@@ -1,48 +1,35 @@
-# Wordpress - ignore core, configuration, examples, uploads and logs.
-# https://github.com/github/gitignore/blob/main/WordPress.gitignore
-
-# Core
-#
-# Note: if you want to stage/commit WP core files
-# you can delete this whole section/until Configuration.
-/wp-admin
-/wp-content/index.php
-/wp-content/languages
-/wp-content/plugins/index.php
-/wp-content/themes/index.php
+# WordPress Core
+/wp-admin/
 /wp-includes/
+/wp-content/index.php
+/wp-content/languages/
+/wp-content/plugins/
+/wp-content/themes/index.php
 /index.php
 /license.txt
 /readme.html
 /wp-*.php
 /xmlrpc.php
 
-# Configuration
+# Configuration & Local Environment
 wp-config.php
-
-# All themes
-/wp-content/themes/twenty*/
-
-# Uploads
-/wp-content/uploads/
-
-# Log files
-*.log
-
-# htaccess
 .htaccess
-package-lock.json
-
-# All plugins
-#
-# Note: If you wish to whitelist plugins,
-# uncomment the next line
-/wp-content/plugins
-
-# Others
+local-*.php
 /assinatura
-/node_modules
-/wp-content/uploads
-/wp-content/updraft
-/wp-content/ai1wm-backups
-/wp-content/webp-express
+
+# Dependencies
+/node_modules/
+/vendor/
+
+# Themes (Ignore legacy and default themes)
+/wp-content/themes/twenty*/
+/wp-content/themes/vina/
+
+# Uploads, Backups & Cache
+/wp-content/uploads/
+/wp-content/updraft/
+/wp-content/ai1wm-backups/
+/wp-content/webp-express/
+
+# Logs
+*.log

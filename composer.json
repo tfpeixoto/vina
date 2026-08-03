@@ -1,0 +1,44 @@
+{
+  "name": "tfpeixoto/vina",
+  "description": "Site Vina Gestao de Residuos Solidos",
+  "type": "project",
+  "license": "proprietary",
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://wpackagist.org",
+      "only": [
+        "wpackagist-plugin/*",
+        "wpackagist-theme/*"
+      ]
+    }
+  ],
+  "require": {
+    "php": ">=8.0",
+    "composer/installers": "^2.2",
+    "johnpbloch/wordpress-core": "^6.7",
+    "wpackagist-plugin/advanced-custom-fields": "*",
+    "wpackagist-plugin/all-in-one-wp-migration": "*",
+    "wpackagist-plugin/classic-editor": "*",
+    "wpackagist-plugin/cloudflare": "*",
+    "wpackagist-plugin/contact-form-7": "*",
+    "wpackagist-plugin/export-featured-images": "*",
+    "wpackagist-plugin/seo-by-rank-math": "*",
+    "wpackagist-plugin/webp-express": "*",
+    "wpackagist-plugin/wp-asset-clean-up": "*"
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true,
+      "johnpbloch/wordpress-core-installer": true
+    },
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
+  "extra": {
+    "wordpress-install-dir": ".",
+    "installer-paths": {
+      "wp-content/plugins/{$name}/": ["type:wordpress-plugin"]
+    }
+  }
+}

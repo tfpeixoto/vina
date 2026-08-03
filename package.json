@@ -38,7 +38,6 @@
     "imagemin-optipng": "^8.0.0",
     "imagemin-svgo": "^10.0.1",
     "mini-css-extract-plugin": "^2.7.2",
-    "node-sass": "^8.0.0",
     "patch-package": "^8.0.0",
     "postcss-loader": "^7.0.2",
     "purgecss-webpack-plugin": "^5.0.0",
