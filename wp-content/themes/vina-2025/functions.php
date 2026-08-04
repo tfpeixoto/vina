@@ -191,15 +191,11 @@ function hot_set_headers_seo()
   header('X-XSS-Protection: 1; mode=block');
   header('X-Content-Type-Options: nosniff');
   header('Referrer-Policy: same-origin');
-  header("Cache-Control: no-cache, no-store, must-revalidate");
-  header("Pragma: no-cache");
-  header("Expires: 0");
-  // header('Content-Security-Policy': 'default-src self');
 }
 add_action('send_headers', 'hot_set_headers_seo');
 
 /*
- * Remove Gutemberg's css
+ * Remove Gutemberg's css & unnecessary frontend admin scripts
  */
 function remover_css_block_library()
 {
@@ -207,6 +203,11 @@ function remover_css_block_library()
     wp_dequeue_style('wp-block-library');
     wp_dequeue_style('wp-block-library-theme');
     wp_dequeue_style('global-styles');
+  }
+
+  if (!is_user_logged_in()) {
+    wp_dequeue_script('rank-math-analytics');
+    wp_dequeue_style('rank-math-analytics');
   }
 }
 add_action('wp_enqueue_scripts', 'remover_css_block_library', 100);
@@ -218,3 +219,4 @@ function is_mobile_device()
 {
   return preg_match('/(android|iphone|ipad|ipod|blackberry|windows phone)/i', $_SERVER['HTTP_USER_AGENT']);
 }
+

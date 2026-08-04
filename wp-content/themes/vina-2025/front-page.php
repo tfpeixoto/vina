@@ -34,24 +34,25 @@ require_once('parts/header.php');
       $slides = new WP_Query($args);
       if ($slides->have_posts()) : while ($slides->have_posts()) : $slides->the_post(); ?>
 
-          <div class="carousel-item <?= $contadorSlide === 1 ? 'active' : ''; ?>">
+          <div class="carousel-item <?= $contadorSlide === 0 ? 'active' : ''; ?>">
             <?php
             $image_mobile = get_field('imagem_mobile');
+            $isFirstSlide = ($contadorSlide === 0);
             if ($image_mobile) :
             ?>
 
-              <img class="d-block d-md-none img-mobile" src="<?= $image_mobile['url'] ?>" alt="<?= $image_mobile['alt'] ?>" loading="<?= ($contadorSlide > 0 || !is_mobile_device()) ? 'lazy' : ''; ?>" width="100%" height="100%" />
+              <img class="d-block d-md-none img-mobile" src="<?= $image_mobile['url'] ?>" alt="<?= $image_mobile['alt'] ?>" loading="<?= $isFirstSlide ? 'eager' : 'lazy'; ?>" <?= $isFirstSlide ? 'fetchpriority="high"' : ''; ?> width="100%" height="100%" />
 
             <?php else : ?>
 
-              <img class="d-block d-md-none img-mobile" src="<?php the_post_thumbnail_url(); ?>" alt="<?php the_title(); ?>" loading="<?= ($contadorSlide > 0 || !is_mobile_device()) ? 'lazy' : ''; ?>" width="720" height="1280">
+              <img class="d-block d-md-none img-mobile" src="<?php the_post_thumbnail_url(); ?>" alt="<?php the_title(); ?>" loading="<?= $isFirstSlide ? 'eager' : 'lazy'; ?>" <?= $isFirstSlide ? 'fetchpriority="high"' : ''; ?> width="720" height="1280">
 
             <?php endif; ?>
 
-            <img class="d-none d-md-block img-desktop" src="<?php the_post_thumbnail_url(); ?>" width="1920" height="1080" loading="<?= ($contadorSlide > 0 || is_mobile_device()) ? 'lazy' : ''; ?>" alt="<?php the_title(); ?>">
+            <img class="d-none d-md-block img-desktop" src="<?php the_post_thumbnail_url(); ?>" width="1920" height="1080" loading="<?= $isFirstSlide ? 'eager' : 'lazy'; ?>" <?= $isFirstSlide ? 'fetchpriority="high"' : ''; ?> alt="<?php the_title(); ?>">
 
             <div class="carousel-caption">
-              <img src="<?= get_template_directory_uri(); ?>/assets/images/marca-vina.svg" class="marca-slide" width="250" height="76" loading="<?= ($contadorSlide > 0 || is_mobile_device()) ? 'lazy' : ''; ?>" alt="<?php bloginfo('title'); ?>" />
+              <img src="<?= get_template_directory_uri(); ?>/assets/images/marca-vina.svg" class="marca-slide" width="250" height="76" loading="<?= $isFirstSlide ? 'eager' : 'lazy'; ?>" alt="<?php bloginfo('title'); ?>" />
               <h5><?php the_title(); ?></h5>
             </div>
           </div>
