@@ -18,12 +18,14 @@ function wpdocs_custom_excerpt_length($length)
 }
 add_filter('excerpt_length', 'wpdocs_custom_excerpt_length', 999);
 
-// INCLUI NAV WALKER
-function register_navwalker()
+/**
+ * Register Custom Navigation Walker
+ */
+function vina_register_navwalker()
 {
-  require_once get_template_directory() . '/class-wp-bootstrap-navwalker.php';
+  require_once('includes/class-wp-bootstrap-navwalker.php');
 }
-add_action('after_setup_theme', 'register_navwalker');
+add_action('after_setup_theme', 'vina_register_navwalker');
 
 // REGISTRA MENU
 function vina_registra_menu()
@@ -40,15 +42,35 @@ add_action('after_setup_theme', 'vina_registra_menu');
 // SCRIPTS
 function vina_scripts()
 {
-  wp_enqueue_style('critital', get_template_directory_uri() . '/assets/css/critical.css', array(), '1.1', 'all');
+  wp_dequeue_script('jquery');
 
-  wp_deregister_script('jquery');
-  wp_enqueue_script('jquery', 'https://code.jquery.com/jquery-3.5.1.slim.min.js', array(), '3.5.1', true);
-  wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js', array('jquery'), '4.5.3', true);
-  wp_enqueue_script('lightbox', 'https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js', array('bootstrap'), '5.3.0', true);
-  wp_enqueue_script('acoes', get_template_directory_uri() . '/assets/js/scripts.min.js', array('lightbox'), '1.0', true);
+  if (is_front_page()) {
+    wp_enqueue_script('home', get_template_directory_uri() . '/assets/js/home.js', array('jquery'), time(), true);
+    wp_enqueue_style('current', get_template_directory_uri() . '/assets/css/home.css', array(), time());
+  } else {
+    wp_enqueue_script('acoes', get_template_directory_uri() . '/assets/js/page.js', array(), time(), true);
+    wp_enqueue_style('current', get_template_directory_uri() . '/assets/css/page.css', array(), time());
+  }
+
+  if (is_page('galeria')) {
+    wp_enqueue_script('lightbox', 'https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js', array('bootstrap'), '5.3.0', true); // identify page
+  }
+
+  wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.js', array(), '5.3.1', true);
 }
 add_action('wp_enqueue_scripts', 'vina_scripts');
+
+/*
+  * Remove o recaptcha do Contact Form 7 em página onde ele não é necessário
+  */
+function desative_recaptcha()
+{
+  if (!is_page('trabalhe-conosco') || !is_page('fale-conosco')) {
+    wp_deregister_script('google-recaptcha');
+    wp_dequeue_script('google-recaptcha');
+  }
+}
+add_action('wp_enqueue_scripts', 'desative_recaptcha', 100);
 
 /*
  * Shortcode Tempo de leitura no post
@@ -280,7 +302,15 @@ function hot_set_headers_seo()
 }
 add_action('send_headers', 'hot_set_headers_seo');
 
-
-// desative css and js for Recaptcha
-add_filter('wpcf7_load_js', '__return_false');
-add_filter('wpcf7_load_css', '__return_false');
+/*
+ * Remove o css do Gutenberg
+ */
+function remover_css_block_library()
+{
+  if (!is_admin()) {
+    wp_dequeue_style('wp-block-library');
+    wp_dequeue_style('wp-block-library-theme');
+    wp_dequeue_style('global-styles');
+  }
+}
+// add_action('wp_enqueue_scripts', 'remover_css_block_library', 100);
