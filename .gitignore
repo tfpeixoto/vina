@@ -1,35 +1,56 @@
-# WordPress Core
+# Wordpress - ignore core, configuration, examples, uploads and logs.
+# https://github.com/github/gitignore/blob/main/WordPress.gitignore
+
+# Core
+#
+# Note: if you want to stage/commit WP core files
+# you can delete this whole section/until Configuration.
 /wp-admin/
-/wp-includes/
 /wp-content/index.php
-/wp-content/languages/
-/wp-content/plugins/
+/wp-content/languages
+/wp-content/plugins/index.php
 /wp-content/themes/index.php
+/wp-includes/
 /index.php
 /license.txt
 /readme.html
 /wp-*.php
 /xmlrpc.php
 
-# Configuration & Local Environment
+# Configuration
 wp-config.php
-.htaccess
-local-*.php
-/assinatura
 
-# Dependencies
-/node_modules/
-/vendor/
-
-# Themes (Ignore legacy and default themes)
+# Example themes
 /wp-content/themes/twenty*/
-/wp-content/themes/vina/
 
-# Uploads, Backups & Cache
+# Uploads
 /wp-content/uploads/
-/wp-content/updraft/
-/wp-content/ai1wm-backups/
-/wp-content/webp-express/
 
-# Logs
+# Log files
 *.log
+
+# htaccess
+.htaccess
+package-lock.json
+
+# All plugins
+#
+# Note: If you wish to whitelist plugins,
+# uncomment the next line
+/wp-content/plugins
+
+# All themes
+#
+# Note: If you wish to whitelist themes,
+# uncomment the next line
+assinatura
+node_modules
+tmpnodejsnpm-cache
+wp-content/uploads
+wp-content/updraft
+
+wp-content/webp-express/webp-images
+wp-content/webp-express/config/config.json
+wp-content/webp-express/config/wod-options.json
+wp-content/webp-express/htaccess-capability-tests/header-set/request-me.txt
+wp-content/webp-express/htaccess-capability-tests/pass-info-from-rewrite-to-script-through-env/test.php

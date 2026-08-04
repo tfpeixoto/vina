@@ -11,7 +11,7 @@ const autoprefixer = require('autoprefixer')
 const jquery = require('jquery')
 var webpack = require("webpack")
 
-THEME_NAME = 'vina-2025'
+THEME_NAME = 'vina'
 JS_DIR = path.resolve(__dirname, `wp-content/themes/${THEME_NAME}/src/js`)
 CSS_DIR = path.resolve(__dirname, `wp-content/themes/${THEME_NAME}/src/css`)
 THEME_DIR = path.resolve(__dirname, `wp-content/themes/${THEME_NAME}`)
@@ -125,16 +125,7 @@ const config = {
               }
             }
           },
-          {
-            loader: 'sass-loader',
-            options: {
-              sassOptions: {
-                includePaths: [
-                  path.resolve(__dirname, 'node_modules')
-                ]
-              }
-            }
-          }
+          'sass-loader'
         ]
       },
 

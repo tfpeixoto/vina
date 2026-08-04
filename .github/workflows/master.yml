@@ -1,40 +1,19 @@
 on:
   push:
     branches:
-      - main
       - master
 
 name: 🚀 Deploy website on push
 jobs:
   web-deploy:
-    name: 🎉 Deploy to Server
+    name: 🎉 Master
     runs-on: ubuntu-latest
     steps:
       - name: 🚚 Get latest code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: 🐘 Setup PHP & Composer
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          coverage: none
-
-      - name: 📦 Install NPM dependencies and build assets
-        run: |
-          npm ci
-          npm run build
-
-      - name: 🎼 Install Composer dependencies (Plugins & Core)
-        run: |
-          composer install --no-dev --optimize-autoloader
-
-      - name: 📂 Sync files to server
-        uses: SamKirkland/FTP-Deploy-Action@4.3.5
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
@@ -46,6 +25,3 @@ jobs:
             **/wp-content/webp-express/**
             **/wp-content/cache/**
             .htaccess
-            .git*
-            .git*/**
-            node_modules/**
